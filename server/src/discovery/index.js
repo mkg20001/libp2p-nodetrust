@@ -20,13 +20,14 @@ module.exports = (swarm, config) => {
       if (expireTime < time) {
         log('%s has expired, removing', id)
         delete discoveryDB[id]
+        delete lastUpdate[id]
         deleteId.push(id)
       }
     }
     peerIDs = peerIDs.filter(id => deleteId.indexOf(id) == -1)
   }
 
-  setInterval(updateDB, 5000)
+  setInterval(updateDB, config.interval || 5000)
 
   swarm.handle('/nodetrust/discovery/1.0.0', (protocol, conn) => {
     protos.server(conn, protos.discovery, (data, respond) => {

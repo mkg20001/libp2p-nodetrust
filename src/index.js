@@ -56,7 +56,7 @@ module.exports = class NodeTrust {
         this.cert = cert
         this.loop(err => {
           if (err) return cb(err)
-          this.interval = setInterval(4 * 60 * 1000, this.loop.bind(this)).unref()
+          this.interval = setInterval(this.loop.bind(this), 5 * 60 * 1000 - 20000).unref()
           this.enabled = true
         })
       })
@@ -78,6 +78,7 @@ module.exports = class NodeTrust {
       this.doDiscovery(this.discoveryPeers, err => {
         if (err) return cb(err)
         log("loop ok")
+        cb()
       })
     })
   }

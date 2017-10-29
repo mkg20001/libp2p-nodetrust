@@ -1,7 +1,7 @@
 'use strict'
 
 const debug = require("debug")
-const log = debug("libp2p:nodetrust:server")
+const log = debug("nodetrust:server")
 
 const libp2p = require("libp2p")
 const TCP = require("libp2p-tcp")
