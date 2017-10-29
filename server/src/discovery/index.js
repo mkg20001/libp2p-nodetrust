@@ -44,6 +44,23 @@ module.exports = (swarm, config) => {
           peerIDs.push(id)
         }
         lastUpdate[id] = new Date().getTime() + expire
+        discoveryDB[id] = data.multiaddr
+        if (data.numPeers < 0) data.numPeers = 0
+        if (data.numPeers > 100) data.numPeers = 100
+        let randItem = Math.floor(Math.random() * peerIDs.length)
+        const numPeers = data.numPeers
+        while (randItem + numPeers > peerIDs.length) randItem--
+          if (randItem < 0) randItem = 0
+        const peers = peerIDs.slice(0, numPeers).filter(i => i != id).map(id => {
+          return {
+            id,
+            multiaddr: discoveryDB[id]
+          }
+        })
+        return respond({
+          peers,
+          success: true
+        })
       })
     })
   })

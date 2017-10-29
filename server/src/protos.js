@@ -10,7 +10,7 @@ module.exports = {
   info: protobuf('message Request { } message Result { required string zone = 1; }'),
   ca: protobuf('message Request { required bytes certRequest = 1; required bytes signature = 2; } message Result { required bool success = 1; bytes certificate = 2; }'),
   dns: protobuf('message Request { required int64 time = 1; required bytes signature = 2; } message Result { required bool success = 1; }'),
-  discovery: protobuf('message Request { required int32 numPeers = 1; repeated bytes multiaddr = 2; } message Peer { required string id = 1; repeated bytes multiaddr = 2; } message Result { repeated Peer peers = 1; }'),
+  discovery: protobuf('message Request { required int32 numPeers = 1; repeated bytes multiaddr = 2; } message Peer { required string id = 1; repeated bytes multiaddr = 2; } message Result { required bool success = 1; repeated Peer peers = 2; }'),
   server: (conn, def, cb) => {
     pull(
       conn,
@@ -39,6 +39,7 @@ module.exports = {
         if (err) return cb(err)
         try {
           res = def.Result.decode(Buffer.concat(res))
+          if (!res) throw new Error("Empty result")
         } catch (e) {
           cb(err)
         }

@@ -56,7 +56,7 @@ module.exports = class NodeTrust {
         this.cert = cert
         this.loop(err => {
           if (err) return cb(err)
-          this.interval = setInterval(4 * 60 * 1000, this.loop.bind(this))
+          this.interval = setInterval(4 * 60 * 1000, this.loop.bind(this)).unref()
           this.enabled = true
         })
       })
@@ -205,8 +205,8 @@ module.exports = class NodeTrust {
         multiaddr: this.swarm.peerInfo.multiaddrs.toArray().map(addr => addr.buffer)
       }, (err, res) => {
         if (err) return cb(err)
-        if (!res.success || !res.peers || !res.peers.length) return cb(new Error('Server did not complete discovery request'))
-        this.discovery.handle(res.peers)
+        if (!res.success || !res.peers) return cb(new Error('Server did not complete discovery request'))
+        this.discovery._handle(res.peers)
         cb(null, res.peers)
       })
     })
