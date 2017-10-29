@@ -74,9 +74,9 @@ module.exports = class NodeTrust {
     log("doLoop")
     if (!cb) cb = (e) => e ? log("loop error", e) : null
     this.renewDNS(err => {
-      if (err) cb(err)
+      if (err) return cb(err)
       this.doDiscovery(this.discoveryPeers, err => {
-        if (err) cb(err)
+        if (err) return cb(err)
         log("loop ok")
       })
     })
