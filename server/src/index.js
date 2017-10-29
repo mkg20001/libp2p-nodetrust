@@ -16,13 +16,14 @@ module.exports = function NodetrustServer(config) {
 
   if (!config) throw new Error("Config is required")
   if (!config.listen) config.listen = ["/ip4/0.0.0.0/tcp/4001", "/ip6/::/tcp/4001"]
-  Array("id", "ca", "dns", "discovery").forEach(key => {
-    if (!config[key]) throw new Error("Config key '" + JSON.stringify(key) + "' missing!")
+  Array("id", "zone", "ca", "dns", "discovery").forEach(key => {
+    if (!config[key]) throw new Error("Config key " + JSON.stringify(key) + " missing!")
   })
 
   log("creating server", config)
 
   const peer = new Peer(config.id)
+  config.listen.forEach(addr => peer.multiaddrs.add(addr))
 
   const swarm = self.swarm = new libp2p({
     transport: [
@@ -37,8 +38,13 @@ module.exports = function NodetrustServer(config) {
     }
   }, peer)
 
+  swarm.zone = config.zone
+
   require("./ca")(swarm, config.ca)
   require("./dns")(swarm, config.dns)
   require("./discovery")(swarm, config.discovery)
+  require("./info")(swarm, config)
 
+  self.start = cb => swarm.start(cb)
+  self.stop = cb => swarm.stop(cb)
 }

@@ -3,10 +3,11 @@
 const protos = require('./protos')
 const Id = require('peer-id')
 const Peer = require('peer-info')
-const defaultNode = new Peer(Id.fromB58String('Qm')) //TODO: add the official node
+const defaultNode = new Peer(Id.createFromB58String('Qm')) //TODO: add the official node
 const debug = require('debug')
 const log = debug('libp2p:nodetrust')
 const EventEmitter = require("events").EventEmitter
+const forge = require("node-forge")
 
 class DiscoveryInstance extends EventEmitter {
   constructor() {
@@ -36,7 +37,7 @@ class DiscoveryInstance extends EventEmitter {
 module.exports = class NodeTrust {
   constructor(swarm, config) {
     this.swarm = swarm
-    this.config = config || {}
+    config = this.config = config || {}
     this.id = this.swarm.peerInfo.id
     this.node = config.node || defaultNode
     this.discoveryPeers = config.discoveryPeers || 20
@@ -47,13 +48,16 @@ module.exports = class NodeTrust {
 
   enable(cb) {
     log('enabling')
-    this.getCert((err, cert) => {
+    this.getInfo(err => {
       if (err) return cb(err)
-      this.cert = cert
-      this.loop(err => {
+      this.getCert((err, cert) => {
         if (err) return cb(err)
-        this.interval = setInterval(4 * 60 * 1000, this.loop.bind(this))
-        this.enabled = true
+        this.cert = cert
+        this.loop(err => {
+          if (err) return cb(err)
+          this.interval = setInterval(4 * 60 * 1000, this.loop.bind(this))
+          this.enabled = true
+        })
       })
     })
   }
@@ -77,11 +81,25 @@ module.exports = class NodeTrust {
     })
   }
 
+  // Info
+
+  getInfo(cb) {
+    if (this.info) return cb()
+    this.swarm.dial(this.node, '/nodetrust/info/1.0.0', (err, conn) => {
+      if (err) return cb(err)
+      protos.client(conn, protos.info, {}, (err, res) => {
+        if (err) return cb(err)
+        this.info = res
+        cb()
+      })
+    })
+  }
+
   // Certificate
 
   getCert(cb) {
     log('getting certificate')
-    this._getCertRequest(this.id, (err, request) => {
+    this._getCertRequest(this.info, (err, request) => {
       if (err) return cb(err)
       this.id.sign(request, (err, sign) => {
         if (err) return cb(err, sign)
@@ -102,8 +120,55 @@ module.exports = class NodeTrust {
       })
     })
   }
-  _getCertRequest(id, cb) {
-
+  _getCertRequest(info, cb) {
+    const keys = forge.pki.rsa.generateKeyPair(1024) //TODO: use bigger key and generate async
+    const csr = forge.pki.createCertificationRequest()
+    csr.publicKey = keys.publicKey
+    csr.setSubject([{
+      name: 'commonName',
+      value: this.id.toB58String() + "." + info.zone
+    }, {
+      name: 'countryName',
+      value: 'US'
+    }, {
+      shortName: 'ST',
+      value: 'Virginia'
+    }, {
+      name: 'localityName',
+      value: 'Blacksburg'
+    }, {
+      name: 'organizationName',
+      value: 'Test'
+    }, {
+      shortName: 'OU',
+      value: 'Test'
+    }])
+    // set (optional) attributes
+    /*csr.setAttributes([{
+      name: 'challengePassword',
+      value: 'password'
+    }, {
+      name: 'unstructuredName',
+      value: 'My Company, Inc.'
+    }, {
+      name: 'extensionRequest',
+      extensions: [{
+        name: 'subjectAltName',
+        altNames: [{
+          // 2 is DNS type
+          type: 2,
+          value: 'test.domain.com'
+        }, {
+          type: 2,
+          value: 'other.domain.com',
+        }, {
+          type: 2,
+          value: 'www.domain.net'
+        }]
+      }]
+    }])*/
+    csr.sign(keys.privateKey)
+    return cb(null, Buffer.from(forge.pki.certificationRequestToPem(csr)))
   }
 
   // DNS
