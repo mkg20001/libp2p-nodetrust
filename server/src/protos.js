@@ -4,6 +4,7 @@ const protobuf = require('protons')
 const pull = require('pull-stream')
 const debug = require('debug')
 const log = debug('error')
+const once = require('once')
 
 module.exports = {
   info: protobuf('message Request { } message Result { required string zone = 1; }'),
@@ -29,6 +30,8 @@ module.exports = {
     )
   },
   client: (conn, def, data, cb) => {
+    cb = once(cb)
+    setTimeout(() => cb(new Error('Timeout')), 10 * 1000)
     pull(
       pull.values([def.Request.encode(data)]),
       conn,

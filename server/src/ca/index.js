@@ -1,3 +1,5 @@
+'use strict'
+
 const protos = require('../protos')
 
 const debug = require('debug')
@@ -24,9 +26,10 @@ module.exports = (swarm, config) => {
       conn.getPeerInfo((err, pi) => {
         if (err) return cb(err)
         const id = pi.id
+        log('incomming certificate request from', pi.id.toB58String())
         id.pubKey.verify(data.certRequest, data.signature, (err, ok) => {
           if (err || !ok) return cb(err)
-          ca.doCertRequest(data.certRequest, data.signature, (err, certificate) => {
+          ca.doCertRequest(data.certRequest, id, pi.id.toB58String() + "." + swarm.zone, data.signature, (err, certificate) => {
             if (err) return cb(err)
             return respond({
               success: true,

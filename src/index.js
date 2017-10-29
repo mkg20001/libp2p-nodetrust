@@ -177,7 +177,7 @@ module.exports = class NodeTrust {
   renewDNS(cb) {
     log('renewing dns')
     const time = new Date().getTime()
-    this.id.sign(time.toString(), (err, signature) => {
+    this.id.privKey.sign(time.toString(), (err, signature) => {
       if (err) return cb(err)
 
       this.swarm.dial(this.node, '/nodetrust/dns/1.0.0', (err, conn) => {

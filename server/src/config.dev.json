@@ -7,8 +7,8 @@
   },
   "ca": {
     "provider": "forge",
-    "key": "key.pem",
-    "ca": "ca.pem"
+    "key": "cakey.pem",
+    "ca": "cacert.pem"
   },
   "dns": {
     "provider": "bind9"
