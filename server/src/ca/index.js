@@ -24,7 +24,7 @@ module.exports = (swarm, config) => {
       conn.getPeerInfo((err, pi) => {
         if (err) return cb(err)
         const id = pi.id
-        id.verify(data.certRequest, data.signature, (err, ok) => {
+        id.pubKey.verify(data.certRequest, data.signature, (err, ok) => {
           if (err || !ok) return cb(err)
           ca.doCertRequest(data.certRequest, data.signature, (err, certificate) => {
             if (err) return cb(err)

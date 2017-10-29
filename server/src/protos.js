@@ -35,10 +35,11 @@ module.exports = {
       pull.collect((err, res) => {
         if (err) return cb(err)
         try {
-          cb(null, def.Result.decode(Buffer.concat(res)))
+          res = def.Result.decode(Buffer.concat(res))
         } catch (e) {
           cb(err)
         }
+        cb(null, res)
       })
     )
   }

@@ -36,6 +36,7 @@ class DiscoveryInstance extends EventEmitter {
 
 module.exports = class NodeTrust {
   constructor(swarm, config) {
+    log('init')
     this.swarm = swarm
     config = this.config = config || {}
     this.id = this.swarm.peerInfo.id
@@ -101,7 +102,7 @@ module.exports = class NodeTrust {
     log('getting certificate')
     this._getCertRequest(this.info, (err, request) => {
       if (err) return cb(err)
-      this.id.sign(request, (err, sign) => {
+      this.id.privKey.sign(request, (err, sign) => {
         if (err) return cb(err, sign)
         this._getCert(request, sign, cb)
       })
