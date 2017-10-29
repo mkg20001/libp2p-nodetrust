@@ -27,3 +27,15 @@ The node then dials /nodetrust/dns/1.0.0/ and sends a signed timestamp. The serv
 This has to be done every 5 minutes otherwise the DNS record is removed (so the DNS DB doesn't get filled up with offline nodes)
 
 Additionally /nodetrust/discovery/1.0.0/ can be used to discover other nodes using this service (so the browser can find the wss nodes faster)
+
+# Development
+
+## Client
+Run `nodemon index.js -d 1`
+
+## Server
+cd into server
+
+Run `bash genca.sh` once
+
+Run `nodemon src/bin.js ./config.dev.json`
