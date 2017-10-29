@@ -2,7 +2,7 @@
   "name": "libp2p-nodetrust",
   "version": "0.0.1",
   "description": "ID.node.libp2p.io addresses and certificates for libp2p nodes",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
