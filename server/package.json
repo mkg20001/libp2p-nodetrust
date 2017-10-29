@@ -1,0 +1,25 @@
+{
+  "name": "libp2p-nodetrust-server",
+  "version": "0.0.1",
+  "description": "Server for libp2p-nodetrust",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "libp2p",
+    "nodetrust",
+    "server"
+  ],
+  "author": "Maciej Krüger <mkg20001@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "libp2p": "^0.13.0",
+    "libp2p-crypto": "^0.10.3",
+    "libp2p-multiplex": "^0.5.0",
+    "libp2p-secio": "^0.8.1",
+    "libp2p-spdy": "^0.11.0",
+    "libp2p-tcp": "^0.11.1",
+    "protons": "^1.0.0"
+  }
+}

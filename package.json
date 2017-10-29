@@ -1,0 +1,20 @@
+{
+  "name": "libp2p-nodetrust",
+  "version": "0.0.1",
+  "description": "ID.node.libp2p.io addresses and certificates for libp2p nodes",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "libp2p",
+    "https",
+    "dns",
+    "address",
+    "certificate",
+    "peer-id",
+    "id"
+  ],
+  "author": "Maciej Krüger <mkg20001@gmail.com>",
+  "license": "MIT"
+}
