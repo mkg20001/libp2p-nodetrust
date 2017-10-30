@@ -32,7 +32,7 @@ module.exports = class ForgeCA {
     if (cn != cn_req) return cb(new Error("Rejecting request: commonName (" + cn + ") and requested commonName (" + cn_req + ") do not match!"))
     const cert = pki.createCertificate()
 
-    cert.serialNumber = "03"
+    cert.serialNumber = "0" + new Date().getTime().toString()
 
     cert.validity.notBefore = new Date()
     cert.validity.notAfter = new Date()
