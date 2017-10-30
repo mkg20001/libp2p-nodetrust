@@ -41,9 +41,9 @@ module.exports = function NodetrustServer(config) {
   }, peer)
 
   swarm.zone = config.zone
-  swarm.getCN = id => {
+  swarm.getCN = (id, cb) => {
     if (id.toB58String) id = id.toB58String()
-    return protos.buildCN(id, swarm.zone)
+    return protos.buildCN(id, swarm.zone, cb)
   }
 
   require("./ca")(swarm, config.ca)

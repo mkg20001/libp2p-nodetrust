@@ -134,51 +134,54 @@ module.exports = class NodeTrust {
     const keys = forge.pki.rsa.generateKeyPair(1024) //TODO: use bigger key and generate async
     const csr = forge.pki.createCertificationRequest()
     csr.publicKey = keys.publicKey
-    csr.setSubject([{
-      name: 'commonName',
-      value: protos.buildCN(this.id.toB58String(), info.zone)
-    }, {
-      name: 'countryName',
-      value: 'US'
-    }, {
-      shortName: 'ST',
-      value: 'Virginia'
-    }, {
-      name: 'localityName',
-      value: 'Blacksburg'
-    }, {
-      name: 'organizationName',
-      value: 'Test'
-    }, {
-      shortName: 'OU',
-      value: 'Test'
-    }])
-    // set (optional) attributes
-    /*csr.setAttributes([{
-      name: 'challengePassword',
-      value: 'password'
-    }, {
-      name: 'unstructuredName',
-      value: 'My Company, Inc.'
-    }, {
-      name: 'extensionRequest',
-      extensions: [{
-        name: 'subjectAltName',
-        altNames: [{
-          // 2 is DNS type
-          type: 2,
-          value: 'test.domain.com'
-        }, {
-          type: 2,
-          value: 'other.domain.com',
-        }, {
-          type: 2,
-          value: 'www.domain.net'
+    protos.buildCN(this.id.toB58String(), info.zone, (err, cn) => {
+      if (err) return cb(err)
+      csr.setSubject([{
+        name: 'commonName',
+        value: cn
+      }, {
+        name: 'countryName',
+        value: 'US'
+      }, {
+        shortName: 'ST',
+        value: 'Virginia'
+      }, {
+        name: 'localityName',
+        value: 'Blacksburg'
+      }, {
+        name: 'organizationName',
+        value: 'Libp2p'
+      }, {
+        shortName: 'OU',
+        value: this.id.toB58String()
+      }])
+      // set (optional) attributes
+      /*csr.setAttributes([{
+        name: 'challengePassword',
+        value: 'password'
+      }, {
+        name: 'unstructuredName',
+        value: 'My Company, Inc.'
+      }, {
+        name: 'extensionRequest',
+        extensions: [{
+          name: 'subjectAltName',
+          altNames: [{
+            // 2 is DNS type
+            type: 2,
+            value: 'test.domain.com'
+          }, {
+            type: 2,
+            value: 'other.domain.com',
+          }, {
+            type: 2,
+            value: 'www.domain.net'
+          }]
         }]
-      }]
-    }])*/
-    csr.sign(keys.privateKey)
-    return cb(null, Buffer.from(forge.pki.certificationRequestToPem(csr)), Buffer.from(forge.pki.privateKeyToPem(keys.privateKey)))
+      }])*/
+      csr.sign(keys.privateKey)
+      return cb(null, Buffer.from(forge.pki.certificationRequestToPem(csr)), Buffer.from(forge.pki.privateKeyToPem(keys.privateKey)))
+    })
   }
 
   // DNS

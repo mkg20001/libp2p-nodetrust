@@ -37,18 +37,21 @@ module.exports = (swarm, config) => {
           if (err || !ok) return cb(err)
           conn.getObservedAddrs((err, addr) => {
             if (err) return cb(err)
-            const dns = swarm.getCN(id) + "."
-            const ips = addr.map(addr => addr.toString()).filter(addr => addr.startsWith("/ip")).map(addr => {
-              const s = addr.split("/")
-              return {
-                dns,
-                type: toDNS[s[1]],
-                value: s[2]
-              }
-            })
-            console.log(ips) //TODO: add dns updates
-            return respond({
-              success: true
+            swarm.getCN(id, (err, dns) => {
+              if (err) return cb(err)
+              dns += "."
+              const ips = addr.map(addr => addr.toString()).filter(addr => addr.startsWith("/ip")).map(addr => {
+                const s = addr.split("/")
+                return {
+                  dns,
+                  type: toDNS[s[1]],
+                  value: s[2]
+                }
+              })
+              console.log(ips) //TODO: add dns updates
+              return respond({
+                success: true
+              })
             })
           })
         })

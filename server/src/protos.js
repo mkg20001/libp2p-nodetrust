@@ -5,6 +5,8 @@ const pull = require('pull-stream')
 const debug = require('debug')
 const log = debug('error')
 const once = require('once')
+const multihashing = require('multihashing-async')
+const base32Encode = require('base32-encode')
 
 module.exports = {
   info: protobuf('message Request { } message Result { required string zone = 1; }'),
@@ -47,11 +49,11 @@ module.exports = {
       })
     )
   },
-  buildCN: (id, zone) => {
-    id = id.replace(/([A-Z])/g, c => c.toLowerCase() + "-").split("")
-    let n = []
-    while (id.length)
-      n.push(id.splice(0, 60).join(""))
-    return n.concat([zone]).join(".")
+  buildCN: (id, zone, cb) => {
+    multihashing(Buffer.from(id), 'sha2-256', (err, digest) => {
+      if (err) return cb(err)
+      id = base32Encode(digest, 'RFC4648').replace(/=/g, '').toLowerCase()
+      cb(null, id + "." + zone)
+    })
   }
 }

@@ -29,6 +29,8 @@
     "libp2p-websockets": "github:libp2p/js-libp2p-websockets#pass-options"
   },
   "dependencies": {
+    "base32-encode": "^0.1.0",
+    "multihashing-async": "^0.4.7",
     "node-forge": "^0.7.1",
     "protons": "^1.0.0"
   }
