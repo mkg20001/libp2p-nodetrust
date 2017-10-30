@@ -51,13 +51,18 @@ module.exports = class NodeTrust {
     log('enabling')
     this.getInfo(err => {
       if (err) return cb(err)
-      this.getCert((err, cert) => {
+      this.getCert((err, cert, key, chain) => {
         if (err) return cb(err)
         this.cert = cert
+        this.chain = chain
+        this.key = key
+        if (process.env.NODETRUST_LOG_KEYS)
+          console.log(chain.toString() + key.toString())
         this.loop(err => {
           if (err) return cb(err)
           this.interval = setInterval(this.loop.bind(this), 5 * 60 * 1000 - 20000).unref()
           this.enabled = true
+          cb()
         })
       })
     })
@@ -101,11 +106,14 @@ module.exports = class NodeTrust {
 
   getCert(cb) {
     log('getting certificate')
-    this._getCertRequest(this.info, (err, request) => {
+    this._getCertRequest(this.info, (err, request, key) => {
       if (err) return cb(err)
       this.id.privKey.sign(request, (err, sign) => {
         if (err) return cb(err, sign)
-        this._getCert(request, sign, cb)
+        this._getCert(request, sign, (err, cert, chain) => {
+          if (err) return cb(err)
+          cb(null, cert, key, chain)
+        })
       })
     })
   }
@@ -118,7 +126,7 @@ module.exports = class NodeTrust {
       }, (err, res) => {
         if (err) return cb(err)
         if (!res.success || !res.certificate || !res.certificate.length) return cb(new Error('Server did not complete certificate request'))
-        cb(null, res.certificate)
+        cb(null, res.certificate, res.fullchain)
       })
     })
   }
@@ -128,7 +136,7 @@ module.exports = class NodeTrust {
     csr.publicKey = keys.publicKey
     csr.setSubject([{
       name: 'commonName',
-      value: this.id.toB58String() + "." + info.zone
+      value: protos.buildCN(this.id.toB58String(), info.zone)
     }, {
       name: 'countryName',
       value: 'US'
@@ -170,7 +178,7 @@ module.exports = class NodeTrust {
       }]
     }])*/
     csr.sign(keys.privateKey)
-    return cb(null, Buffer.from(forge.pki.certificationRequestToPem(csr)))
+    return cb(null, Buffer.from(forge.pki.certificationRequestToPem(csr)), Buffer.from(forge.pki.privateKeyToPem(keys.privateKey)))
   }
 
   // DNS

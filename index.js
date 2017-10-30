@@ -2,8 +2,10 @@
 
 const libp2p = require("libp2p")
 const TCP = require("libp2p-tcp")
+const WS = require("libp2p-websockets")
 const Peer = require("peer-info")
 const Id = require("peer-id")
+const multiaddr = require("multiaddr")
 
 const SPDY = require('libp2p-spdy')
 const MULTIPLEX = require('libp2p-multiplex')
@@ -22,9 +24,20 @@ map(require("./test/ids.json"), Id.createFromJSON, (e, ids) => {
 
   listen.forEach(addr => peer.multiaddrs.add(addr))
 
+  let tcp = new TCP()
+  let ws = new WS()
+  let l = []
+  const create = tcp.createListener.bind(tcp)
+  tcp.createListener = (options, handler) => {
+    let n = create(options, handler)
+    n.handler = handler
+    l.push(n)
+    return n
+  }
+
   const swarm = new libp2p({
     transport: [
-      new TCP()
+      tcp
     ],
     connection: {
       muxer: [
@@ -44,6 +57,16 @@ map(require("./test/ids.json"), Id.createFromJSON, (e, ids) => {
 
   swarm.start(err => {
     if (err) throw err
-    swarm.nodetrust.enable(console.log)
+    swarm.nodetrust.enable(err => {
+      if (err) throw err
+      let wss = ws.createListener({
+        cert: swarm.nodetrust.chain,
+        key: swarm.nodetrust.key
+      }, l[0].handler)
+      wss.listen(multiaddr("/ip4/0.0.0.0/tcp/5285/ws"), err => {
+        if (err) throw err
+        console.log("Online @ https://localhost:5285")
+      })
+    })
   })
 })

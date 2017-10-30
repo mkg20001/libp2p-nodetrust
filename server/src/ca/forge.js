@@ -32,7 +32,7 @@ module.exports = class ForgeCA {
     if (cn != cn_req) return cb(new Error("Rejecting request: commonName (" + cn + ") and requested commonName (" + cn_req + ") do not match!"))
     const cert = pki.createCertificate()
 
-    cert.serialNumber = '02'
+    cert.serialNumber = "03"
 
     cert.validity.notBefore = new Date()
     cert.validity.notAfter = new Date()
@@ -48,6 +48,8 @@ module.exports = class ForgeCA {
 
     log('signing csr for %s', cn)
 
-    return cb(null, Buffer.from(pki.certificateToPem(cert)))
+    const pemout = Buffer.from(pki.certificateToPem(cert))
+
+    return cb(null, pemout, Buffer.concat([pemout, Buffer.from(this.cert)]))
   }
 }

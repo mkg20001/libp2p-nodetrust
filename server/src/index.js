@@ -11,6 +11,8 @@ const SPDY = require('libp2p-spdy')
 const MULTIPLEX = require('libp2p-multiplex')
 const SECIO = require('libp2p-secio')
 
+const protos = require('./protos')
+
 module.exports = function NodetrustServer(config) {
   const self = this
 
@@ -39,6 +41,10 @@ module.exports = function NodetrustServer(config) {
   }, peer)
 
   swarm.zone = config.zone
+  swarm.getCN = id => {
+    if (id.toB58String) id = id.toB58String()
+    return protos.buildCN(id, swarm.zone)
+  }
 
   require("./ca")(swarm, config.ca)
   require("./dns")(swarm, config.dns)

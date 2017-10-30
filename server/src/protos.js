@@ -8,7 +8,7 @@ const once = require('once')
 
 module.exports = {
   info: protobuf('message Request { } message Result { required string zone = 1; }'),
-  ca: protobuf('message Request { required bytes certRequest = 1; required bytes signature = 2; } message Result { required bool success = 1; bytes certificate = 2; }'),
+  ca: protobuf('message Request { required bytes certRequest = 1; required bytes signature = 2; } message Result { required bool success = 1; bytes certificate = 2; bytes fullchain = 3; }'),
   dns: protobuf('message Request { required int64 time = 1; required bytes signature = 2; } message Result { required bool success = 1; }'),
   discovery: protobuf('message Request { required int32 numPeers = 1; repeated bytes multiaddr = 2; } message Peer { required string id = 1; repeated bytes multiaddr = 2; } message Result { required bool success = 1; repeated Peer peers = 2; }'),
   server: (conn, def, cb) => {
@@ -46,5 +46,12 @@ module.exports = {
         cb(null, res)
       })
     )
+  },
+  buildCN: (id, zone) => {
+    id = id.replace(/([A-Z])/g, c => c.toLowerCase() + "-").split("")
+    let n = []
+    while (id.length)
+      n.push(id.splice(0, 60).join(""))
+    return n.concat([zone]).join(".")
   }
 }

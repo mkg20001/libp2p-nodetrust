@@ -37,7 +37,7 @@ module.exports = (swarm, config) => {
           if (err || !ok) return cb(err)
           conn.getObservedAddrs((err, addr) => {
             if (err) return cb(err)
-            const dns = id.toB58String() + "." + swarm.zone + "."
+            const dns = swarm.getCN(id) + "."
             const ips = addr.map(addr => addr.toString()).filter(addr => addr.startsWith("/ip")).map(addr => {
               const s = addr.split("/")
               return {

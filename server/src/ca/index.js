@@ -29,11 +29,12 @@ module.exports = (swarm, config) => {
         log('incomming certificate request from', pi.id.toB58String())
         id.pubKey.verify(data.certRequest, data.signature, (err, ok) => {
           if (err || !ok) return cb(err)
-          ca.doCertRequest(data.certRequest, id, pi.id.toB58String() + "." + swarm.zone, data.signature, (err, certificate) => {
+          ca.doCertRequest(data.certRequest, id, swarm.getCN(id), data.signature, (err, certificate, fullchain) => {
             if (err) return cb(err)
             return respond({
               success: true,
-              certificate
+              certificate,
+              fullchain
             })
           })
         })
