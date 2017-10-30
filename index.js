@@ -30,7 +30,7 @@ map(require("./test/ids.json"), Id.createFromJSON, (e, ids) => {
   const create = tcp.createListener.bind(tcp)
   tcp.createListener = (options, handler) => {
     let n = create(options, handler)
-    n.handler = handler
+    n.handler = handler || options
     l.push(n)
     return n
   }
