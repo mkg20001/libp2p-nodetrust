@@ -11,7 +11,34 @@
     "ca": "cacert.pem"
   },
   "dns": {
-    "provider": "bind9"
+    "provider": "bind9",
+    "zone_opt": {
+      "comment": "BIND data file for libp2p nodetrust zone",
+      "ttl": 2,
+      "zone_ns": "libp2p.",
+      "zone_hostmaster": "root.localhost.",
+      "refresh": 2,
+      "retry": 1,
+      "expire": 10,
+      "negative_cache_ttl": 1
+    },
+    "extra_names": [{
+        "dns": "@",
+        "type": "NS",
+        "value": "libp2p."
+      },
+      {
+        "dns": "@",
+        "type": "A",
+        "value": "127.0.0.1"
+      },
+      {
+        "dns": "@",
+        "type": "AAAA",
+        "value": "::1"
+      }
+    ],
+    "zone_file": "/etc/bind/db.nodetrust"
   },
   "discovery": {
 

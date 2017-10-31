@@ -20,6 +20,8 @@ module.exports = (swarm, config) => {
     throw e
   }
 
+  let dnsprov = dns
+
   swarm.handle('/nodetrust/dns/1.0.0', (protocol, conn) => {
     protos.server(conn, protos.dns, (data, respond) => {
       const cb = err => {
@@ -48,9 +50,15 @@ module.exports = (swarm, config) => {
                   value: s[2]
                 }
               })
-              console.log(ips) //TODO: add dns updates
-              return respond({
-                success: true
+              dnsprov.clearAllForDomain(dns, err => {
+                if (err) return cb(err)
+                dnsprov.addNames(ips, err => {
+                  if (err) return cb(err)
+                  console.log(ips) //TODO: add dns updates
+                  return respond({
+                    success: true
+                  })
+                })
               })
             })
           })
