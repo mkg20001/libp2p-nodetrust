@@ -52,7 +52,7 @@ module.exports = {
   buildCN: (id, zone, cb) => {
     multihashing(Buffer.from(id), 'sha2-256', (err, digest) => {
       if (err) return cb(err)
-      id = base32Encode(digest, 'RFC4648').replace(/=/g, '').toLowerCase()
+      id = base32Encode(digest, 'RFC4648').replace('=', '').toLowerCase()
       cb(null, id + '.' + zone)
     })
   }
