@@ -24,7 +24,7 @@ module.exports = (swarm, config) => {
         deleteId.push(id)
       }
     }
-    peerIDs = peerIDs.filter(id => deleteId.indexOf(id) == -1)
+    peerIDs = peerIDs.filter(id => deleteId.indexOf(id) === -1)
   }
 
   setInterval(updateDB, config.interval || 5000)
@@ -40,7 +40,7 @@ module.exports = (swarm, config) => {
       conn.getPeerInfo((err, pi) => {
         if (err) return cb(err)
         const id = pi.id.toB58String()
-        if (peerIDs.indexOf(id) == -1) {
+        if (peerIDs.indexOf(id) === -1) {
           log('adding %s', id)
           peerIDs.push(id)
         }
@@ -52,7 +52,7 @@ module.exports = (swarm, config) => {
         const numPeers = data.numPeers
         while (randItem + numPeers > peerIDs.length) randItem--
           if (randItem < 0) randItem = 0
-        const peers = peerIDs.slice(0, numPeers).filter(i => i != id).map(id => {
+        const peers = peerIDs.slice(0, numPeers).filter(i => i !== id).map(id => {
           return {
             id,
             multiaddr: discoveryDB[id]

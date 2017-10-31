@@ -41,7 +41,7 @@ module.exports = {
         if (err) return cb(err)
         try {
           res = def.Result.decode(Buffer.concat(res))
-          if (!res) throw new Error("Empty result")
+          if (!res) throw new Error('Empty result')
         } catch (e) {
           cb(err)
         }
@@ -53,7 +53,7 @@ module.exports = {
     multihashing(Buffer.from(id), 'sha2-256', (err, digest) => {
       if (err) return cb(err)
       id = base32Encode(digest, 'RFC4648').replace(/=/g, '').toLowerCase()
-      cb(null, id + "." + zone)
+      cb(null, id + '.' + zone)
     })
   }
 }

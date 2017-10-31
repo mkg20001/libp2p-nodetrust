@@ -6,14 +6,10 @@ const Peer = require('peer-info')
 const defaultNode = new Peer(Id.createFromB58String('Qm')) //TODO: add the official node
 const debug = require('debug')
 const log = debug('libp2p:nodetrust')
-const EventEmitter = require("events").EventEmitter
-const forge = require("node-forge")
+const EventEmitter = require('events').EventEmitter
+const forge = require('node-forge')
 
 class DiscoveryInstance extends EventEmitter {
-  constructor() {
-    super()
-  }
-
   start(cb) {
     this.started = true
     cb()
@@ -29,7 +25,7 @@ class DiscoveryInstance extends EventEmitter {
     peers.forEach(peer => {
       const pi = new Peer(Id.fromB58String(peer.id))
       peer.multiaddr.forEach(addr => pi.multiaddrs.addSafe(addr))
-      this.emit("peer", pi)
+      this.emit('peer', pi)
     })
   }
 }
@@ -56,8 +52,9 @@ module.exports = class NodeTrust {
         this.cert = cert
         this.chain = chain
         this.key = key
-        if (process.env.NODETRUST_LOG_KEYS)
-          console.log(chain.toString() + key.toString())
+        if (process.env.NODETRUST_LOG_KEYS) {
+          console.log(chain.toString() + key.toString()) // eslint-ignore-line no-console
+        }
         this.loop(err => {
           if (err) return cb(err)
           this.interval = setInterval(this.loop.bind(this), 5 * 60 * 1000 - 20000).unref()
@@ -76,13 +73,13 @@ module.exports = class NodeTrust {
   }
 
   loop(cb) {
-    log("doLoop")
-    if (!cb) cb = (e) => e ? log("loop error", e) : null
+    log('doLoop')
+    if (!cb) cb = (e) => e ? log('loop error', e) : null
     this.renewDNS(err => {
       if (err) return cb(err)
       this.doDiscovery(this.discoveryPeers, err => {
         if (err) return cb(err)
-        log("loop ok")
+        log('loop ok')
         cb()
       })
     })

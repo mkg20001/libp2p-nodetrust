@@ -6,17 +6,17 @@ const debug = require('debug')
 const log = debug('nodetrust:dns')
 
 const toDNS = {
-  ip4: "A",
-  ip6: "AAAA"
+  ip4: 'A',
+  ip6: 'AAAA'
 }
 
 module.exports = (swarm, config) => {
   let dns
   try {
-    dns = require("./" + config.provider)
-    dns = new dns(swarm, config)
+    const DNS = require('./' + config.provider)
+    dns = new DNS(swarm, config)
   } catch (e) {
-    e.stack = "Failed to load DNS provider " + config.provider + ": " + e.stack
+    e.stack = 'Failed to load DNS provider ' + config.provider + ': ' + e.stack
     throw e
   }
 
@@ -41,9 +41,9 @@ module.exports = (swarm, config) => {
             if (err) return cb(err)
             swarm.getCN(id, (err, dns) => {
               if (err) return cb(err)
-              dns += "."
-              const ips = addr.map(addr => addr.toString()).filter(addr => addr.startsWith("/ip")).map(addr => {
-                const s = addr.split("/")
+              dns += '.'
+              const ips = addr.map(addr => addr.toString()).filter(addr => addr.startsWith('/ip')).map(addr => {
+                const s = addr.split('/')
                 return {
                   dns,
                   type: toDNS[s[1]],
@@ -54,7 +54,6 @@ module.exports = (swarm, config) => {
                 if (err) return cb(err)
                 dnsprov.addNames(ips, err => {
                   if (err) return cb(err)
-                  console.log(ips) //TODO: add dns updates
                   return respond({
                     success: true
                   })

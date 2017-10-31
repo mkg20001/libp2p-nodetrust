@@ -3,7 +3,7 @@
 const fs = require('fs')
 const read = (file, desc) => {
   if (!fs.existsSync(file))
-    throw new Error("Unable to find " + desc + " file " + JSON.stringify(file))
+    throw new Error('Unable to find ' + desc + ' file ' + JSON.stringify(file))
   return fs.readFileSync(file).toString()
 }
 const forge = require('node-forge')
@@ -24,15 +24,15 @@ module.exports = class ForgeCA {
   doCertRequest(pem, id, cn, sig, cb) {
     log('reading csr')
     const csr = pki.certificationRequestFromPem(pem.toString())
-    if (!csr.verify()) return cb(new Error("Certification request invalid"))
+    if (!csr.verify()) return cb(new Error('Certification request invalid'))
     // const ext = csr.getAttribute({name: 'extensionRequest'})
-    const cn_req = csr.subject.getField({
+    const cnReq = csr.subject.getField({
       name: 'commonName'
     }).value
-    if (cn != cn_req) return cb(new Error("Rejecting request: commonName (" + cn + ") and requested commonName (" + cn_req + ") do not match!"))
+    if (cn !== cnReq) return cb(new Error('Rejecting request: commonName (' + cn + ') and requested commonName (' + cnReq + ') do not match!'))
     const cert = pki.createCertificate()
 
-    cert.serialNumber = "0" + new Date().getTime().toString()
+    cert.serialNumber = '0' + new Date().getTime().toString()
 
     cert.validity.notBefore = new Date()
     cert.validity.notAfter = new Date()

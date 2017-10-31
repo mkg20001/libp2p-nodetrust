@@ -15,7 +15,7 @@ function ZoneFile(opt, names) {
   //ttl
   out.push(['$TTL', opt.ttl])
   //header
-  out.push(['@', 'IN', 'SOA', opt.zone_ns + " " + opt.zone_hostmaster + ' ('])
+  out.push(['@', 'IN', 'SOA', opt.zone_ns + ' ' + opt.zone_hostmaster + ' ('])
   out.push('\t\t\t' + negativeSpace(7, opt.serial) + '\t\t; Serial')
   out.push('\t\t\t' + negativeSpace(7, opt.refresh) + '\t\t; Refresh')
   out.push('\t\t\t' + negativeSpace(7, opt.retry) + '\t\t; Retry')
@@ -70,7 +70,7 @@ module.exports = class Bind9DNS {
 
   clearAllForDomain(domain, cb) {
     log('clearing domain', domain)
-    this.names = this.names.filter(d => d.dns != domain)
+    this.names = this.names.filter(d => d.dns !== domain)
     this._writeZoneFile(cb)
   }
 

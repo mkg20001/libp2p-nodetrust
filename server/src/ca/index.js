@@ -8,10 +8,10 @@ const log = debug('nodetrust:ca')
 module.exports = (swarm, config) => {
   let ca
   try {
-    ca = require("./" + config.provider)
-    ca = new ca(swarm, config)
+    const CA = require('./' + config.provider)
+    ca = new CA(swarm, config)
   } catch (e) {
-    e.stack = "Failed to load CA provider " + config.provider + ": " + e.stack
+    e.stack = 'Failed to load CA provider ' + config.provider + ': ' + e.stack
     throw e
   }
 
