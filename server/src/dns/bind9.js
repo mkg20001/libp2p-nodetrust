@@ -22,7 +22,7 @@ function ZoneFile (opt, names) {
   out.push('\t\t\t' + negativeSpace(7, opt.expire) + '\t\t; Expire')
   out.push('\t\t\t' + negativeSpace(7, opt.negative_cache_ttl) + '\t)\t; Negative Cache TTL')
   out.push(';')
-  names.forEach(name => out.push([name.dns, 'IN', name.type, name.value]))
+  names.forEach(name => out.push([name.name, 'IN', name.type, name.value]))
 
   return out.reduce((a, b) => Array.isArray(b) ? a + '\n' + b.join('\t') : a + '\n' + b, ';') + '\n'
 }
@@ -70,7 +70,7 @@ module.exports = class Bind9DNS {
 
   removeNames (names, cb) {
     log('removing names', names)
-    this.names = this.names.filter(n2 => names.filter(n => n.dns === n2.dns && n.type == n2.type))
+    this.names = this.names.filter(n2 => names.filter(n => n.name === n2.name && n.type == n2.type))
     this._writeZoneFile(cb)
   }
 
@@ -82,7 +82,7 @@ module.exports = class Bind9DNS {
   }
 
   clearDomain(domain, cb) {
-    this.removeNames(this.names.filter(n => n.dns === domain), cb)
+    this.removeNames(this.names.filter(n => n.name === domain), cb)
   }
 
   getNames (cb) {

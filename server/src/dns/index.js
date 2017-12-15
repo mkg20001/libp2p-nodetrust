@@ -43,8 +43,9 @@ module.exports = (swarm, config) => {
 
   dns.getNames((err, names) => {
     if (err) throw err
-    names.filter(n => n.dns.match(nameRegEx)).map(n => n.dns.split('.').shift()).forEach(id => dnsDB.set(id, true))
+    names.filter(n => n.name.match(nameRegEx)).map(n => n.name.split('.').shift()).forEach(id => dnsDB.set(id, true))
     ready = true
+    log('dns is ready')
   })
 
   const handleDNS = (protocol, conn) => {
@@ -72,19 +73,19 @@ module.exports = (swarm, config) => {
           })
         },
         (id, cb) => {
-          swarm.getCN(id, (err, dns) => {
+          swarm.getCN(id, (err, name) => {
             if (err) return cb(err)
             dns += '.'
-            cb(null, dns)
+            cb(null, name)
           })
         },
-        (dns, cb) => {
+        (name, cb) => {
           conn.getObservedAddrs((err, addr) => {
             if (err) return cb(err)
             const ips = addr.map(addr => addr.toString()).filter(addr => addr.startsWith('/ip')).map(addr => {
               const s = addr.split('/')
               return {
-                dns,
+                name,
                 type: toDNS[s[1]],
                 value: s[2]
               }
