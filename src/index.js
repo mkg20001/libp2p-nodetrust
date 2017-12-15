@@ -3,24 +3,24 @@
 const protos = require('./protos')
 const Id = require('peer-id')
 const Peer = require('peer-info')
-const defaultNode = new Peer(Id.createFromB58String('Qm')) //TODO: add the official node
+const defaultNode = new Peer(Id.createFromB58String('Qm')) // TODO: add the official node
 const debug = require('debug')
 const log = debug('libp2p:nodetrust')
 const EventEmitter = require('events').EventEmitter
 const forge = require('node-forge')
 
 class DiscoveryInstance extends EventEmitter {
-  start(cb) {
+  start (cb) {
     this.started = true
     cb()
   }
 
-  stop(cb) {
+  stop (cb) {
     this.started = false
     cb()
   }
 
-  _handle(peers) {
+  _handle (peers) {
     if (!this.started) return
     peers.forEach(peer => {
       const pi = new Peer(Id.fromB58String(peer.id))
@@ -31,7 +31,7 @@ class DiscoveryInstance extends EventEmitter {
 }
 
 module.exports = class NodeTrust {
-  constructor(swarm, config) {
+  constructor (swarm, config) {
     log('init')
     this.swarm = swarm
     config = this.config = config || {}
@@ -43,7 +43,11 @@ module.exports = class NodeTrust {
     this.swarm.nodetrust = this
   }
 
-  enable(cb) {
+  enable (opt, cb) {
+    if (typeof opt === 'function') {
+      cb = opt
+      opt = {}
+    }
     log('enabling')
     this.getInfo(err => {
       if (err) return cb(err)
@@ -65,14 +69,14 @@ module.exports = class NodeTrust {
     })
   }
 
-  disable(cb) {
+  disable (cb) {
     if (!this.enabled) return cb()
     clearInterval(this.interval)
     this.enabled = false
     cb()
   }
 
-  loop(cb) {
+  loop (cb) {
     log('doLoop')
     if (!cb) cb = (e) => e ? log('loop error', e) : null
     this.renewDNS(err => {
@@ -87,7 +91,7 @@ module.exports = class NodeTrust {
 
   // Info
 
-  getInfo(cb) {
+  getInfo (cb) {
     if (this.info) return cb()
     this.swarm.dial(this.node, '/nodetrust/info/1.0.0', (err, conn) => {
       if (err) return cb(err)
@@ -101,7 +105,7 @@ module.exports = class NodeTrust {
 
   // Certificate
 
-  getCert(cb) {
+  getCert (cb) {
     log('getting certificate')
     this._getCertRequest(this.info, (err, request, key) => {
       if (err) return cb(err)
@@ -114,7 +118,7 @@ module.exports = class NodeTrust {
       })
     })
   }
-  _getCert(certRequest, signature, cb) {
+  _getCert (certRequest, signature, cb) {
     this.swarm.dial(this.node, '/nodetrust/ca/1.0.0', (err, conn) => {
       if (err) return cb(err)
       protos.client(conn, protos.ca, {
@@ -127,8 +131,8 @@ module.exports = class NodeTrust {
       })
     })
   }
-  _getCertRequest(info, cb) {
-    const keys = forge.pki.rsa.generateKeyPair(1024) //TODO: use bigger key and generate async
+  _getCertRequest (info, cb) {
+    const keys = forge.pki.rsa.generateKeyPair(1024) // TODO: use bigger key and generate async
     const csr = forge.pki.createCertificationRequest()
     csr.publicKey = keys.publicKey
     protos.buildCN(this.id.toB58String(), info.zone, (err, cn) => {
@@ -153,7 +157,7 @@ module.exports = class NodeTrust {
         value: this.id.toB58String()
       }])
       // set (optional) attributes
-      /*csr.setAttributes([{
+      /* csr.setAttributes([{
         name: 'challengePassword',
         value: 'password'
       }, {
@@ -175,7 +179,7 @@ module.exports = class NodeTrust {
             value: 'www.domain.net'
           }]
         }]
-      }])*/
+      }]) */
       csr.sign(keys.privateKey)
       return cb(null, Buffer.from(forge.pki.certificationRequestToPem(csr)), Buffer.from(forge.pki.privateKeyToPem(keys.privateKey)))
     })
@@ -183,7 +187,7 @@ module.exports = class NodeTrust {
 
   // DNS
 
-  renewDNS(cb) {
+  renewDNS (cb) {
     log('renewing dns')
     const time = new Date().getTime()
     this.id.privKey.sign(time.toString(), (err, signature) => {
@@ -205,7 +209,7 @@ module.exports = class NodeTrust {
 
   // Discovery
 
-  doDiscovery(numPeers, cb) {
+  doDiscovery (numPeers, cb) {
     log('discovery')
     this.swarm.dial(this.node, '/nodetrust/discovery/1.0.0', (err, conn) => {
       if (err) return cb(err)

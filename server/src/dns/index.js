@@ -15,6 +15,13 @@ const toDNS = {
 
 module.exports = (swarm, config) => {
   let dns
+  const nameRegEx = new RegExp('^ci[a-z]{53}\\.' + swarm.zone.replace(/\./g, '\\.') + '$', 'mi')
+  const {db, dnsDB} = swarm
+  db.on('evict', ({key}) => {
+    dnsDB.remove(key)
+    dnsDB.emit('evict', {key})
+  })
+
   try {
     const DNS = require('./' + config.provider)
     dns = new DNS(swarm, config)
@@ -23,9 +30,25 @@ module.exports = (swarm, config) => {
     throw e
   }
 
-  let dnsprov = dns
+  dnsDB.on('evict', ({key}) => {
+    log('clear up dns for %s', key)
+    swarm.getCN(key, (err, cn) => {
+      if (err) return log(err)
+      dns.clearDomain(cn, err => err ? log(err) : false)
+    })
+  })
 
-  swarm.handle('/nodetrust/dns/1.0.0', (protocol, conn) => {
+  let dnsprov = dns
+  let ready = false
+
+  dns.getNames((err, names) => {
+    if (err) throw err
+    names.filter(n => n.dns.match(nameRegEx)).map(n => n.dns.split('.').shift()).forEach(id => dnsDB.set(id, true))
+    ready = true
+  })
+
+  const handleDNS = (protocol, conn) => {
+    if (!ready) return setTimeout(handleDNS, 500, protocol, conn)
     protos.server(conn, protos.dns, (data, respond) => {
       const cb = err => {
         if (err) {
@@ -37,8 +60,10 @@ module.exports = (swarm, config) => {
       }
       waterfall([
         cb => conn.getPeerInfo(cb),
-        (cb, pi) => {
+        (pi, cb) => {
           const id = pi.id
+          log('update dns for %s', id.toB58String())
+          if (!db.get(id.toB58String())) return cb(new Error(id.toB58String() + ' has not requested a certificate! Rejecting discovery...'))
           const time = new Date().getTime()
           if (data.time > time + 10000 || data.time < time - 10000) return cb(new Error('Timestamp too old/new'))
           id.pubKey.verify(data.time.toString(), data.signature, (err, ok) => {
@@ -46,14 +71,14 @@ module.exports = (swarm, config) => {
             return cb(null, id)
           })
         },
-        (cb, id) => {
+        (id, cb) => {
           swarm.getCN(id, (err, dns) => {
             if (err) return cb(err)
             dns += '.'
             cb(null, dns)
           })
         },
-        (cb, dns) => {
+        (dns, cb) => {
           conn.getObservedAddrs((err, addr) => {
             if (err) return cb(err)
             const ips = addr.map(addr => addr.toString()).filter(addr => addr.startsWith('/ip')).map(addr => {
@@ -67,8 +92,8 @@ module.exports = (swarm, config) => {
             cb(null, dns, ips)
           })
         },
-        (cb, dns, ips) => {
-          dnsprov.clearAllForDomain(dns, err => {
+        (dns, ips, cb) => {
+          dnsprov.clearDomain(dns, err => {
             if (err) return cb(err)
             dnsprov.addNames(ips, err => {
               if (err) return cb(err)
@@ -80,5 +105,6 @@ module.exports = (swarm, config) => {
         }
       ], cb)
     })
-  })
+  }
+  swarm.handle('/nodetrust/dns/1.0.0', handleDNS)
 }

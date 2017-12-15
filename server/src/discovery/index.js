@@ -5,29 +5,13 @@ const protos = require('../protos')
 const debug = require('debug')
 const log = debug('nodetrust:discovery')
 
-module.exports = (swarm, config) => {
-  let discoveryDB = {}
-  let peerIDs = []
-  let lastUpdate = {}
+module.exports = (swarm) => {
+  const {db, discoveryDB} = swarm
 
-  const expire = config.expire || 5 * 60 * 1000
-
-  function updateDB() {
-    const time = new Date().getTime()
-    let deleteId = []
-    for (const id in lastUpdate) {
-      const expireTime = lastUpdate[id]
-      if (expireTime < time) {
-        log('%s has expired, removing', id)
-        delete discoveryDB[id]
-        delete lastUpdate[id]
-        deleteId.push(id)
-      }
-    }
-    peerIDs = peerIDs.filter(id => deleteId.indexOf(id) === -1)
-  }
-
-  setInterval(updateDB, config.interval || 5000)
+  db.on('evict', ({key}) => {
+    discoveryDB.remove(key)
+    discoveryDB.emit('evict', {key})
+  })
 
   swarm.handle('/nodetrust/discovery/1.0.0', (protocol, conn) => {
     protos.server(conn, protos.discovery, (data, respond) => {
@@ -40,22 +24,19 @@ module.exports = (swarm, config) => {
       conn.getPeerInfo((err, pi) => {
         if (err) return cb(err)
         const id = pi.id.toB58String()
-        if (peerIDs.indexOf(id) === -1) {
-          log('adding %s', id)
-          peerIDs.push(id)
-        }
-        lastUpdate[id] = new Date().getTime() + expire
-        discoveryDB[id] = data.multiaddr
+        if (!db.get(id)) return cb(new Error(id + ' has not requested a certificate! Rejecting discovery...'))
+        log('discovery from %s want=%s', id, data.numPeers)
+        discoveryDB.set(id, data.multiaddr)
         if (data.numPeers < 0) data.numPeers = 0
         if (data.numPeers > 100) data.numPeers = 100
-        let randItem = Math.floor(Math.random() * peerIDs.length)
+        let randItem = Math.floor(Math.random() * discoveryDB.length)
         const numPeers = data.numPeers
-        while (randItem + numPeers > peerIDs.length) randItem--
-          if (randItem < 0) randItem = 0
-        const peers = peerIDs.slice(0, numPeers).filter(i => i !== id).map(id => {
+        while (randItem + numPeers > discoveryDB.length) randItem--
+        if (randItem < 0) randItem = 0
+        const peers = discoveryDB.keys.slice(0, numPeers).filter(i => i !== id).map(id => {
           return {
             id,
-            multiaddr: discoveryDB[id]
+            multiaddr: discoveryDB.peek(id)
           }
         })
         return respond({

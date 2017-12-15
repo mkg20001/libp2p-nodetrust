@@ -4,17 +4,17 @@ const fs = require('fs')
 const debug = require('debug')
 const log = debug('nodetrust:dns:bind9')
 
-function negativeSpace(len, str) {
+function negativeSpace (len, str) {
   return ' '.repeat(len - str.toString().length) + str
 }
 
-function ZoneFile(opt, names) {
+function ZoneFile (opt, names) {
   let out = []
-  //comment header
+  // comment header
   out.push('; ' + opt.comment, ';')
-  //ttl
+  // ttl
   out.push(['$TTL', opt.ttl])
-  //header
+  // header
   out.push(['@', 'IN', 'SOA', opt.zone_ns + ' ' + opt.zone_hostmaster + ' ('])
   out.push('\t\t\t' + negativeSpace(7, opt.serial) + '\t\t; Serial')
   out.push('\t\t\t' + negativeSpace(7, opt.refresh) + '\t\t; Refresh')
@@ -27,7 +27,7 @@ function ZoneFile(opt, names) {
   return out.reduce((a, b) => Array.isArray(b) ? a + '\n' + b.join('\t') : a + '\n' + b, ';') + '\n'
 }
 
-/*console.log(ZoneFile({
+/* console.log(ZoneFile({
   comment: 'BIND data file for local loopback interface',
   ttl: 604800,
   zone_ns: 'localhost.',
@@ -52,10 +52,10 @@ function ZoneFile(opt, names) {
     type: 'AAAA',
     value: '::1'
   }
-]))*/
+])) */
 
 module.exports = class Bind9DNS {
-  constructor(swarm, config) {
+  constructor (swarm, config) {
     this.swarm = swarm
     this.config = config
     this.zoneopt = config.zone_opt
@@ -68,19 +68,29 @@ module.exports = class Bind9DNS {
     }
   }
 
-  clearAllForDomain(domain, cb) {
-    log('clearing domain', domain)
-    this.names = this.names.filter(d => d.dns !== domain)
+  removeNames (names, cb) {
+    log('removing names', names)
+    this.names = this.names.filter(n2 => names.filter(n => n.dns === n2.dns && n.type == n2.type))
     this._writeZoneFile(cb)
   }
 
-  addNames(names, cb) {
+  addNames (names, cb) {
+    this.removeNames(names) // clears them up beforehand so we don't get duplicates
     log('adding names', names)
     this.names = this.names.concat(names)
     this._writeZoneFile(cb)
   }
 
-  _writeZoneFile(cb) {
+  clearDomain(domain, cb) {
+    this.removeNames(this.names.filter(n => n.dns === domain), cb)
+  }
+
+  getNames (cb) {
+    log('getting names')
+    return cb(null, this.names)
+  }
+
+  _writeZoneFile (cb) {
     log('writing zone file', this.zonefile)
     this.zoneopt.serial++
     fs.writeFile(this.zonefile, Buffer.from(ZoneFile(this.zoneopt, this.names)), cb)

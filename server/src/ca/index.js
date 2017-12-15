@@ -30,22 +30,23 @@ module.exports = (swarm, config) => {
       }
       waterfall([
         cb => conn.getPeerInfo(cb),
-        (cb, pi) => {
+        (pi, cb) => {
           const id = pi.id
           id.pubKey.verify(data.certRequest, data.signature, (err, ok) => {
             if (err || !ok) return cb(err || true)
             cb(null, id)
           })
         },
-        (cb, id) => {
+        (id, cb) => {
           swarm.getCN(id, (err, cn) => {
             if (err) return cb(err)
             cb(null, cn, id)
           })
         },
-        (cb, cn, id) => {
+        (cn, id, cb) => {
           ca.doCertRequest(data.certRequest, id, cn, data.signature, (err, certificate, fullchain) => {
             if (err) return cb(err)
+            swarm.db.set(id.toB58String(), true)
             return respond({
               success: true,
               certificate,

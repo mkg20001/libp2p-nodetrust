@@ -13,7 +13,9 @@ const SECIO = require('libp2p-secio')
 
 const protos = require('./protos')
 
-module.exports = function NodetrustServer(config) {
+const LRU = require('lru')
+
+module.exports = function NodetrustServer (config) {
   const self = this
 
   if (!config) throw new Error('Config is required')
@@ -46,6 +48,13 @@ module.exports = function NodetrustServer(config) {
     if (id.toB58String) id = id.toB58String()
     return protos.buildCN(id, swarm.zone, cb)
   }
+  swarm.dbParam = {
+    max: 1000000,
+    maxAge: config.expire || 5 * 60 * 1000
+  }
+  swarm.db = new LRU(swarm.dbParam)
+  swarm.discoveryDB = new LRU(swarm.dbParam)
+  swarm.dnsDB = new LRU(swarm.dbParam)
 
   require('./ca')(swarm, config.ca)
   require('./dns')(swarm, config.dns)
