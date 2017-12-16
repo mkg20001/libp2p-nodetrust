@@ -20,7 +20,9 @@ const NodeTrust = require('./src')
 
 map(require('./test/ids.json'), Id.createFromJSON, (e, ids) => {
   if (e) throw e
-  const peer = new Peer(ids[1])
+  Id.create((e, id) => {
+  if (e) throw e
+  const peer = new Peer(id)
 
   listen.forEach(addr => peer.multiaddrs.add(addr))
 
@@ -68,5 +70,6 @@ map(require('./test/ids.json'), Id.createFromJSON, (e, ids) => {
         console.log('Online @ https://localhost:5285')
       })
     })
+  })
   })
 })

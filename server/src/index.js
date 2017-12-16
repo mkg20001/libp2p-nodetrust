@@ -13,7 +13,7 @@ const SECIO = require('libp2p-secio')
 
 const protos = require('./protos')
 
-const LRU = require('lru')
+const DB = require('./db')
 
 module.exports = function NodetrustServer (config) {
   const self = this
@@ -52,9 +52,9 @@ module.exports = function NodetrustServer (config) {
     max: 1000000,
     maxAge: config.expire || 5 * 60 * 1000
   }
-  swarm.db = new LRU(swarm.dbParam)
-  swarm.discoveryDB = new LRU(swarm.dbParam)
-  swarm.dnsDB = new LRU(swarm.dbParam)
+  swarm.db = new DB(swarm.dbParam)
+  swarm.discoveryDB = new DB(swarm.dbParam)
+  swarm.dnsDB = new DB(swarm.dbParam)
 
   require('./ca')(swarm, config.ca)
   require('./dns')(swarm, config.dns)

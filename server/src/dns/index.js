@@ -15,7 +15,7 @@ const toDNS = {
 
 module.exports = (swarm, config) => {
   let dns
-  const nameRegEx = new RegExp('^ci[a-z]{53}\\.' + swarm.zone.replace(/\./g, '\\.') + '$', 'mi')
+  const nameRegEx = new RegExp('^ci[a-z0-9]+\\.' + swarm.zone.replace(/\./g, '\\.') + '$', 'mi')
   const {db, dnsDB} = swarm
   db.on('evict', ({key}) => {
     dnsDB.remove(key)
@@ -75,7 +75,6 @@ module.exports = (swarm, config) => {
         (id, cb) => {
           swarm.getCN(id, (err, name) => {
             if (err) return cb(err)
-            dns += '.'
             cb(null, name)
           })
         },
