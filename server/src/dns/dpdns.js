@@ -12,35 +12,47 @@ module.exports = class DPDNS {
     this.last_name_get = 0
   }
 
-  _doRequest(url, post, cb, method) {
+  _doRequest(url, method, cb) {
     url = this.config.api + url + '?format=json&apiKey='
-    if (typeof post == 'function') {
-      cb = post
-      post = false
+    let post = false
+    if (!method) method = 'GET'
+    if (typeof method === 'function') {
+      cb = method
+      method = 'GET'
+    }
+    if (typeof method === 'object') {
+      post = method
+      method = 'POST'
     }
 
-    log('doRequest (post=%s, url=%s)', Boolean(post), url + '[secret]')
+    log('doRequest %s %s %s', method, url + '[secret]', JSON.stringify(post))
 
     url += this.config.key
 
-    if (post) {
+    const cbb = (err, res, body) => {
+      if (err) return cb(err)
+      let resp
+      try {
+        resp = body ? JSON.parse(body) : {success: true}
+        if (resp.error) throw new Error(resp.error)
+        if (res.statusCode - (res.statusCode % 100) !== 200) throw new Error('Status not ok: ' + res.statusCode)
+      } catch(err) {
+        return cb(err)
+      }
+      cb(null, resp)
+    }
 
+    if (post) {
+      request({
+        url,
+        method,
+        form: post
+      }, cbb)
     } else {
       request({
         url,
-        method: method || 'GET'
-      }, (err, res, body) => {
-        if (err) return cb(err)
-        let resp
-        try {
-          resp = JSON.parse(body)
-          if (resp.error) throw new Error(resp.error)
-          if (res.statusCode !== 200) throw new Error('Status not ok: ' + res.statusCode)
-        } catch(err) {
-          return cb(err)
-        }
-        cb(null, resp)
-      })
+        method
+      }, cbb)
     }
   }
 
@@ -49,8 +61,8 @@ module.exports = class DPDNS {
     this.getNames(err => {
       if (err) return cb(err)
       delete this.last_name_get
-      const rem = this.names.filter(n2 => names.filter(n => n.name === n2.name && n.type == n2.type))
-      forEach(rem, (name, cb) => this._doRequest('record/' + name.id, false, cb, 'DELETE'), cb)
+      const rem = this.names.filter(n2 => names.filter(n => n.name === n2.name && n.type === n2.type)[0])
+      forEach(rem, (name, cb) => this._doRequest('record/' + name.id, 'DELETE', cb), cb)
     })
   }
 
@@ -58,7 +70,19 @@ module.exports = class DPDNS {
     this.removeNames(names, err => { // clears them up beforehand so we don't get duplicates
       if (err) return cb(err)
       log('adding names', names)
-      forEach(names, (name, cb) => this._doRequest('get-records', name, cb), cb)
+      forEach(names.map(n => {
+        let nn = n.name.split('.')
+        nn.pop()
+        nn.pop()
+        return {
+          id: 0,
+          name: nn.join('.'),
+          type: n.type,
+          content: n.value,
+          prio: 0,
+          ttl: 60
+        }
+      }), (name, cb) => this._doRequest('get-records', name, cb), cb)
     })
   }
 
@@ -70,7 +94,12 @@ module.exports = class DPDNS {
     log('getting names')
     this._doRequest('get-records', (err, names) => {
       if (err) return cb(err)
-      this.names = names
+      const fqdn = names.filter(n => n.type === 'SOA')[0].name
+      this.names = names.map(n => {
+        n.value = n.content
+        if (n.name !== fqdn) n.name += '.' + fqdn
+        return n
+      })
       this.last_name_get = new Date().getTime()
       return cb(null, this.names)
     })
