@@ -27,6 +27,34 @@ class DiscoveryInstance extends EventEmitter {
     cb()
   }
 
+  enableStandalone (config) {
+    this.node = config.node || defaultNode
+    this.discoveryPeers = config.discoveryPeers || 20
+    this.interval = setInterval(this._doDiscovery.bind(this), config.intervalMS || 1000)
+    this.swarm = config.swarm
+  }
+
+  disableStandalone () {
+    clearInterval(this.interval || 0)
+  }
+
+  _doDiscovery (numPeers, cb) {
+    log('discovery')
+    if (!numPeers) numPeers = this.discoveryPeers
+    if (!cb) cb = e => e ? log(e) : false
+    this.swarm.dial(this.node, '/nodetrust/discovery/1.0.0', (err, conn) => {
+      if (err) return cb(err)
+      protos.client(conn, protos.discovery, {
+        numPeers
+      }, (err, res) => {
+        if (err) return cb(err)
+        if (!res.success || !res.peers) return cb(new Error('Server did not complete discovery request!'))
+        this._handle(res.peers)
+        cb(null, res.peers)
+      })
+    })
+  }
+
   _handle (peers) {
     // if (!this.started) return
     peers.forEach(peer => {
@@ -44,8 +72,10 @@ module.exports = class NodeTrust {
     config = this.config = config || {}
     this.id = this.swarm.peerInfo.id
     this.node = config.node || defaultNode
-    this.discoveryPeers = config.discoveryPeers || 20
     this.discovery = config.discovery || new DiscoveryInstance()
+    config.swarm = swarm
+    config.node = this.node
+    this.discovery.enableStandalone(config)
 
     this.swarm.nodetrust = this
   }
@@ -94,11 +124,8 @@ module.exports = class NodeTrust {
       if (err) return cb(err)
       this.doAnnounce(err => {
         if (err) return cb(err)
-        this.doDiscovery(this.discoveryPeers, err => {
-          if (err) return cb(err)
-          log('loop ok')
-          cb()
-        })
+        log('loop ok')
+        cb()
       })
     })
   }
@@ -257,21 +284,6 @@ module.exports = class NodeTrust {
         if (err) return cb(err)
         if (!res.success) return cb(new Error('Server did not complete discovery request!'))
         cb(null)
-      })
-    })
-  }
-
-  doDiscovery (numPeers, cb) {
-    log('discovery')
-    this.swarm.dial(this.node, '/nodetrust/discovery/1.0.0', (err, conn) => {
-      if (err) return cb(err)
-      protos.client(conn, protos.discovery, {
-        numPeers
-      }, (err, res) => {
-        if (err) return cb(err)
-        if (!res.success || !res.peers) return cb(new Error('Server did not complete discovery request!'))
-        this.discovery._handle(res.peers)
-        cb(null, res.peers)
       })
     })
   }
