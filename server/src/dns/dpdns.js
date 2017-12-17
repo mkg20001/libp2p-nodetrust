@@ -12,7 +12,7 @@ module.exports = class DPDNS {
     this.last_name_get = 0
   }
 
-  _doRequest(url, method, cb) {
+  _doRequest (url, method, cb) {
     url = this.config.api + url + '?format=json&apiKey='
     let post = false
     if (!method) method = 'GET'
@@ -36,7 +36,7 @@ module.exports = class DPDNS {
         resp = body ? JSON.parse(body) : {success: true}
         if (resp.error) throw new Error(resp.error)
         if (res.statusCode - (res.statusCode % 100) !== 200) throw new Error('Status not ok: ' + res.statusCode)
-      } catch(err) {
+      } catch (err) {
         return cb(err)
       }
       cb(null, resp)
@@ -86,7 +86,7 @@ module.exports = class DPDNS {
     })
   }
 
-  clearDomain(domain, cb) {
+  clearDomain (domain, cb) {
     this.removeNames(this.names.filter(n => n.name === domain), cb)
   }
 
@@ -105,7 +105,7 @@ module.exports = class DPDNS {
     })
   }
 
-  getNames(cb) {
+  getNames (cb) {
     if (this.last_name_get) {
       log('using cache')
       cb(null, this.names)
@@ -113,5 +113,4 @@ module.exports = class DPDNS {
       this._getNames(cb)
     }
   }
-
 }

@@ -10,6 +10,13 @@ const EventEmitter = require('events').EventEmitter
 const forge = require('node-forge')
 
 class DiscoveryInstance extends EventEmitter {
+  constructor () {
+    super()
+    this.start = this.start.bind(this)
+    this.stop = this.stop.bind(this)
+    this._handle = this._handle.bind(this)
+  }
+
   start (cb) {
     this.started = true
     cb()
@@ -21,10 +28,10 @@ class DiscoveryInstance extends EventEmitter {
   }
 
   _handle (peers) {
-    if (!this.started) return
+    // if (!this.started) return
     peers.forEach(peer => {
-      const pi = new Peer(Id.fromB58String(peer.id))
-      peer.multiaddr.forEach(addr => pi.multiaddrs.addSafe(addr))
+      const pi = new Peer(Id.createFromB58String(peer.id))
+      peer.multiaddr.forEach(addr => pi.multiaddrs.add(addr))
       this.emit('peer', pi)
     })
   }
@@ -38,9 +45,13 @@ module.exports = class NodeTrust {
     this.id = this.swarm.peerInfo.id
     this.node = config.node || defaultNode
     this.discoveryPeers = config.discoveryPeers || 20
-    this.discovery = new DiscoveryInstance()
+    this.discovery = config.discovery || new DiscoveryInstance()
 
     this.swarm.nodetrust = this
+  }
+
+  static get discovery () {
+    return new DiscoveryInstance()
   }
 
   enable (opt, cb) {
@@ -106,7 +117,31 @@ module.exports = class NodeTrust {
   // Certificate
 
   getCert (cb) {
-    log('getting certificate')
+    log('getting %s certificate', this.info.type)
+    switch (this.info.type) {
+      case 'csr-ca':
+        this._CSRCA(cb)
+        break
+      case 'drop-wildcard':
+        this._DROPWILDCARD(cb)
+        break
+      default:
+        cb(new Error('Certificate Request type ' + this.info.type + ' not supported!'))
+    }
+  }
+
+  _DROPWILDCARD (cb) {
+    this.swarm.dial(this.node, '/nodetrust/ca/1.0.0', (err, conn) => {
+      if (err) return cb(err)
+      protos.client(conn, protos.ca, {}, (err, res) => {
+        if (err) return cb(err)
+        if (!res.success || !res.certificate || !res.certificate.length || !res.key || !res.key.length) return cb(new Error('Server did not complete certificate request'))
+        cb(null, res.certificate, res.key, res.fullchain)
+      })
+    })
+  }
+
+  _CSRCA (cb) {
     this._getCertRequest(this.info, (err, request, key) => {
       if (err) return cb(err)
       this.id.privKey.sign(request, (err, sign) => {
@@ -118,7 +153,7 @@ module.exports = class NodeTrust {
       })
     })
   }
-  _getCert (certRequest, signature, cb) {
+  _getCertCSRCA (certRequest, signature, cb) {
     this.swarm.dial(this.node, '/nodetrust/ca/1.0.0', (err, conn) => {
       if (err) return cb(err)
       protos.client(conn, protos.ca, {
@@ -131,7 +166,7 @@ module.exports = class NodeTrust {
       })
     })
   }
-  _getCertRequest (info, cb) {
+  _getCSR (info, cb) {
     const keys = forge.pki.rsa.generateKeyPair(1024) // TODO: use bigger key and generate async
     const csr = forge.pki.createCertificationRequest()
     csr.publicKey = keys.publicKey
@@ -200,7 +235,7 @@ module.exports = class NodeTrust {
           signature
         }, (err, res) => {
           if (err) return cb(err)
-          if (!res.success) return cb(new Error('Server did not complete dns request'))
+          if (!res.success) return cb(new Error('Server did not complete dns request!'))
           cb()
         })
       })
@@ -218,7 +253,7 @@ module.exports = class NodeTrust {
         multiaddr: this.swarm.peerInfo.multiaddrs.toArray().map(addr => addr.buffer)
       }, (err, res) => {
         if (err) return cb(err)
-        if (!res.success || !res.peers) return cb(new Error('Server did not complete discovery request'))
+        if (!res.success || !res.peers) return cb(new Error('Server did not complete discovery request!'))
         this.discovery._handle(res.peers)
         cb(null, res.peers)
       })

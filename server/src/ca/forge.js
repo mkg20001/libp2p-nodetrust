@@ -2,8 +2,9 @@
 
 const fs = require('fs')
 const read = (file, desc) => {
-  if (!fs.existsSync(file))
+  if (!fs.existsSync(file)) {
     throw new Error('Unable to find ' + desc + ' file ' + JSON.stringify(file))
+  }
   return fs.readFileSync(file).toString()
 }
 const forge = require('node-forge')
@@ -12,16 +13,17 @@ const debug = require('debug')
 const log = debug('nodetrust:ca:forge')
 
 module.exports = class ForgeCA {
-  constructor(swarm, config) {
+  constructor (swarm, config) {
     this.swarm = swarm
     this.config = config
     this.cert = read(config.ca, 'Certificate Authority Certification')
     this.key = read(config.key, 'Certificate Authority Private Key')
     this.caKey = pki.privateKeyFromPem(this.key)
     this.caCert = pki.certificateFromPem(this.cert)
+    this.type = 'csr-ca'
   }
 
-  doCertRequest(pem, id, cn, sig, cb) {
+  doCertRequest (pem, id, cn, sig, cb) {
     log('reading csr')
     const csr = pki.certificationRequestFromPem(pem.toString())
     if (!csr.verify()) return cb(new Error('Certification request invalid'))

@@ -70,18 +70,21 @@ module.exports = class Bind9DNS {
 
   removeNames (names, cb) {
     log('removing names', names)
-    this.names = this.names.filter(n2 => names.filter(n => n.name === n2.name && n.type == n2.type))
+    this.names = this.names.filter(n2 => names.filter(n => n.name === n2.name + '.' && n.type === n2.type))
     this._writeZoneFile(cb)
   }
 
   addNames (names, cb) {
     this.removeNames(names) // clears them up beforehand so we don't get duplicates
     log('adding names', names)
-    this.names = this.names.concat(names)
+    this.names = this.names.concat(names.map(n => {
+      n.name += '.'
+      return n
+    }))
     this._writeZoneFile(cb)
   }
 
-  clearDomain(domain, cb) {
+  clearDomain (domain, cb) {
     this.removeNames(this.names.filter(n => n.name === domain), cb)
   }
 
@@ -95,5 +98,4 @@ module.exports = class Bind9DNS {
     this.zoneopt.serial++
     fs.writeFile(this.zonefile, Buffer.from(ZoneFile(this.zoneopt, this.names)), cb)
   }
-
 }

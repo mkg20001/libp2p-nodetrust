@@ -15,7 +15,7 @@ class DB extends EE {
     this.last_used[key] = new Date().getTime()
     return this.data[key]
   }
-  get keys() {
+  get keys () {
     return Object.keys(this.data)
   }
   peek (key) {
