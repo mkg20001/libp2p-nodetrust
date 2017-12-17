@@ -92,10 +92,13 @@ module.exports = class NodeTrust {
     if (!cb) cb = (e) => e ? log('loop error', e) : null
     this.renewDNS(err => {
       if (err) return cb(err)
-      this.doDiscovery(this.discoveryPeers, err => {
+      this.doAnnounce(err => {
         if (err) return cb(err)
-        log('loop ok')
-        cb()
+        this.doDiscovery(this.discoveryPeers, err => {
+          if (err) return cb(err)
+          log('loop ok')
+          cb()
+        })
       })
     })
   }
@@ -244,13 +247,26 @@ module.exports = class NodeTrust {
 
   // Discovery
 
+  doAnnounce (cb) {
+    log('announce')
+    this.swarm.dial(this.node, '/nodetrust/announce/1.0.0', (err, conn) => {
+      if (err) return cb(err)
+      protos.client(conn, protos.announce, {
+        multiaddr: this.swarm.peerInfo.multiaddrs.toArray().map(addr => addr.buffer)
+      }, (err, res) => {
+        if (err) return cb(err)
+        if (!res.success) return cb(new Error('Server did not complete discovery request!'))
+        cb(null)
+      })
+    })
+  }
+
   doDiscovery (numPeers, cb) {
     log('discovery')
     this.swarm.dial(this.node, '/nodetrust/discovery/1.0.0', (err, conn) => {
       if (err) return cb(err)
       protos.client(conn, protos.discovery, {
-        numPeers,
-        multiaddr: this.swarm.peerInfo.multiaddrs.toArray().map(addr => addr.buffer)
+        numPeers
       }, (err, res) => {
         if (err) return cb(err)
         if (!res.success || !res.peers) return cb(new Error('Server did not complete discovery request!'))

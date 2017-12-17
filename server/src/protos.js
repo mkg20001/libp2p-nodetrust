@@ -12,7 +12,8 @@ module.exports = {
   info: protobuf('message Request { } message Result { required string zone = 1; required string type = 2; }'),
   ca: protobuf('message Request { bytes certRequest = 1; bytes signature = 2; } message Result { required bool success = 1; bytes certificate = 2; bytes key = 3; bytes fullchain = 4; }'),
   dns: protobuf('message Request { required int64 time = 1; required bytes signature = 2; } message Result { required bool success = 1; }'),
-  discovery: protobuf('message Request { required int32 numPeers = 1; repeated bytes multiaddr = 2; } message Peer { required string id = 1; repeated bytes multiaddr = 2; } message Result { required bool success = 1; repeated Peer peers = 2; }'),
+  announce: protobuf('message Request { repeated bytes multiaddr = 1; } message Result { required bool success = 1; }'),
+  discovery: protobuf('message Request { required int32 numPeers = 1; } message Peer { required string id = 1; repeated bytes multiaddr = 2; } message Result { required bool success = 1; repeated Peer peers = 2; }'),
   server: (conn, def, cb) => {
     pull(
       conn,

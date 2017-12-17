@@ -13,6 +13,27 @@ module.exports = (swarm) => {
     discoveryDB.emit('evict', {key})
   })
 
+  swarm.handle('/nodetrust/announce/1.0.0', (protocol, conn) => {
+    protos.server(conn, protos.announce, (data, respond) => {
+      const cb = err => {
+        if (err) log(err)
+        respond({
+          success: false
+        })
+      }
+      conn.getPeerInfo((err, pi) => {
+        if (err) return cb(err)
+        const id = pi.id.toB58String()
+        if (!db.get(id)) return cb(new Error(id + ' has not requested a certificate! Rejecting announce...'))
+        log('announce from %s', id)
+        discoveryDB.set(id, data.multiaddr)
+        return respond({
+          success: true
+        })
+      })
+    })
+  })
+
   swarm.handle('/nodetrust/discovery/1.0.0', (protocol, conn) => {
     protos.server(conn, protos.discovery, (data, respond) => {
       const cb = err => {
@@ -24,9 +45,7 @@ module.exports = (swarm) => {
       conn.getPeerInfo((err, pi) => {
         if (err) return cb(err)
         const id = pi.id.toB58String()
-        if (!db.get(id)) return cb(new Error(id + ' has not requested a certificate! Rejecting discovery...'))
         log('discovery from %s want=%s', id, data.numPeers)
-        discoveryDB.set(id, data.multiaddr)
         if (data.numPeers < 0) data.numPeers = 0
         if (data.numPeers > 100) data.numPeers = 100
         let randItem = Math.floor(Math.random() * discoveryDB.length)
