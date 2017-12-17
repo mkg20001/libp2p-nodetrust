@@ -22,7 +22,7 @@ const NodeTrust = require('./src')
 
 map(require('./test/ids.json'), Id.createFromJSON, (e, ids) => {
   if (e) throw e
-  Id.create((e, id) => {
+  Id.create({bits: 512}, (e, id) => {
     if (e) throw e
     const peer = new Peer(id)
 

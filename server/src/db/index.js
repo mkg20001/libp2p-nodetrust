@@ -18,6 +18,9 @@ class DB extends EE {
   get keys () {
     return Object.keys(this.data)
   }
+  get length () {
+    return this.keys.length
+  }
   peek (key) {
     return this.data[key] || false
   }

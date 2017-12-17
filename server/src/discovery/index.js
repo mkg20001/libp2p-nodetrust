@@ -45,14 +45,13 @@ module.exports = (swarm) => {
       conn.getPeerInfo((err, pi) => {
         if (err) return cb(err)
         const id = pi.id.toB58String()
-        log('discovery from %s want=%s', id, data.numPeers)
-        if (data.numPeers < 0) data.numPeers = 0
-        if (data.numPeers > 100) data.numPeers = 100
+        const {numPeers} = data
         let randItem = Math.floor(Math.random() * discoveryDB.length)
-        const numPeers = data.numPeers
         while (randItem + numPeers > discoveryDB.length) randItem--
-        if (randItem < 0) randItem = 0
-        const peers = discoveryDB.keys.slice(0, numPeers).filter(i => i !== id).map(id => {
+        const from = randItem
+        const to = randItem + numPeers
+        log('discovery from %s want=%s give=(%s=>%s)/%s', id, data.numPeers, from, to, discoveryDB.length)
+        const peers = discoveryDB.keys.slice(from, to).filter(i => i !== id).map(id => {
           return {
             id,
             multiaddr: discoveryDB.peek(id)
