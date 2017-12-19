@@ -11,6 +11,7 @@ const SPDY = require('libp2p-spdy')
 const MULTIPLEX = require('libp2p-multiplex')
 const SECIO = require('libp2p-secio')
 const listen = ['/ip4/0.0.0.0/tcp/0', '/ip6/::/tcp/0']
+const pull = require('pull-stream')
 
 const {
   map
@@ -79,6 +80,14 @@ map(require('../test/ids.json'), Id.createFromJSON, (e, ids) => {
           nodetrust.doAnnounce(err => err ? console.error('ANNOUNCE FAILED: %s', err) : false)
         })
       })
+    })
+
+    swarm.handle('/messages/1.0.0', conn => {
+      pull(
+        pull.values([Buffer.from('Hello from ' + id.toB58String() + '!')]),
+        conn,
+        pull.drain()
+      )
     })
 
     let nodes = {}

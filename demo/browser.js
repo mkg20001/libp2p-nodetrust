@@ -6,6 +6,7 @@ require('debug').save('libp2p*')
 process.env.INTENSE_DEBUG = '1'
 process.env.DEBUG_PACKETS = '1'
 window.debug = require('debug')
+const pull = require('pull-stream')
 
 window.onerror = function (messageOrEvent, source, lineno, colno, error) {
   console.error('%c' + (messageOrEvent == 'Script Error.' ? messageOrEvent : error.stack), 'color: red')
@@ -171,7 +172,15 @@ $(document).ready(() => (function () {
       if (nodes[id]) return
       nodes[id] = true
       $('#peers').append(pi2html(pi, 'p'))
-      swarm.dial(pi, '/echo/1.0.0', err => err ? console.error(err) : false)
+      swarm.dial(pi, '/messages/1.0.0', (err, conn) => {
+        if (err) return console.error(err)
+        pull(
+          pull.values([]),
+          conn,
+          pull.map(m => m.indexOf('>') != -1 || m.indexOf('<') != -1 ? console.warn('Got an XSS\'d message') : $('#messages').append($('<p>' + m + '</p>'))),
+          pull.drain()
+        )
+      })
     })
     swarm.on('peer:connect', pi => {
       $('#c' + pi.id.toB58String()).remove()

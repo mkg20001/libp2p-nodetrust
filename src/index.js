@@ -176,11 +176,11 @@ module.exports = class NodeTrust {
   }
 
   _CSRCA (cb) {
-    this._getCertRequest(this.info, (err, request, key) => {
+    this._getCSR(this.info, (err, request, key) => {
       if (err) return cb(err)
       this.id.privKey.sign(request, (err, sign) => {
         if (err) return cb(err, sign)
-        this._getCert(request, sign, (err, cert, chain) => {
+        this._getCertCSRCA(request, sign, (err, cert, chain) => {
           if (err) return cb(err)
           cb(null, cert, key, chain)
         })
