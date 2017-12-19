@@ -18,20 +18,16 @@
   "author": "Maciej Krüger <mkg20001@gmail.com>",
   "license": "MIT",
   "devDependencies": {
-    "aegir": "^12.2.0",
+    "aegir": "^12.3.0",
     "chai": "^4.1.2",
-    "dirty-chai": "^2.0.1",
-    "libp2p": "^0.14.3",
-    "libp2p-multiplex": "^0.5.1",
-    "libp2p-secio": "^0.8.1",
-    "libp2p-spdy": "^0.11.0",
-    "libp2p-tcp": "^0.11.1",
-    "libp2p-websockets": "github:libp2p/js-libp2p-websockets#pass-options"
+    "dirty-chai": "^2.0.1"
   },
   "dependencies": {
     "base32-encode": "^1.0.0",
     "multihashing-async": "^0.4.7",
     "node-forge": "^0.7.1",
+    "peer-id": "^0.10.3",
+    "peer-info": "^0.11.4",
     "protons": "^1.0.1"
   }
 }

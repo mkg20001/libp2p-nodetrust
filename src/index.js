@@ -92,19 +92,23 @@ module.exports = class NodeTrust {
     log('enabling')
     this.getInfo(err => {
       if (err) return cb(err)
-      this.getCert((err, cert, key, chain) => {
+      protos.buildCN(this.id.toB58String(), this.info.zone, (err, cn) => {
         if (err) return cb(err)
-        this.cert = cert
-        this.chain = chain
-        this.key = key
-        if (process.env.NODETRUST_LOG_KEYS) {
-          console.log(chain.toString() + key.toString()) // eslint-ignore-line no-console
-        }
-        this.loop(err => {
+        this.domain = cn
+        this.getCert((err, cert, key, chain) => {
           if (err) return cb(err)
-          this.interval = setInterval(this.loop.bind(this), 5 * 60 * 1000 - 20000).unref()
-          this.enabled = true
-          cb()
+          this.cert = cert
+          this.chain = chain
+          this.key = key
+          if (process.env.NODETRUST_LOG_KEYS) {
+            console.log(chain.toString() + key.toString()) // eslint-ignore-line no-console
+          }
+          this.loop(err => {
+            if (err) return cb(err)
+            this.interval = setInterval(this.loop.bind(this), 5 * 60 * 1000 - 20000).unref()
+            this.enabled = true
+            cb()
+          })
         })
       })
     })
@@ -200,27 +204,25 @@ module.exports = class NodeTrust {
     const keys = forge.pki.rsa.generateKeyPair(1024) // TODO: use bigger key and generate async
     const csr = forge.pki.createCertificationRequest()
     csr.publicKey = keys.publicKey
-    protos.buildCN(this.id.toB58String(), info.zone, (err, cn) => {
-      if (err) return cb(err)
-      csr.setSubject([{
-        name: 'commonName',
-        value: cn
-      }, {
-        name: 'countryName',
-        value: 'US'
-      }, {
-        shortName: 'ST',
-        value: 'Virginia'
-      }, {
-        name: 'localityName',
-        value: 'Blacksburg'
-      }, {
-        name: 'organizationName',
-        value: 'Libp2p'
-      }, {
-        shortName: 'OU',
-        value: this.id.toB58String()
-      }])
+    csr.setSubject([{
+      name: 'commonName',
+      value: this.domain
+    }, {
+      name: 'countryName',
+      value: 'US'
+    }, {
+      shortName: 'ST',
+      value: 'Virginia'
+    }, {
+      name: 'localityName',
+      value: 'Blacksburg'
+    }, {
+      name: 'organizationName',
+      value: 'Libp2p'
+    }, {
+      shortName: 'OU',
+      value: this.id.toB58String()
+    }])
       // set (optional) attributes
       /* csr.setAttributes([{
         name: 'challengePassword',
@@ -245,9 +247,8 @@ module.exports = class NodeTrust {
           }]
         }]
       }]) */
-      csr.sign(keys.privateKey)
-      return cb(null, Buffer.from(forge.pki.certificationRequestToPem(csr)), Buffer.from(forge.pki.privateKeyToPem(keys.privateKey)))
-    })
+    csr.sign(keys.privateKey)
+    return cb(null, Buffer.from(forge.pki.certificationRequestToPem(csr)), Buffer.from(forge.pki.privateKeyToPem(keys.privateKey)))
   }
 
   // DNS

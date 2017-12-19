@@ -20,6 +20,7 @@
     "libp2p-secio": "^0.8.1",
     "libp2p-spdy": "^0.11.0",
     "libp2p-tcp": "^0.11.1",
+    "libp2p-websockets": "^0.10.4",
     "lru": "^3.1.0",
     "multihashing-async": "^0.4.7",
     "node-forge": "^0.7.1",

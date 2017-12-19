@@ -28,6 +28,7 @@ tmp
 config.json
 *.pem
 *.crt
+bundle.js
 
 # Python
 *.pyc

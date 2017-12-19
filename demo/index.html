@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nodetrust Demo</title>
+  <link rel="shortcut icon" href="https://libp2p.io/img/favicon.png" type="image/png">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.7/cosmo/bootstrap.min.css">
+  <link rel="stylesheet" href="page.css">
+</head>
+
+<body>
+  <nav class="navbar navbar-inverse">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <a class="navbar-brand">Nodetrust Demo</a>
+      </div>
+    </div>
+  </nav>
+  <div class="container">
+    <center>
+      <h2><b>Nodetrust Demo</b></h2>
+      <h4 class="btn btn-primary" id="swarm-state">Loading...</h4>
+      <div id="controls" style="display: none;">
+        <h3><b>Tests</b></h3>
+        <div class="flex-center">
+          <h4 type="button" class="btn btn-primary" id="discovery">Enable Discovery</h4>
+        </div>
+      </div>
+    </center>
+    <br>
+    <br>
+    <div class="tt" id="peers">
+      <center>
+        <h3>Discovered Peers</h3>
+      </center>
+    </div>
+    <div class="tt" id="conns">
+      <center>
+        <h3>Connected Peers</h3>
+      </center>
+    </div>
+    <br>
+    <br>
+    <tt>
+      <div id="logfield">
+
+      </div>
+    </tt>
+  </div>
+</body>
+
+</html>
+
+<script src="./bundle.js"></script>

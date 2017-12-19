@@ -1,0 +1,30 @@
+{
+  "name": "libp2p-nodetrust-demo",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "build": "browserify . -d -o bundle.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "watchify browser.js -d -v -o bundle.js",
+    "start": "http-server -p 3000 .",
+    "dist": "browserify . -d | babel -s inline -f bundle.min.js --presets es2015 | uglifyjs --source-map content=inline,url=bundle.min.js.map --compress -o bundle.min.js"
+  },
+  "author": "Maciej Krüger <mkg20001@gmail.com>",
+  "license": "MIT",
+  "description": "",
+  "dependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-es2015": "^6.24.1",
+    "browserify": "^14.5.0",
+    "http-server": "^0.10.0",
+    "jquery": "^3.2.1",
+    "libp2p": "^0.14.3",
+    "libp2p-multiplex": "^0.5.1",
+    "libp2p-secio": "^0.8.1",
+    "libp2p-spdy": "^0.11.0",
+    "libp2p-tcp": "^0.11.1",
+    "libp2p-websockets": "github:libp2p/js-libp2p-websockets#pass-options",
+    "moment": "^2.20.1",
+    "watchify": "^3.9.0"
+  }
+}

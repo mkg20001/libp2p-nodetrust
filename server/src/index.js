@@ -5,6 +5,7 @@ const log = debug('nodetrust:server')
 
 const Libp2p = require('libp2p')
 const TCP = require('libp2p-tcp')
+const WS = require('libp2p-websockets')
 const Peer = require('peer-info')
 
 const SPDY = require('libp2p-spdy')
@@ -19,7 +20,7 @@ module.exports = function NodetrustServer (config) {
   const self = this
 
   if (!config) throw new Error('Config is required')
-  if (!config.listen) config.listen = ['/ip4/0.0.0.0/tcp/4001', '/ip6/::/tcp/4001']
+  if (!config.listen) config.listen = ['/ip4/0.0.0.0/tcp/4001', '/ip6/::/tcp/4001', '/ip4/0.0.0.0/tcp/8877/ws']
   const keys = ['id', 'zone', 'ca', 'dns', 'discovery']
   keys.forEach(key => {
     if (!config[key]) throw new Error('Config key ' + JSON.stringify(key) + ' missing!')
@@ -32,7 +33,8 @@ module.exports = function NodetrustServer (config) {
 
   const swarm = self.swarm = new Libp2p({
     transport: [
-      new TCP()
+      new TCP(),
+      new WS()
     ],
     connection: {
       muxer: [
