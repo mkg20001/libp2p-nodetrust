@@ -60,7 +60,7 @@ map(require('../test/ids.json'), Id.createFromJSON, (e, ids) => {
     node.multiaddrs.add('/ip4/127.0.0.1/tcp/8899/ipfs/' + ids[0].toB58String())
 
     const nodetrust = new NodeTrust(swarm, {
-      node,
+      node: process.env.USE_PROD ? null : node,
       discovery
     })
 

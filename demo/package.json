@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "watchify browser.js -d -v -o bundle.js",
     "start": "http-server -p 3000 .",
-    "dist": "browserify . -d | babel -s inline -f bundle.min.js --presets es2015 | uglifyjs --source-map content=inline,url=bundle.min.js.map --compress -o bundle.min.js"
+    "dist": "browserify browser.js -d | babel -s inline -f bundle.min.js --presets es2015 | uglifyjs --source-map content=inline,url=bundle.min.js.map --compress -o bundle.min.js"
   },
   "author": "Maciej Krüger <mkg20001@gmail.com>",
   "license": "MIT",
