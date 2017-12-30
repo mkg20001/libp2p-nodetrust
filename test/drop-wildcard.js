@@ -19,16 +19,16 @@ describe('drop-wildcard', () => {
 
   it('should start the server', cb => {
     server = createServer({
-      'zone': 'node.libp2p',
-      'ca': {
-        'provider': 'wilddrop',
-        'key': path.join('server', 'wildkey.pem'),
-        'cert': path.join('server', 'wildcert.pem')
+      zone: 'node.libp2p',
+      ca: {
+        provider: 'wilddrop',
+        key: path.join('server', 'wildkey.pem'),
+        cert: path.join('server', 'wildcert.pem')
       },
-      'dns': {
-        'provider': 'memory'
+      dns: {
+        provider: 'memory'
       },
-      'discovery': {
+      discovery: {
 
       }
     }, cb)

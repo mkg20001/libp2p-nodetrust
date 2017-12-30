@@ -18,16 +18,16 @@ describe('csr-ca', () => {
 
   it('should start the server', cb => {
     server = createServer({
-      'zone': 'node.libp2p',
-      'ca': {
-        'provider': 'forge',
-        'key': path.join('server', 'cakey'),
-        'ca': path.join('server', 'cacert')
+      zone: 'node.libp2p',
+      ca: {
+        provider: 'forge',
+        key: path.join('server', 'cakey'),
+        ca: path.join('server', 'cacert')
       },
-      'dns': {
-        'provider': 'memory'
+      dns: {
+        provider: 'memory'
       },
-      'discovery': {
+      discovery: {
 
       }
     }, cb)

@@ -1,6 +1,6 @@
 'use strict'
 
-/* eslint-env node */
+/* eslint-env mocha */
 
 describe('libp2p nodetrust', () => {
   // tasks

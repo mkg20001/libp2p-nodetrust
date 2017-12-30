@@ -223,30 +223,30 @@ module.exports = class NodeTrust {
       shortName: 'OU',
       value: this.id.toB58String()
     }])
-      // set (optional) attributes
-      /* csr.setAttributes([{
-        name: 'challengePassword',
-        value: 'password'
-      }, {
-        name: 'unstructuredName',
-        value: 'My Company, Inc.'
-      }, {
-        name: 'extensionRequest',
-        extensions: [{
-          name: 'subjectAltName',
-          altNames: [{
-            // 2 is DNS type
-            type: 2,
-            value: 'test.domain.com'
-          }, {
-            type: 2,
-            value: 'other.domain.com',
-          }, {
-            type: 2,
-            value: 'www.domain.net'
-          }]
+    // set (optional) attributes
+    /* csr.setAttributes([{
+      name: 'challengePassword',
+      value: 'password'
+    }, {
+      name: 'unstructuredName',
+      value: 'My Company, Inc.'
+    }, {
+      name: 'extensionRequest',
+      extensions: [{
+        name: 'subjectAltName',
+        altNames: [{
+          // 2 is DNS type
+          type: 2,
+          value: 'test.domain.com'
+        }, {
+          type: 2,
+          value: 'other.domain.com',
+        }, {
+          type: 2,
+          value: 'www.domain.net'
         }]
-      }]) */
+      }]
+    }]) */
     csr.sign(keys.privateKey)
     return cb(null, Buffer.from(forge.pki.certificationRequestToPem(csr)), Buffer.from(forge.pki.privateKeyToPem(keys.privateKey)))
   }
