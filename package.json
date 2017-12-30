@@ -4,7 +4,16 @@
   "description": "ID.node.libp2p.io addresses and certificates for libp2p nodes",
   "main": "src/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "lint": "aegir lint",
+    "build": "aegir build",
+    "test": "aegir test",
+    "test:node": "aegir test -t node",
+    "test:browser": "aegir test -t browser",
+    "release": "aegir release",
+    "release-minor": "aegir release --type minor",
+    "release-major": "aegir release --type major",
+    "coverage": "aegir coverage",
+    "coverage-publish": "aegir coverage -u"
   },
   "keywords": [
     "libp2p",
@@ -20,7 +29,13 @@
   "devDependencies": {
     "aegir": "^12.3.0",
     "chai": "^4.1.2",
-    "dirty-chai": "^2.0.1"
+    "dirty-chai": "^2.0.1",
+    "libp2p": "^0.14.3",
+    "libp2p-multiplex": "^0.5.1",
+    "libp2p-secio": "^0.8.1",
+    "libp2p-spdy": "^0.11.0",
+    "libp2p-tcp": "^0.11.1",
+    "libp2p-websockets": "^0.10.4"
   },
   "dependencies": {
     "base32-encode": "^1.0.0",
@@ -29,5 +44,16 @@
     "peer-id": "^0.10.3",
     "peer-info": "^0.11.4",
     "protons": "^1.0.1"
-  }
+  },
+  "directories": {
+    "test": "tests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mkg20001/libp2p-nodetrust.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mkg20001/libp2p-nodetrust/issues"
+  },
+  "homepage": "https://github.com/mkg20001/libp2p-nodetrust#readme"
 }

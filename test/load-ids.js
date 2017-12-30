@@ -14,5 +14,3 @@ before(function (cb) {
     cb()
   })
 })
-
-require('./node')

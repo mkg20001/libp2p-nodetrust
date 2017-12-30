@@ -57,7 +57,7 @@ map(require('../test/ids.json'), Id.createFromJSON, (e, ids) => {
     }, peer)
 
     const node = new Peer(ids[0])
-    node.multiaddrs.add('/ip4/127.0.0.1/tcp/4001/ipfs/' + ids[0].toB58String())
+    node.multiaddrs.add('/ip4/127.0.0.1/tcp/8899/ipfs/' + ids[0].toB58String())
 
     const nodetrust = new NodeTrust(swarm, {
       node,

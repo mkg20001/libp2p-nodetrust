@@ -20,7 +20,7 @@ module.exports = function NodetrustServer (config) {
   const self = this
 
   if (!config) throw new Error('Config is required')
-  if (!config.listen) config.listen = ['/ip4/0.0.0.0/tcp/4001', '/ip6/::/tcp/4001', '/ip4/0.0.0.0/tcp/8877/ws']
+  if (!config.listen) config.listen = ['/ip4/0.0.0.0/tcp/8899', '/ip6/::/tcp/8899', '/ip4/0.0.0.0/tcp/8877/ws']
   const keys = ['id', 'zone', 'ca', 'dns', 'discovery']
   keys.forEach(key => {
     if (!config[key]) throw new Error('Config key ' + JSON.stringify(key) + ' missing!')
