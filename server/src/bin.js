@@ -13,6 +13,7 @@ Id.createFromJSON(config.id, (err, id) => {
   const s = new Server(config)
   s.start(err => {
     if (err) throw err
-    console.log('READY')
+    s.swarm.peerInfo.multiaddrs.toArray().map(a => a.toString()).forEach(a => console.log('Listening on', a))
+    console.log('Ready to accept requests!')
   })
 })

@@ -23,6 +23,7 @@
   "author": "Maciej Krüger <mkg20001@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "base32-encode": "^1.0.0",
     "libp2p": "^0.14.3",
     "libp2p-crypto": "^0.10.4",
     "libp2p-multiplex": "^0.5.1",
