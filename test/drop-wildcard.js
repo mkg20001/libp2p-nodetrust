@@ -8,6 +8,7 @@ chai.use(dirtyChai)
 const {createServer, createClient} = require('./utils')
 const {parallel} = require('async')
 const fs = require('fs')
+const path = require('path')
 
 /* eslint-env mocha */
 
@@ -21,8 +22,8 @@ describe('drop-wildcard', () => {
       'zone': 'node.libp2p',
       'ca': {
         'provider': 'wilddrop',
-        'key': 'server/wildkey.pem',
-        'cert': 'server/wildcert.pem'
+        'key': path.join('server', 'wildkey.pem'),
+        'cert': path.join('server', 'wildcert.pem')
       },
       'dns': {
         'provider': 'memory'
@@ -45,8 +46,8 @@ describe('drop-wildcard', () => {
       expect(client.chain).to.exist()
       expect(client.cert).to.exist()
       expect(client.key).to.exist()
-      expect(client.cert.toString()).to.equal(fs.readFileSync('server/wildcert.pem').toString())
-      expect(client.key.toString()).to.equal(fs.readFileSync('server/wildkey.pem').toString())
+      expect(client.cert.toString()).to.equal(fs.readFileSync(path.join('server', 'wildcert.pem')).toString())
+      expect(client.key.toString()).to.equal(fs.readFileSync(path.join('server', 'wildkey.pem')).toString())
       cb()
     })
   })

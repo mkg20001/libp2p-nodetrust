@@ -7,6 +7,7 @@ chai.use(dirtyChai)
 
 const {createServer, createClient} = require('./utils')
 const {parallel} = require('async')
+const path = require('path')
 
 /* eslint-env mocha */
 
@@ -20,8 +21,8 @@ describe('csr-ca', () => {
       'zone': 'node.libp2p',
       'ca': {
         'provider': 'forge',
-        'key': 'server/cakey.pem',
-        'ca': 'server/cacert.pem'
+        'key': path.join('server', 'cakey'),
+        'ca': path.join('server', 'cacert')
       },
       'dns': {
         'provider': 'memory'
