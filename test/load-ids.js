@@ -15,7 +15,7 @@ before(function (cb) {
     global.id = ids[0]
     global.ids = ids
     if (!fs.existsSync(path.join('server/wildcert.pem'))) {
-      cp.execSync('bash server/genca.sh')
+      cp.execSync('bash server/genca.sh -C')
     }
     cb()
   })

@@ -1,5 +1,7 @@
 #!/bin/sh
 
+[ "x$1" == "x-C" ] && cd server # enter server dir
+
 openssl req -subj '/C=US/ST=Oregon/L=Portland/O=Libp2p Nodetrust DEV/OU=Org' -new -nodes -x509 -days 3650 -extensions v3_ca -keyout cakey.pem -out cacert.pem
 openssl x509 -in cacert.pem -inform PEM -out ca.crt
 
