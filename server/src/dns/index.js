@@ -14,7 +14,7 @@ const toDNS = {
 }
 
 module.exports = (swarm, config) => {
-  let dns
+  let dnsprov
   const nameRegEx = new RegExp('^ci[a-z0-9]+\\.' + swarm.zone.replace(/\./g, '\\.') + '$', 'mi')
   const {db, dnsDB} = swarm
   db.on('evict', ({key}) => {
@@ -24,7 +24,7 @@ module.exports = (swarm, config) => {
 
   try {
     const DNS = require('./' + config.provider)
-    dns = new DNS(swarm, config)
+    dnsprov = new DNS(swarm, config)
   } catch (e) {
     e.stack = 'Failed to load DNS provider ' + config.provider + ': ' + e.stack
     throw e
@@ -34,14 +34,13 @@ module.exports = (swarm, config) => {
     log('clear up dns for %s', key)
     swarm.getCN(key, (err, cn) => {
       if (err) return log(err)
-      dns.clearDomain(cn, err => err ? log(err) : false)
+      dnsprov.clearDomain(cn, err => err ? log(err) : false)
     })
   })
 
-  let dnsprov = dns
   let ready = false
 
-  dns.getNames((err, names) => {
+  dnsprov.getNames((err, names) => {
     if (err) throw err
     names.filter(n => n.name.match(nameRegEx)).map(n => n.name.split('.').shift()).forEach(id => dnsDB.set(id, true))
     ready = true
@@ -89,7 +88,7 @@ module.exports = (swarm, config) => {
                 value: s[2]
               }
             })
-            cb(null, dns, ips)
+            cb(null, name, ips)
           })
         },
         (dns, ips, cb) => {
