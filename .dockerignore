@@ -3,3 +3,4 @@
 !demo/package.json
 !demo/index.js
 !src
+!test/ids.json
