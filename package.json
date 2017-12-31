@@ -43,7 +43,8 @@
     "node-forge": "^0.7.1",
     "peer-id": "^0.10.3",
     "peer-info": "^0.11.4",
-    "protons": "^1.0.1"
+    "protons": "^1.0.1",
+    "pull-stream": "^3.6.1"
   },
   "directories": {
     "test": "tests"
