@@ -39,6 +39,7 @@
   },
   "dependencies": {
     "base32-encode": "^1.0.0",
+    "debug": "^3.1.0",
     "multihashing-async": "^0.4.7",
     "node-forge": "^0.7.1",
     "peer-id": "^0.10.3",
