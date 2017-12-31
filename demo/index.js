@@ -71,7 +71,8 @@ map(require('../test/ids.json'), Id.createFromJSON, (e, ids) => {
         let wss = ws.createListener({
           cert: nodetrust.chain,
           key: nodetrust.key
-        }, l[0].handler) // use the handler from TCP
+        }, l[0].handler || console.log) // use the handler from TCP
+        wss.on('connection', conn => l[0].emit('connection', conn))
         wss.listen(multiaddr('/ip4/0.0.0.0/tcp/5285/ws'), err => {
           if (err) throw err
           const ma = '/dns/' + nodetrust.domain + '/tcp/5285/wss/'
@@ -82,7 +83,7 @@ map(require('../test/ids.json'), Id.createFromJSON, (e, ids) => {
       })
     })
 
-    swarm.handle('/messages/1.0.0', conn => {
+    swarm.handle('/messages/1.0.0', (proto, conn) => {
       pull(
         pull.values([Buffer.from('Hello from ' + id.toB58String() + '!')]),
         conn,

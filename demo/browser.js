@@ -36,8 +36,9 @@ let c_hist = []
 
 let ntPeer
 
-if (window.location.host === 'localhost' && window.location.port === 3000) { // ifdev
+if (window.location.host === 'localhost:3000') { // ifdev
   map(require('../test/ids.json'), Id.createFromJSON, (e, ids) => {
+    console.info('Using dev!')
     if (e) throw e
     ntPeer = new Peer(ids[0])
     ntPeer.multiaddrs.add('/ip4/127.0.0.1/tcp/8877/ws/ipfs/' + ids[0].toB58String())
