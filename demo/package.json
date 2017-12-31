@@ -13,9 +13,6 @@
   "license": "MIT",
   "description": "",
   "dependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-preset-es2015": "^6.24.1",
-    "browserify": "^14.5.0",
     "http-server": "^0.10.0",
     "jquery": "^3.2.1",
     "libp2p": "^0.14.3",
@@ -25,7 +22,12 @@
     "libp2p-tcp": "^0.11.1",
     "libp2p-websockets": "github:libp2p/js-libp2p-websockets#pass-options",
     "moment": "^2.20.1",
-    "pull-stream": "^3.6.1",
+    "pull-stream": "^3.6.1"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-es2015": "^6.24.1",
+    "browserify": "^14.5.0",
     "watchify": "^3.9.0"
   }
 }
