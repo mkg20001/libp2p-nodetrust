@@ -8,3 +8,4 @@ RUN npm i --production
 ENTRYPOINT ["/usr/local/bin/dumb-init", "node", "."]
 ENV USE_PROD 1
 ENV DEBUG libp2p*
+EXPOSE 5285
