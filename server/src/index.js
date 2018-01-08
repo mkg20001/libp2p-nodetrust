@@ -16,6 +16,18 @@ const protos = require('./protos')
 
 const DB = require('./db')
 
+function stripSecrets (conf) {
+  const c = Object.assign({}, conf) // clone the object
+  for (const p in c) {
+    if (Boolean(['key', 'cert', 'priv', 'id', 'api'].filter(v => p.indexOf(v) !== -1).length) && p !== 'provider') {
+      c[p] = '[secret]'
+    } else if (typeof c[p] === 'object' && !Array.isArray(c[p])) {
+      c[p] = stripSecrets(c[p])
+    }
+  }
+  return c
+}
+
 module.exports = function NodetrustServer (config) {
   const self = this
 
@@ -26,7 +38,9 @@ module.exports = function NodetrustServer (config) {
     if (!config[key]) throw new Error('Config key ' + JSON.stringify(key) + ' missing!')
   })
 
-  log('creating server', config)
+  const configSafe = stripSecrets(config)
+
+  log('creating server', configSafe)
 
   const peer = new Peer(config.id)
   config.listen.forEach(addr => peer.multiaddrs.add(addr))
