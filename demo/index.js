@@ -75,7 +75,7 @@ map(require('../test/ids.json'), Id.createFromJSON, (e, ids) => {
         wss.on('connection', conn => l[0].emit('connection', conn))
         wss.listen(multiaddr('/ip4/0.0.0.0/tcp/5285/ws'), err => {
           if (err) throw err
-          const ma = '/dns/' + nodetrust.domain + '/tcp/5285/wss/'
+          const ma = '/dnsaddr/' + nodetrust.domain + '/tcp/5285/wss/'
           console.log('Online @ https://localhost:5285 & %s', ma)
           swarm.peerInfo.multiaddrs.add(ma)
           nodetrust.doAnnounce(err => err ? console.error('ANNOUNCE FAILED: %s', err) : false)
