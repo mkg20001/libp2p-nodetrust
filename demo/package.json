@@ -21,6 +21,7 @@
     "libp2p-spdy": "^0.11.0",
     "libp2p-tcp": "^0.11.2",
     "libp2p-websockets": "github:libp2p/js-libp2p-websockets#pass-options",
+    "mafmt": "github:mkg20001/js-mafmt#patch-2",
     "moment": "^2.20.1",
     "pull-stream": "^3.6.1"
   },
