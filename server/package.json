@@ -26,17 +26,14 @@
     "debug": "^3.1.0",
     "greenlock": "^2.1.18",
     "libp2p": "^0.16.4",
-    "libp2p-crypto": "^0.12.1",
     "libp2p-multiplex": "^0.5.1",
     "libp2p-secio": "^0.9.2",
     "libp2p-spdy": "^0.11.0",
     "libp2p-tcp": "^0.11.5",
-    "libp2p-websockets": "^0.10.4",
-    "lru": "^3.1.0",
     "mafmt": "^4.0.0",
     "named": "github:mkg20001/node-named",
     "node-forge": "^0.7.1",
     "protons": "^1.0.1",
-    "request": "^2.83.0"
+    "pull-protocol-buffers": "^0.1.2"
   }
 }

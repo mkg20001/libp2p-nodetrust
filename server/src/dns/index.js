@@ -38,6 +38,9 @@ module.exports = class DNSServer {
   }
   start (cb) {
     this.server.listen(this.port, this.host, cb)
+  }
+  stop (cb) {
+    // TODO: stop the server
     cb()
   }
   _handle (query, send) { // TODO: legitify the dns response

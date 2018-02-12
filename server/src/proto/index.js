@@ -6,7 +6,7 @@ const Pushable = require('pull-pushable')
 const pull = require('pull-stream')
 const debug = require('debug')
 const log = debug('nodetrust:protocol')
-const forge = require('forge')
+const forge = require('node-forge')
 const {pki} = forge
 
 const {decodeAddr} = require('../dns')
@@ -60,7 +60,7 @@ class RPC {
       } catch (e) {
         return cb(e)
       }
-      this.opt.le.handleRequest(data, d, csr)
+      this.opt.le.handleRequest(data, d, csr, cb)
     }
     read(null, next)
   }
@@ -81,4 +81,13 @@ class RPC {
       return cb()
     })
   }
+}
+
+module.exports = (opt) => {
+  opt.swarm.handle('/nodetrust/2.0.0', (proto, conn) => {
+    const rpc = new RPC(opt)
+    rpc.setup(conn, err => {
+      if (err) return log(err)
+    })
+  })
 }

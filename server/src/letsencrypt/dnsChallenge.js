@@ -8,9 +8,9 @@ const createAuthDigest = keyAuthorization => crypto.createHash('sha256').update(
 const dns = require('dns')
 
 module.exports = class DNSChallenge {
-  constructor (dns) {
-    this.dns = dns
-    this.zone = dns.zone
+  constructor (opt) {
+    this.dns = opt.dns
+    this.zone = opt.zone
   }
   set (args, domain, challenge, keyAuthorization, cb) {
     domain = (args.test || '') + args.acmeChallengeDns + domain

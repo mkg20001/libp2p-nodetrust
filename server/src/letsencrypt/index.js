@@ -22,7 +22,7 @@ class Letsencrypt {
       log
     })
 
-    const dns = new dnsChallenge(opt.dns)
+    const dns = new dnsChallenge(opt)
 
     this.le = LE.create({
       server: LE.stagingServerUrl,
