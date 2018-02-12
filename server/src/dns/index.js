@@ -44,7 +44,7 @@ module.exports = class DNSServer {
     cb()
   }
   _handle (query, send) { // TODO: legitify the dns response
-    const domain = query.name()
+    const domain = query.name().toLowerCase() //  [78.47.119.230:15900#8530]      V8-8-8-8.iP.liBp2P-NODETrusT.tk, yep some dns clients are plain retarded
     const res = decodeAddr(domain.split('.')[0]).concat(this._db[domain] || [])
     const id = query._client.address + ':' + query._client.port + '#' + query.id
     res.forEach(r => {
