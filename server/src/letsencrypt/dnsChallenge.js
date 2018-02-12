@@ -5,7 +5,6 @@ const log = debug('nodetrust:letsencrypt:dns')
 const crypto = require('crypto')
 const createAuthDigest = keyAuthorization => crypto.createHash('sha256').update(keyAuthorization || '').digest('base64')
   .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '')
-const dns = require('dns')
 
 module.exports = class DNSChallenge {
   constructor (opt) {
@@ -28,9 +27,5 @@ module.exports = class DNSChallenge {
     this.dns.removeRecords(domain)
     log('removed challenge for %s', domain)
     cb(null)
-  }
-  loopback (args, domain, challenge, done) {
-    domain = (args.test || '') + args.acmeChallengeDns + domain
-    dns.resolveTxt(done)
   }
 }
