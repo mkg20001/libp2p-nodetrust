@@ -11,12 +11,12 @@ const ip6re = /^(::)?(((\d{1,3}\.){3}(\d{1,3}){1})?([0-9a-f]){0,4}:{0,2}){1,8}(:
 function decodeAddr (addr) {
   let ip
   switch (addr.substr(0, 2)) {
-    case 'v4':
+    case 'ip4':
       ip = addr.substr(2).replace(/-/g, '.')
       if (!ip.match(ip4re)) return []
       return [['A', ip]]
       break
-    case 'v6':
+    case 'ip6':
       ip = addr.substr(2).replace(/-/g, ':')
       if (!ip.match(ip6re)) return []
       return [['AAAA', ip]]
@@ -38,6 +38,7 @@ module.exports = class DNSServer {
   }
   start (cb) {
     this.server.listen(this.port, this.host, cb)
+    cb()
   }
   stop (cb) {
     // TODO: stop the server
