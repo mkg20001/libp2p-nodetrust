@@ -23,7 +23,6 @@
   "author": "Maciej Krüger <mkg20001@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "base32-encode": "^1.0.0",
     "libp2p": "^0.15.0",
     "libp2p-crypto": "^0.11.0",
     "libp2p-multiplex": "^0.5.1",
@@ -33,7 +32,7 @@
     "libp2p-websockets": "^0.10.4",
     "lru": "^3.1.0",
     "mafmt": "github:mkg20001/js-mafmt#patch-2",
-    "multihashing-async": "^0.4.7",
+    "named": "github:mkg20001/node-named",
     "node-forge": "^0.7.1",
     "protons": "^1.0.1",
     "request": "^2.83.0"
