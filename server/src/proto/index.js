@@ -39,28 +39,16 @@ class RPC {
         this.source.end()
         return read(err, next)
       }
-      const cb = (err, cert) => {
+      const cb = (err, res) => {
         if (err) {
           log(err)
-          return this.source.push(CertResponse.encode({
-            error: true
-          }))
+          return this.source.push(CertResponse.encode({ error: true }))
         }
-        return this.source.push(CertResponse.encode({
-          error: false,
-          cert
-        }))
+        return this.source.push(CertResponse.encode(Object.assign({ error: false }, res)))
       }
       const d = decodeAddr(data.sub)
       if (!d.length) return cb(new Error('Invalid subdomain'))
-      let csr
-      try {
-        csr = pki.certificationRequestToPem(forge.util.encodeUtf8(data.csr))
-        // TODO: check if CN matches
-      } catch (e) {
-        return cb(e)
-      }
-      this.opt.le.handleRequest(data, d, csr, cb)
+      this.opt.le.handleRequest(data.sub + '.' + this.opt.zone, cb)
     }
     read(null, next)
   }

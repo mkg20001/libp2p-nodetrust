@@ -6,7 +6,8 @@
   },
   "zone": "node.libp2p.io",
   "letsencrypt": {
-    "storageDir": "/tmp/nodetrust-le-tmp"
+    "storageDir": "/tmp/nodetrust-le-tmp",
+    "email": "you@localhost"
   },
   "dns": {
     "port": 4500,

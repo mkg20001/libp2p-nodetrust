@@ -22,6 +22,8 @@ class Letsencrypt {
       log
     })
 
+    this.email = opt.email
+
     const dns = new dnsChallenge(opt)
 
     this.le = LE.create({
@@ -37,6 +39,15 @@ class Letsencrypt {
       debug,
       log
     })
+  }
+  handle (domain, cb) {
+    this.le.register({
+      domains: [domain],
+      email: this.email,
+      agreeTos: true, // yolo
+      rsaKeySize: 2048,
+      challengeType: 'dns-01'
+    }).then(res => cb(null, res), cb)
   }
 }
 
