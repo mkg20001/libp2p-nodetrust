@@ -69,6 +69,7 @@ module.exports = class Nodetrust {
     this.zone = opt.zone
 
     const dns = this.dns = new DNS(opt.dns)
+    dns.zone = opt.zone
     opt.letsencrypt.dns = dns
     this.le = new LE(opt.letsencrypt)
 
@@ -77,15 +78,15 @@ module.exports = class Nodetrust {
 
   start (cb) {
     waterfall([
-      cb => this.swarm.start(cb),
-      cb => this.dns.start(cb)
+      cb => this.swarm.start(err => cb(err)),
+      cb => this.dns.start(err => cb(err))
     ], cb)
   }
 
   stop (cb) {
     waterfall([
-      cb => this.swarm.stop(cb),
-      cb => this.dns.stop(cb)
+      cb => this.swarm.stop(err => cb(err)),
+      cb => this.dns.stop(err => cb(err))
     ], cb)
   }
 }

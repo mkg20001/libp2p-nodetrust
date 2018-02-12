@@ -30,17 +30,16 @@ class Letsencrypt {
       server: LE.stagingServerUrl,
       store: leStore,
       challenges: {
-        challenges: {
-          'dns-01': dns
-        }
+        'dns-01': dns
       },
       challengeType: 'dns-01',
       aggreeToTerms: leAgree,
       debug,
       log
     })
+    this.le.challenges['dns-01'] = dns // workarround
   }
-  handle (domain, cb) {
+  handleRequest (domain, cb) {
     this.le.register({
       domains: [domain],
       email: this.email,
