@@ -34,11 +34,15 @@ class RPC {
       if (err) {
         log(err)
         this.source.push({ error: true })
-      } else this.source.push(Object.assign({ error: false }, res))
+      } else {
+        this.source.push(Object.assign({ error: false }, res))
+      }
+
       this.source.end()
     }
     const ips = this.addr.map(a => a.toString()).filter(a => a.startsWith('/ip')).map(a => a.split('/')[2]) // TODO: filter unique
     const domains = ips.map(ip => encodeAddr(ip)).filter(Boolean).map(sub => sub + '.' + this.opt.zone)
+    log('cert for %s', domains.join(', '))
     this.opt.le.handleRequest(domains, cb)
   }
   setup (conn, cb) {

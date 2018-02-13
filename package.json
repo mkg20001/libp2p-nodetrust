@@ -34,17 +34,15 @@
     "libp2p-multiplex": "^0.5.1",
     "libp2p-secio": "^0.9.2",
     "libp2p-spdy": "^0.11.0",
-    "libp2p-tcp": "^0.11.5",
-    "libp2p-websockets": "^0.10.4"
+    "libp2p-tcp": "^0.11.5"
   },
   "dependencies": {
     "debug": "^3.1.0",
     "mafmt": "^4.0.0",
-    "node-forge": "^0.7.1",
     "once": "^1.4.0",
-    "peer-info": "^0.11.6",
     "protons": "^1.0.1",
-    "pull-stream": "^3.6.1"
+    "pull-stream": "^3.6.1",
+    "libp2p-websockets": "^0.10.4"
   },
   "directories": {
     "test": "tests"
