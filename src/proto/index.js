@@ -24,6 +24,7 @@ module.exports = class RPC {
   sink (read) {
     const next = (err, data) => {
       if (err) {
+        if (err === true) err = new Error('Server unexpectedly closed the connection!')
         this.onCert(err)
       } else {
         if (data.error) {
@@ -34,7 +35,7 @@ module.exports = class RPC {
         }
       }
 
-      return read(true)
+      return read(true, () => {})
     }
 
     read(null, next)

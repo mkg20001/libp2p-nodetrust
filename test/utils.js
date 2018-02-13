@@ -46,7 +46,7 @@ const Utils = module.exports = {
     }, Utils.clientPeer())
   },
   createClient: (config, cb) => {
-    config.node = Utils.serverPeer()
+    if (!config.node) config.node = Utils.serverPeer()
     const swarm = Utils.createClientSwarm()
     const client = new Client(config)
     client.__setSwarm(swarm)

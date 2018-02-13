@@ -27,9 +27,9 @@ function decodeAddr (addr) {
 function encodeAddr (ip) {
   switch (true) {
     case Boolean(ip.match(ip4re)):
-      return 'ip4' + ip.replace(/\./, '-')
+      return 'ip4' + ip.replace(/\./g, '-')
     case Boolean(ip.match(ip6re)):
-      return 'ip6' + ip.replace(/:/, '-')
+      return 'ip6' + ip.replace(/:/g, '-')
     default:
       return false
   }

@@ -11,7 +11,7 @@ const once = require('once')
 const debug = require('debug')
 const log = debug('libp2p:nodetrust')
 const noop = err => err ? log(err) : false
-defaultNode.multiaddrs.add('/dns/libp2p-nodetrust.tk/tcp/8899')
+defaultNode.multiaddrs.add('/dnsaddr/libp2p-nodetrust.tk/tcp/8899')
 
 module.exports = class Nodetrust {
   constructor (opt) {
@@ -31,6 +31,7 @@ module.exports = class Nodetrust {
   }
 
   _getCert (cb) {
+    cb = once(cb)
     if (this.cert && this.cert.expiresAt - Date.now() > 0) return cb(null, this.cert)
     this._aquireCert((err, cert) => {
       if (err) return cb(err)
@@ -41,7 +42,7 @@ module.exports = class Nodetrust {
 
   _stealListener () {
     // HACK: get a random listener from libp2p
-    const {swarm} = this
+    const swarm = this.swarm.switch
     for (const transport in swarm.transports) {
       if (swarm.transports[transport].listeners.length) return swarm.transports[transport].listeners[0]
     }
@@ -83,7 +84,7 @@ module.exports = class Nodetrust {
     waterfall([
       cb => this._getCert(cb),
       (cert, cb) => {
-        this._renewTimeout = setTimeout(this._renew.bind(this), cert.expiresAt - Date.now() - 1000) // leave 1s gap to avoid ._getCert race
+        // this._renewTimeout = setTimeout(this._renew.bind(this), cert.expiresAt - Date.now() - 1000) // leave 1s gap to avoid ._getCert race
         this._setupServer(cb)
       },
       (addr, cb) => {
@@ -91,7 +92,7 @@ module.exports = class Nodetrust {
         const {peerInfo} = swarm
         const port = parseInt(addr.map(a => a.toString().match(/\/tcp\/(\d+)\//)[1]).filter(Boolean)[0], 10)
         if (isNaN(port)) return cb(new Error('WSS listening on invalid port!'))
-        const ma = this._addedMAs = cert.altnames.map(domain => '/dns/' + domain + '/tcp/' + port + '/wss')
+        const ma = this._addedMAs = cert.altnames.map(domain => '/dnsaddr/' + domain + '/tcp/' + port + '/wss')
         ma.forEach(addr => peerInfo.multiaddrs.add(addr))
         cb()
       }
@@ -105,7 +106,7 @@ module.exports = class Nodetrust {
         const {_addedMAs, swarm, _renewTimeout} = this
         clearTimeout(_renewTimeout || 0)
         const {peerInfo} = swarm
-        peerInfo.replace(_addedMAs, [])
+        peerInfo.multiaddrs.replace(_addedMAs, [])
         cb()
       }
     ], cb)
