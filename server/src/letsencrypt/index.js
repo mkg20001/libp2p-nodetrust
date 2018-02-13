@@ -2,7 +2,7 @@
 
 const LE = require('greenlock')
 const storeCertbot = require('le-store-certbot')
-const dnsChallenge = require('./dnsChallenge')
+const DnsChallenge = require('./dnsChallenge')
 
 const debug = require('debug')
 const log = debug('nodetrust:letsencrypt')
@@ -24,7 +24,7 @@ class Letsencrypt {
 
     this.email = opt.email
 
-    const dns = new dnsChallenge(opt)
+    const dns = new DnsChallenge(opt)
 
     this.le = LE.create({
       server: LE.stagingServerUrl,
@@ -39,9 +39,9 @@ class Letsencrypt {
     })
     this.le.challenges['dns-01'] = dns // workarround
   }
-  handleRequest (domain, cb) {
+  handleRequest (domains, cb) {
     this.le.register({
-      domains: [domain],
+      domains,
       email: this.email,
       agreeTos: true, // yolo
       rsaKeySize: 2048,

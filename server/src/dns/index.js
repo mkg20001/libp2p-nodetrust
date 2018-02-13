@@ -15,14 +15,23 @@ function decodeAddr (addr) {
       ip = addr.substr(3).replace(/-/g, '.')
       if (!ip.match(ip4re)) return []
       return [['A', ip]]
-      break
     case 'ip6':
       ip = addr.substr(3).replace(/-/g, ':')
       if (!ip.match(ip6re)) return []
       return [['AAAA', ip]]
-      break
     default:
       return []
+  }
+}
+
+function encodeAddr (ip) {
+  switch (true) {
+    case Boolean(ip.match(ip4re)):
+      return ip.replace(/\./, '-')
+    case Boolean(ip.match(ip6re)):
+      return ip.replace(/:/, '-')
+    default:
+      return false
   }
 }
 
@@ -66,3 +75,5 @@ module.exports = class DNSServer {
 }
 
 module.exports.decodeAddr = decodeAddr
+
+module.exports.encodeAddr = encodeAddr

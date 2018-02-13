@@ -3,11 +3,11 @@
 // This is a tiny script to test nodetrust's dns server as standalone
 // Use $ dig -p 4500 @localhost DOMAIN to query it
 
-const d = require('./')
+const DNS = require('./')
 
-const i = new d({
+const dnsServer = new DNS({
   port: 4500,
   ttl: 2
 })
-i.start(console.log)
-i.addRecords('nodetrust.debug', [['TXT', 'true']])
+dnsServer.start(console.log)
+dnsServer.addRecords('nodetrust.debug', [['TXT', 'true']])
