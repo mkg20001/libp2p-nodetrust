@@ -7,7 +7,6 @@ const Client = require('../src')
 const Libp2p = require('libp2p')
 
 const TCP = require('libp2p-tcp')
-const WS = require('libp2p-websockets')
 
 const MULTIPLEX = require('libp2p-multiplex')
 const SPDY = require('libp2p-spdy')
@@ -35,8 +34,7 @@ const Utils = module.exports = {
   createClientSwarm: () => {
     return new Libp2p({
       transport: [
-        new TCP(),
-        new WS()
+        new TCP()
       ],
       connection: {
         muxer: [
@@ -50,7 +48,8 @@ const Utils = module.exports = {
   createClient: (config, cb) => {
     config.node = Utils.serverPeer()
     const swarm = Utils.createClientSwarm()
-    const client = new Client(swarm, config)
+    const client = new Client(config)
+    client.__setSwarm(swarm)
     swarm.start(cb)
     return [swarm, client]
   }
