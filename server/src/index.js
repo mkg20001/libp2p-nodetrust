@@ -5,16 +5,11 @@ const log = debug('nodetrust:server')
 
 const Libp2p = require('libp2p')
 const TCP = require('libp2p-tcp')
-const WS = require('libp2p-websockets')
 const Peer = require('peer-info')
 
 const SPDY = require('libp2p-spdy')
 const MULTIPLEX = require('libp2p-multiplex')
 const SECIO = require('libp2p-secio')
-
-const protos = require('./protos')
-
-const DB = require('./db')
 
 function stripSecrets (conf) {
   const c = Object.assign({}, conf) // clone the object
@@ -28,55 +23,70 @@ function stripSecrets (conf) {
   return c
 }
 
-module.exports = function NodetrustServer (config) {
-  const self = this
+const Proto = require('./proto')
+const LE = require('./letsencrypt')
+const DNS = require('./dns')
 
-  if (!config) throw new Error('Config is required')
-  if (!config.listen) config.listen = ['/ip4/0.0.0.0/tcp/8899', '/ip6/::/tcp/8899', '/ip4/0.0.0.0/tcp/8877/ws']
-  const keys = ['id', 'zone', 'ca', 'dns', 'discovery']
-  keys.forEach(key => {
-    if (!config[key]) throw new Error('Config key ' + JSON.stringify(key) + ' missing!')
-  })
+const {waterfall} = require('async')
 
-  const configSafe = stripSecrets(config)
+module.exports = class Nodetrust {
+  constructor (opt) {
+    if (!opt) throw new Error('No config!')
+    if (!opt.listen) opt.listen = ['/ip4/0.0.0.0/tcp/8899', '/ip6/::/tcp/8899', '/ip4/0.0.0.0/tcp/8877/ws']
+    const keys = ['id', 'zone', 'dns', 'letsencrypt']
+    keys.forEach(k => {
+      if (!opt[k]) throw new Error('Config is missing key ' + JSON.stringify(k) + '!')
+    })
 
-  log('creating server', configSafe)
+    const configSafe = stripSecrets(opt)
 
-  const peer = new Peer(config.id)
-  config.listen.forEach(addr => peer.multiaddrs.add(addr))
+    const peer = new Peer(opt.id)
+    opt.listen.forEach(addr => peer.multiaddrs.add(addr))
 
-  const swarm = self.swarm = new Libp2p({
-    transport: [
-      new TCP(),
-      new WS()
-    ],
-    connection: {
-      muxer: [
-        MULTIPLEX,
-        SPDY
+    log('creating server', configSafe)
+
+    this.swarm = new Libp2p({
+      transport: [
+        new TCP()
       ],
-      crypto: [SECIO]
-    }
-  }, peer)
+      connection: {
+        muxer: [
+          MULTIPLEX,
+          SPDY
+        ],
+        crypto: [SECIO]
+      }
+    }, peer, null, {
+      relay: {
+        enabled: true,
+        hop: {
+          enabled: true,
+          active: false // passive relay
+        }
+      }
+    })
 
-  swarm.zone = config.zone
-  swarm.getCN = (id, cb) => {
-    if (id.toB58String) id = id.toB58String()
-    return protos.buildCN(id, swarm.zone, cb)
+    this.zone = opt.zone
+
+    const dns = this.dns = new DNS(opt.dns)
+    dns.zone = opt.zone
+    opt.letsencrypt.dns = dns
+    this.le = new LE(opt.letsencrypt)
+
+    Proto(this)
   }
-  swarm.dbParam = {
-    max: 1000000,
-    maxAge: config.expire || 5 * 60 * 1000
+
+  start (cb) {
+    waterfall([
+      cb => this.swarm.start(err => cb(err)),
+      cb => this.dns.start(err => cb(err))
+    ], cb)
   }
-  swarm.db = new DB(swarm.dbParam)
-  swarm.discoveryDB = new DB(swarm.dbParam)
-  swarm.dnsDB = new DB(swarm.dbParam)
 
-  require('./ca')(swarm, config.ca)
-  require('./dns')(swarm, config.dns)
-  require('./discovery')(swarm, config.discovery)
-  require('./info')(swarm, config)
-
-  self.start = cb => swarm.start(cb)
-  self.stop = cb => swarm.stop(cb)
+  stop (cb) {
+    waterfall([
+      cb => this.swarm.stop(err => cb(err)),
+      cb => this.dns.stop(err => cb(err))
+    ], cb)
+  }
 }

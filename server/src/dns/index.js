@@ -1,109 +1,79 @@
 'use strict'
 
-const protos = require('../protos')
-
+const named = require('named')
+const TYPE = named.Protocol.queryTypes
 const debug = require('debug')
 const log = debug('nodetrust:dns')
-const {
-  waterfall
-} = require('async')
 
-const toDNS = {
-  ip4: 'A',
-  ip6: 'AAAA'
+const ip4re = /^(\d{1,3}\.){3,3}\d{1,3}$/
+const ip6re = /^(::)?(((\d{1,3}\.){3}(\d{1,3}){1})?([0-9a-f]){0,4}:{0,2}){1,8}(::)?$/i
+
+function decodeAddr (addr) {
+  let ip
+  switch (addr.substr(0, 3)) {
+    case 'ip4':
+      ip = addr.substr(3).replace(/-/g, '.')
+      if (!ip.match(ip4re)) return []
+      return [['A', ip]]
+    case 'ip6':
+      ip = addr.substr(3).replace(/-/g, ':')
+      if (!ip.match(ip6re)) return []
+      return [['AAAA', ip]]
+    default:
+      return []
+  }
 }
 
-module.exports = (swarm, config) => {
-  let dnsprov
-  const nameRegEx = new RegExp('^ci[a-z0-9]+\\.' + swarm.zone.replace(/\./g, '\\.') + '$', 'mi')
-  const {db, dnsDB} = swarm
-  db.on('evict', ({key}) => {
-    dnsDB.remove(key)
-    dnsDB.emit('evict', {key})
-  })
-
-  try {
-    const DNS = require('./' + config.provider)
-    dnsprov = new DNS(swarm, config)
-  } catch (e) {
-    e.stack = 'Failed to load DNS provider ' + config.provider + ': ' + e.stack
-    throw e
+function encodeAddr (ip) {
+  switch (true) {
+    case Boolean(ip.match(ip4re)):
+      return 'ip4' + ip.replace(/\./g, '-')
+    case Boolean(ip.match(ip6re)):
+      return 'ip6' + ip.replace(/:/g, '-')
+    default:
+      return false
   }
+}
 
-  dnsDB.on('evict', ({key}) => {
-    log('clear up dns for %s', key)
-    swarm.getCN(key, (err, cn) => {
-      if (err) return log(err)
-      dnsprov.clearDomain(cn, err => err ? log(err) : false)
-    })
-  })
-
-  let ready = false
-
-  dnsprov.getNames((err, names) => {
-    if (err) throw err
-    names.filter(n => n.name.match(nameRegEx)).map(n => n.name.split('.').shift()).forEach(id => dnsDB.set(id, true))
-    ready = true
-    log('dns is ready')
-  })
-
-  const handleDNS = (protocol, conn) => {
-    if (!ready) return setTimeout(handleDNS, 500, protocol, conn)
-    protos.server(conn, protos.dns, (data, respond) => {
-      const cb = err => {
-        if (err) {
-          log(err)
-          respond({
-            success: false
-          })
-        }
+module.exports = class DNSServer {
+  constructor (opt) {
+    this.opt = opt || {}
+    this.port = opt.port || 53
+    this.host = opt.host || '127.0.0.1'
+    this.ttl = opt.ttl || 3600
+    this.server = named.createServer()
+    this.server.on('query', q => this._handle.bind(this)(q, this.server.send.bind(this.server)))
+    this._db = {}
+  }
+  start (cb) {
+    this.server.listen(this.port, this.host, cb)
+  }
+  stop (cb) {
+    // TODO: stop the server
+    cb()
+  }
+  _handle (query, send) { // TODO: legitify the dns response
+    const domain = query.name().toLowerCase() //  [78.47.119.230:15900#8530]      V8-8-8-8.iP.liBp2P-NODETrusT.tk, yep some dns clients are plain retarded
+    const res = decodeAddr(domain.split('.')[0]).concat(this._db[domain] || [])
+    const id = query._client.address + ':' + query._client.port + '#' + query.id
+    res.forEach(r => {
+      const [type, value] = r
+      if (TYPE[query._question.type] === type || TYPE[query._question.type] === 'ANY') { // only answer things we should answer
+        log('[%s]\t%s\t=>\t[%s]\t%s', id, domain, type, value)
+        query.addAnswer(domain, new named[type + 'Record'](value), this.ttl)
       }
-      waterfall([
-        cb => conn.getPeerInfo(cb),
-        (pi, cb) => {
-          const id = pi.id
-          log('update dns for %s', id.toB58String())
-          if (!db.get(id.toB58String())) return cb(new Error(id.toB58String() + ' has not requested a certificate! Rejecting discovery...'))
-          const time = new Date().getTime()
-          if (data.time > time + 10000 || data.time < time - 10000) return cb(new Error('Timestamp too old/new'))
-          id.pubKey.verify(data.time.toString(), data.signature, (err, ok) => {
-            if (err || !ok) return cb(err || true)
-            return cb(null, id)
-          })
-        },
-        (id, cb) => {
-          swarm.getCN(id, (err, name) => {
-            if (err) return cb(err)
-            cb(null, name)
-          })
-        },
-        (name, cb) => {
-          conn.getObservedAddrs((err, addr) => {
-            if (err) return cb(err)
-            const ips = addr.map(addr => addr.toString()).filter(addr => addr.startsWith('/ip')).map(addr => {
-              const s = addr.split('/')
-              return {
-                name,
-                type: toDNS[s[1]],
-                value: s[2]
-              }
-            })
-            cb(null, name, ips)
-          })
-        },
-        (dns, ips, cb) => {
-          dnsprov.clearDomain(dns, err => {
-            if (err) return cb(err)
-            dnsprov.addNames(ips, err => {
-              if (err) return cb(err)
-              return respond({
-                success: true
-              })
-            })
-          })
-        }
-      ], cb)
     })
+    if (!res.length) log('[%s]\t%s\t=>\t×', id, domain)
+    send(query)
   }
-  swarm.handle('/nodetrust/dns/1.0.0', handleDNS)
+  addRecords (domain, records) {
+    this._db[domain] = records
+  }
+  deleteRecords (domain) {
+    delete this._db[domain]
+  }
 }
+
+module.exports.decodeAddr = decodeAddr
+
+module.exports.encodeAddr = encodeAddr

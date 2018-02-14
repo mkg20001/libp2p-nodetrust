@@ -3,12 +3,9 @@
 /* eslint-env mocha */
 
 describe('libp2p nodetrust', () => {
-  // tasks
+  // load all ids in before hook
   require('./load-ids')
 
-  // type tests
-  require('./csr-ca')
-  require('./drop-wildcard')
-
-  // TODO: dns tests
+  require('./certificate')
+  require('./server')
 })

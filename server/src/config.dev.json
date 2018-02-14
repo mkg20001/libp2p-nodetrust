@@ -1,46 +1,16 @@
 {
-  "zone": "node.libp2p",
   "id": {
-    "id": "QmRQuY14GoeyDx5DoFWq9xnCteSz6pWFKcopvJspei5LXa",
-    "privKey": "CAASqQkwggSlAgEAAoIBAQDXW+yHJxrvsOVh6EqNowW0CNMZLvDX8Ai+Sy3zDf8LmgOtZaGvQW/5A07peETcYf/pBCw8p2eqZwzouVxXbPteYnGbLX5AV8edzb98PDIRFAb7tInRbzWcaIC6Bwh5hjiUC4smf2ZEuZl0St9zDGYFGYEPam6HSvIph1RfDPbMXU6X+AIqMXKiArc5K43BpEblNht432xR9ywDQUkJuoXM1NkERCjsE0VkO29MZ2IFM9yUp02JqGKNeubgwOsbfmbXsg715aiWoTiT6lTBJ5bgtydE56YO5jaKVuHsQw9u/QoqdygK6N9mK9vK/KANuveLOpQI9tXchHYwV1aY7VdFAgMBAAECggEBAKMTDoZBDFqYHvoGhf2+hmEPlZoqO2God1ZxYzf7Tzefxk0U+lvVN07ePHD6C1q+MqRl7oF3Wj5kjhfj1JK3CZks/k29Iy7hyVwrImaWxmq8OZV73ihjB7uKPn+fN8Gd61Xfb90U94Hu8M5oq89YgiA2cc4Uj+GO1NSxjyfyjyer0z/nOkQRCFgwh5NKxm8rxWHfDdwn3ftjwZglx9cRj3pwZ6g04Cga7HiQMEgZ3LRmwRVHKancqkqfT5woTgzR+8SpGJ4wu+8QVBcHPUWj91Rmt3jm3cLdH4/BBAIIY1RE23k6srWJw7axZOLOJKwgRJDM+qHr4LkYTAn89CoTggECgYEA/s2HqUK9O3S8+0Gf9oUM61GPQBqo8mzEjkeiXF1n2pKr+M0xavtCwj2fWrShpOiIKdXUyM3ANJya+aBDQ4/FPvOjFDGSR0ToQttcWdM+noXq+x6C4yiN/8U533mUKhlG+XzosH7PIaASDVLgKUV57GmbUIEuMEXHruhTHoh+OUECgYEA2F7zvFBPnk+yQGDkYbtrT5RpuqK9qU55ujLO2QuleL7Jm0hvK+/z3cTpuR6Lfn7nPcTl27vCxMLSJvLC/sBEuTcY02u+7PvclD9iBGVdvsXL9NoWBw5xYBXyBOXnQGQKcLhWSlDI4REHWezlcfkZ3Zicx8AqHB4nxaEMbkFG+QUCgYEAnkIHzaBPKluSeThEY3g2Ev6AS9+DKbdWycxCUr4NIBvTRmAkHn9a8owVqt/gOi3XTKysUeBBTiwqsXrR7GeiqjvnAUbcxPlOjR/0FzJ2hT1GOpyzzOVGdSMJk/zOgutaQuFLITxR6F+kdrQP2HJ3jNf3CKSDjKX6pW9VGPTL+UECgYEAg/HbVoHvG45kGAg+HS8qcHwDwbGOURmu95IWO5tzi99kmBIi4TtRjnKPSLlMvZXrs+pHdajZTB22A9RUfv+GqR/lPsBczK2GRM0mG6Io+bYq+ySm/CSdlMetL7l3PPgEudpfnLAI397/iaICBW+vi0eOi+0ugLkO7eCY8P9TpXUCgYAC87u6cHeNecWIjBEsZHoadOYXZTpQIZsVE2c1apcMFp8+xu89Jl4TM4iHYzuzpBuW9q/X7ZYAE35zUpR1iOE1YbWH3nXYj1JCYTuhFS+7acJ4bNfs7qy6AKCbqiw2fv9SNpY0gMn8Y/vLx6FQdzxU2AE8URANgSTA8pA9DaqVEQ==",
-    "pubKey": "CAASpgIwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDXW+yHJxrvsOVh6EqNowW0CNMZLvDX8Ai+Sy3zDf8LmgOtZaGvQW/5A07peETcYf/pBCw8p2eqZwzouVxXbPteYnGbLX5AV8edzb98PDIRFAb7tInRbzWcaIC6Bwh5hjiUC4smf2ZEuZl0St9zDGYFGYEPam6HSvIph1RfDPbMXU6X+AIqMXKiArc5K43BpEblNht432xR9ywDQUkJuoXM1NkERCjsE0VkO29MZ2IFM9yUp02JqGKNeubgwOsbfmbXsg715aiWoTiT6lTBJ5bgtydE56YO5jaKVuHsQw9u/QoqdygK6N9mK9vK/KANuveLOpQI9tXchHYwV1aY7VdFAgMBAAE="
+    "id": "QmNnMDsFRCaKHd8Tybhui1eVuN7xKMMqRZobAEtgKBJU5t",
+    "privKey": "CAASpwkwggSjAgEAAoIBAQC/9Onk0MdCeXf2HKafC/+2+PMuYCptsvsz50VMbGI0UQHPIa8Klj+8feKo1UYBzjX/IK+zRmkSlPAMG0LFh+lRjuNRsckWO47+Zic2GkQzn4sRSQYe/htTB6ycf3eQEIW7vanNCrp8jfZoX6mMjwrgON+pmSkAnLGlhdY8mQQy1OuU8kyPDuexEFOLyhbIrsfpnaxAOM4zv8JknaJw29wKCL/hMzQtC6ahdd0TvOTPwkZ5y481XZqW90VyJjF8Is+7jsKOdCGInzsmSpDT1UAft6QUEb+l0VX88Hwb8I0EuI8IkaBm2JWGQZw4g25n0CFzeDSANlVb/lGVGh6SNU/pAgMBAAECggEAWl+tauwclCBqKTYOAF1+1B9bJp9h+mnEuQgOaU+x4J2u810RczOP6GeAOirHHfx/EZHLBuWEfJogdiKzihpV7+8M+R5x5QS/auifV2qAZ6maqNWvixHpvWqkir28hdgxjlVaR03gxNl1hGhdg+6omS5NpyST2FTtkldzqO4FuwQQ0wTmpDkY457RowjuGHINAEQZD6pTzRP8SfiDclS1Y1wPbElwwtBMF3MuoGwVzix9b1m5RLwwbSX4wYcA1udhArrKVkxSZ1atjHcrFCcBFJnq66gAJGZfqdpW77J5JmEuaxbXY8qX2tzaQ4z9IiuGsYa/rHTwLIaezcm0OI8AnQKBgQDly6sDtRrvrUeJDaNtEnQauYA19PwOJKBrQuJx/jF1/6gxnPiQv7l2Fd/PugkXsIMWejm6+Hnt70497igDsQHtCFaFKCbTgL9twF4H81UHnJSaivrNOR6CUXFXFwRFMpzGm8teqCjVv745BGJzRYY8b+f/bAX3wtVyCMbUTGqvOwKBgQDV2KFEWFunZXuA5HaeaqsajgBtuaYbvHRDnA27OyIkMixto+0jDCOpW61/nCNGsajG2Fc5HZ95CYsg00FBjJF3bc0o7BVlCFJTM1tcGrgl5bhmyZ+U38FaqHwgVMkHRbTDJ3XQjb5QJUH1E23DS2+Hw9K0gkIqXHphBHfYmFGTKwKBgFJmMbBmpH4FGH2gklVuJIvgsISokClSIOPVW/WcPIgfYGRJ8SeWWB5rwZFvGAuSk67frQvKRY54HQo/98E7G4GvV7bvqtx0cjAcppsbOgY8s1ynMT+dl78LDSU5b6KQf38IJmiOy/W5h7BSTisfZv8M8Ze5WHp7NqZpV0KRFEA5AoGBAKwegaat649vmhljSao2NuPXubaXP4CBjZ7BYzf434D8tU/GKl8ULTvqI1pbxPTol+z8QjAhjLLyIH5aKuLkjkzvHrs6UfoQ2ZpH8tfOVbuDC4oH7J75/fnHNKkdNPTagSS2hRhIjg6Z/l2Qtr8C35EJ53UMhs7rwkCGRSQbbUUjAoGAGUy2fg8OoWMeF7c9RuiUEZwBAOBdlWlsIbmmol+Z2go9n5DWNShhkKdm461hP7bpwC73qCzg6WfWG5sbV95dPEmfyKxkzDixwIKtpdLSWgvvY2JWTHLM7aF8CXwSen6wSaRT1fE5WEW8PHv/MYSAW6Oc+5DwtoATzJauv/VobPo=",
+    "pubKey": "CAASpgIwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQC/9Onk0MdCeXf2HKafC/+2+PMuYCptsvsz50VMbGI0UQHPIa8Klj+8feKo1UYBzjX/IK+zRmkSlPAMG0LFh+lRjuNRsckWO47+Zic2GkQzn4sRSQYe/htTB6ycf3eQEIW7vanNCrp8jfZoX6mMjwrgON+pmSkAnLGlhdY8mQQy1OuU8kyPDuexEFOLyhbIrsfpnaxAOM4zv8JknaJw29wKCL/hMzQtC6ahdd0TvOTPwkZ5y481XZqW90VyJjF8Is+7jsKOdCGInzsmSpDT1UAft6QUEb+l0VX88Hwb8I0EuI8IkaBm2JWGQZw4g25n0CFzeDSANlVb/lGVGh6SNU/pAgMBAAE="
   },
-  "ca": {
-    "provider": "forge",
-    "key": "cakey.pem",
-    "ca": "cacert.pem"
+  "zone": "node.libp2p.io",
+  "letsencrypt": {
+    "storageDir": "/tmp/nodetrust-le-tmp",
+    "email": "you@localhost"
   },
   "dns": {
-    "provider": "bind9",
-    "zone_opt": {
-      "comment": "BIND data file for libp2p nodetrust zone",
-      "ttl": 2,
-      "zone_ns": "libp2p.",
-      "zone_hostmaster": "root.localhost.",
-      "refresh": 2,
-      "retry": 1,
-      "expire": 10,
-      "negative_cache_ttl": 1
-    },
-    "extra_names": [{
-        "name": "@",
-        "type": "NS",
-        "value": "libp2p."
-      },
-      {
-        "name": "@",
-        "type": "A",
-        "value": "127.0.0.1"
-      },
-      {
-        "name": "@",
-        "type": "AAAA",
-        "value": "::1"
-      }
-    ],
-    "zone_file": "/etc/bind/db.nodetrust"
-  },
-  "discovery": {
-
+    "port": 4500,
+    "ttl": 2
   }
 }

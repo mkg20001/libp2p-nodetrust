@@ -23,19 +23,17 @@
   "author": "Maciej Krüger <mkg20001@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "base32-encode": "^1.0.0",
-    "libp2p": "^0.15.0",
-    "libp2p-crypto": "^0.11.0",
+    "debug": "^3.1.0",
+    "greenlock": "^2.1.18",
+    "libp2p": "^0.16.4",
     "libp2p-multiplex": "^0.5.1",
-    "libp2p-secio": "^0.9.0",
+    "libp2p-secio": "^0.9.2",
     "libp2p-spdy": "^0.11.0",
-    "libp2p-tcp": "^0.11.2",
-    "libp2p-websockets": "^0.10.4",
-    "lru": "^3.1.0",
-    "mafmt": "github:mkg20001/js-mafmt#patch-2",
-    "multihashing-async": "^0.4.7",
+    "libp2p-tcp": "^0.11.5",
+    "mafmt": "^4.0.0",
+    "named": "github:mkg20001/node-named",
     "node-forge": "^0.7.1",
     "protons": "^1.0.1",
-    "request": "^2.83.0"
+    "pull-protocol-buffers": "^0.1.2"
   }
 }
