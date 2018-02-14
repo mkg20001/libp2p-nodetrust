@@ -110,7 +110,7 @@ module.exports = class Nodetrust {
       (addr, cb) => {
         const {cert, swarm} = this
         const {peerInfo} = swarm
-        const ma = this._addedMAs = cert.altnames.map(domain => '/dnsaddr/' + domain + '/tcp/' + addr.port + '/wss')
+        const ma = this._addedMAs = cert.altnames.map(domain => '/dnsaddr/' + domain + '/tcp/' + addr.port + '/wss/ipfs/' + swarm.peerInfo.id.toB58String())
         ma.forEach(addr => peerInfo.multiaddrs.add(addr))
         cb()
       }
