@@ -8,7 +8,7 @@ const Libp2p = require('libp2p')
 
 const TCP = require('libp2p-tcp')
 
-const MPLEX = require('libp2p-mplex')
+const MULTIPLEX = require('libp2p-multiplex')
 const SPDY = require('libp2p-spdy')
 const SECIO = require('libp2p-secio')
 
@@ -38,7 +38,7 @@ const Utils = module.exports = {
       ],
       connection: {
         muxer: [
-          MPLEX,
+          MULTIPLEX,
           SPDY
         ],
         crypto: [SECIO]

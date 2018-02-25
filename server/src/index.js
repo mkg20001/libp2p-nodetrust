@@ -8,7 +8,7 @@ const TCP = require('libp2p-tcp')
 const Peer = require('peer-info')
 
 const SPDY = require('libp2p-spdy')
-const MPLEX = require('libp2p-mplex')
+const MULTIPLEX = require('libp2p-multiplex')
 const SECIO = require('libp2p-secio')
 
 function stripSecrets (conf) {
@@ -51,7 +51,7 @@ module.exports = class Nodetrust {
       ],
       connection: {
         muxer: [
-          MPLEX,
+          MULTIPLEX,
           SPDY
         ],
         crypto: [SECIO]
