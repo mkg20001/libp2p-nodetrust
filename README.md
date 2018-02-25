@@ -26,8 +26,7 @@ This server will additionally offer letsencrypt certificates for the domain over
 # Development
 
 ## Client
-<!-- Run `nodemon test-client.js -d 1` -->
-> TODO...
+Run `USE_LOCAL=1 nodemon test-client.js -d 1`
 
 ## Server
 cd into server
