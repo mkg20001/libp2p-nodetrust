@@ -14,14 +14,15 @@ const noop = err => err ? log(err) : false
 defaultNode.multiaddrs.add('/dnsaddr/libp2p-nodetrust.tk/tcp/8899')
 
 const nat = require('nat-puncher')
+const protocolMuxer = require('libp2p-switch/src/protocol-muxer')
 
 module.exports = class Nodetrust {
   constructor (opt) {
     this.node = opt.node || defaultNode
-    this.ws = new WS()
   }
   __setSwarm (swarm) {
     this.swarm = swarm
+    this.ws = new WS()
   }
 
   _aquireCert (cb) {
@@ -43,28 +44,24 @@ module.exports = class Nodetrust {
     })
   }
 
-  _stealListener () {
-    // HACK: get a random listener from libp2p
-    const swarm = this.swarm.switch
-    for (const transport in swarm.transports) {
-      if (swarm.transports[transport].listeners.length) return swarm.transports[transport].listeners[0]
-    }
-    return false
-  }
-
   _setupServer (cb) {
     if (this.wss) return cb()
 
-    // HACK: hack in the wss server as a transport
-    const listener = this._stealListener()
-    if (!listener) return cb(new Error('Couldn\'t get a listener'))
-
     log('starting wss server')
 
+    if (!this.swarm.switch.transports.WebSockets) this.swarm.switch.transports.WebSockets = this.ws
+
+    // HACK: hack in the wss server as a transport
     this.wss = this.ws.createListener({
       cert: this.cert.chain,
       key: this.cert.key
-    }, conn => listener.emit('connection', conn))
+    }, conn => {
+      if (this.swarm.switch.protocolMuxer) { // this hack is compatible with 2 versions of libp2p-switch. hacks nowadays seem to evolve ;)
+        this.swarm.switch.protocolMuxer('WebSockets')(conn)
+      } else {
+        protocolMuxer(this.swarm.switch.protocols, conn)
+      }
+    })
 
     this.wss.listen(multiaddr('/ip4/0.0.0.0/tcp/0'), err => {
       if (err) return cb(err)
@@ -73,8 +70,8 @@ module.exports = class Nodetrust {
         this.wss.addr = addr
         const port = parseInt(addr.map(a => a.toString().match(/\/tcp\/(\d+)\//)[1]).filter(Boolean)[0], 10)
         if (isNaN(port)) return cb(new Error('WSS listening on invalid port!'))
-        log('doing nat')
-        nat.addMapping(port, port, 3600 * 24).then(res => {
+        log('doing nat');
+        (process.env.SKIP_NAT ? Promise.resolve({}) : nat.addMapping(port, port, 3600)).then(res => {
           let eport
           if (res.externalPort === -1 || !res.externalPort) {
             log('nat failed')
