@@ -26,6 +26,7 @@ function stripSecrets (conf) {
 const Proto = require('./proto')
 const LE = require('./letsencrypt')
 const DNS = require('./dns')
+const DISCOVERY = '_nodetrust_discovery_v2' // pubsub discovery channel
 
 const {waterfall} = require('async')
 
@@ -77,6 +78,7 @@ module.exports = class Nodetrust {
   }
 
   start (cb) {
+    this.swarm.pubsub.subscribe(DISCOVERY) // act as a relay for nodetrust announces
     waterfall([
       cb => this.swarm.start(err => cb(err)),
       cb => this.dns.start(err => cb(err))
@@ -84,6 +86,7 @@ module.exports = class Nodetrust {
   }
 
   stop (cb) {
+    this.swarm.pubsub.unsubscribe(DISCOVERY)
     waterfall([
       cb => this.swarm.stop(err => cb(err)),
       cb => this.dns.stop(err => cb(err))

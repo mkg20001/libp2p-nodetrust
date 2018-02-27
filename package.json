@@ -24,6 +24,9 @@
     "peer-id",
     "id"
   ],
+  "browser": {
+    "src/index.js": "./src/browser.js"
+  },
   "author": "Maciej Krüger <mkg20001@gmail.com>",
   "license": "MIT",
   "devDependencies": {
