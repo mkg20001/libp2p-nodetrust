@@ -23,7 +23,8 @@
     "libp2p-websockets": "^0.10.5",
     "mafmt": "^4.0.0",
     "moment": "^2.20.1",
-    "pull-stream": "^3.6.2"
+    "pull-stream": "^3.6.2",
+    "raven-js": "^3.22.4"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",

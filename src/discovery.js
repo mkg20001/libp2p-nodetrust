@@ -15,18 +15,20 @@ const noop = () => {}
 
 module.exports = class Discovery extends EE {
   start (cb) {
+    log('starting')
     cb = once(cb || noop)
     this.pubsub.subscribe(CHANNEL, this._handle.bind(this), cb)
   }
 
   stop (cb) {
+    log('stopping')
     cb = once(cb || noop)
     this.pubsub.unsubscribe(CHANNEL, cb)
   }
 
   _handle (data) {
     try {
-      data = Announce.decode(data)
+      data = Announce.decode(data.data)
       const peer = new Peer(new Id(data.id))
       data.addr.forEach(addr => peer.multiaddrs.add(multiaddr(addr)))
       log('discovered %s', peer.id.toB58String())

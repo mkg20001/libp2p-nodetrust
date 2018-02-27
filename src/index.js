@@ -129,8 +129,7 @@ module.exports = class Nodetrust {
   }
 
   _renew (cb) {
-    this.discovery._broadcast(this.swarm.peerInfo)
-    if (this.cert.expiresAt + 1000 > Date.now()) return
+    if (this.cert.expiresAt + 1000 > Date.now()) return this.discovery._broadcast(this.swarm.peerInfo)
     log('renewing')
     waterfall([
       cb => this._shutdown(cb),
