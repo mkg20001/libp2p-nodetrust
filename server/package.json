@@ -31,6 +31,7 @@
     "libp2p-secio": "^0.9.3",
     "libp2p-spdy": "^0.11.0",
     "libp2p-tcp": "^0.11.6",
+    "libp2p-websockets": "^0.10.5",
     "mafmt": "^4.0.0",
     "named": "github:mkg20001/node-named",
     "node-forge": "^0.7.1",

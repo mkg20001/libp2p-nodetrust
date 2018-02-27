@@ -5,6 +5,7 @@ const log = debug('nodetrust:server')
 
 const Libp2p = require('libp2p')
 const TCP = require('libp2p-tcp')
+const WS = require('libp2p-websockets')
 const Peer = require('peer-info')
 
 const SPDY = require('libp2p-spdy')
@@ -48,7 +49,8 @@ module.exports = class Nodetrust {
 
     this.swarm = new Libp2p({
       transport: [
-        new TCP()
+        new TCP(),
+        new WS()
       ],
       connection: {
         muxer: [
