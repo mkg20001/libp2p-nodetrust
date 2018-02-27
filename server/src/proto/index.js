@@ -38,7 +38,7 @@ class RPC {
 
       this.source.end()
 
-      read(true, () => {}) // we will never read from the client
+      // read(true, () => {}) // we will never read from the client
     }
     const ips = this.addr.map(a => a.toString()).filter(a => a.startsWith('/ip')).map(a => a.split('/')[2]) // TODO: filter unique
     const domains = ips.map(ip => encodeAddr(ip)).filter(Boolean).map(sub => sub + '.' + this.opt.zone)

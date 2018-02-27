@@ -4,27 +4,24 @@ const RPC = require('./proto')
 const WS = require('libp2p-websockets')
 const multiaddr = require('multiaddr')
 const {waterfall} = require('async')
-const Peer = require('peer-info')
-const Id = require('peer-id')
 const once = require('once')
 const debug = require('debug')
 const log = debug('libp2p:nodetrust')
 const noop = err => err ? log(err) : false
 
-const defaultNode = new Peer(Id.createFromB58String('Qm'))
-defaultNode.multiaddrs.add('/dnsaddr/nodetrust.libp2p.io/tcp/8899')
-
 const nat = require('nat-puncher')
 const protocolMuxer = require('libp2p-switch/src/protocol-muxer')
 
 const Discovery = require('./discovery')
+const {defaultNode} = require('./defaults')
 
 module.exports = class Nodetrust {
   constructor (opt) {
     this.node = opt.node || defaultNode
+    this.discovery = new Discovery()
   }
   __setSwarm (swarm) {
-    this.discovery = new Discovery(this.swarm)
+    this.discovery.__setSwarm(swarm)
     this.swarm = swarm
     this.ws = new WS()
   }
@@ -132,7 +129,7 @@ module.exports = class Nodetrust {
   }
 
   _renew (cb) {
-    if (this.cert.expiresAt + 1000 > Date.now()) return
+    if (this.cert.expiresAt + 1000 > Date.now()) return this.discovery._broadcast(this.swarm.peerInfo)
     log('renewing')
     waterfall([
       cb => this._shutdown(cb),

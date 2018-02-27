@@ -5,6 +5,7 @@ const log = debug('nodetrust:server')
 
 const Libp2p = require('libp2p')
 const TCP = require('libp2p-tcp')
+const WS = require('libp2p-websockets')
 const Peer = require('peer-info')
 
 const SPDY = require('libp2p-spdy')
@@ -26,6 +27,7 @@ function stripSecrets (conf) {
 const Proto = require('./proto')
 const LE = require('./letsencrypt')
 const DNS = require('./dns')
+const DISCOVERY = '_nodetrust_discovery_v2' // pubsub discovery channel
 
 const {waterfall} = require('async')
 
@@ -47,7 +49,8 @@ module.exports = class Nodetrust {
 
     this.swarm = new Libp2p({
       transport: [
-        new TCP()
+        new TCP(),
+        new WS()
       ],
       connection: {
         muxer: [
@@ -79,12 +82,14 @@ module.exports = class Nodetrust {
   start (cb) {
     waterfall([
       cb => this.swarm.start(err => cb(err)),
+      cb => this.swarm.pubsub.subscribe(DISCOVERY, () => {}, cb), // act as a relay for nodetrust announces
       cb => this.dns.start(err => cb(err))
     ], cb)
   }
 
   stop (cb) {
     waterfall([
+      cb => this.swarm.pubsub.unsubscribe(DISCOVERY, err => cb(err)),
       cb => this.swarm.stop(err => cb(err)),
       cb => this.dns.stop(err => cb(err))
     ], cb)

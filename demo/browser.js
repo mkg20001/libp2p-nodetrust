@@ -1,5 +1,10 @@
 'use strict'
 
+if (window.location.host === 'libp2p-nodetrust.tk') {
+  const Raven = require('raven-js')
+  Raven.config('https://6378f3d56e7a41faae3058d3b9dfefef@sentry.zion.host/10').install()
+}
+
 let running = false
 
 require('debug').save('libp2p*')
@@ -19,14 +24,12 @@ const Libp2p = require('libp2p')
 const WS = require('libp2p-websockets')
 const Peer = require('peer-info')
 const Id = require('peer-id')
-const multiaddr = require('multiaddr')
-const NodeTrust = require('../src')
+const NodeTrust = require('../src/browser')
 const disable = bt => bt.css('transition', '.5s').attr('disabled', true)
 
 const SPDY = require('libp2p-spdy')
 const MULTIPLEX = require('libp2p-multiplex')
 const SECIO = require('libp2p-secio')
-const {map} = require('async')
 
 const COLSTART = 'ȵ'
 const COLEND = 'ȶ'
@@ -37,12 +40,9 @@ let c_hist = []
 let ntPeer
 
 if (window.location.host === 'localhost:3000') { // ifdev
-  map(require('../test/ids.json'), Id.createFromJSON, (e, ids) => {
-    console.info('Using dev!')
-    if (e) throw e
-    ntPeer = new Peer(ids[0])
-    ntPeer.multiaddrs.add('/ip4/127.0.0.1/tcp/8877/ws/ipfs/' + ids[0].toB58String())
-  })
+  console.info('Using dev!')
+  ntPeer = new Peer(Id.createFromB58String('QmNnMDsFRCaKHd8Tybhui1eVuN7xKMMqRZobAEtgKBJU5t'))
+  ntPeer.multiaddrs.add('/ip4/127.0.0.1/tcp/8877/ws/ipfs/QmNnMDsFRCaKHd8Tybhui1eVuN7xKMMqRZobAEtgKBJU5t')
 }
 
 function consoleParse (t) {
@@ -122,7 +122,8 @@ $(document).ready(() => (function () {
     if (err) throw err
     console.info('%c[swarm]%c Ready to launch', 'font-weight: bold', 'color: inherit')
 
-    const discovery = NodeTrust.discovery
+    const nodetrust = new NodeTrust({ node: ntPeer })
+    const {discovery} = nodetrust
 
     const peer = new Peer(id)
 
@@ -140,6 +141,8 @@ $(document).ready(() => (function () {
       }
     }, peer)
 
+    nodetrust.__setSwarm(swarm)
+
     window.swarm = swarm
     $('#swarm-state').text('Node: Offline (Click to launch)')
     $('#swarm-state').click(() => {
@@ -150,18 +153,24 @@ $(document).ready(() => (function () {
         if (err) {
           $('#swarm-state').text('Node: Error')
           throw err
-        } else {
-          $('#swarm-state').text('Node: Online')
-          $('#discovery').one('click', () => {
-            disable($('#discovery'))
-            discovery.enableStandalone({
-              node: ntPeer,
-              swarm
-            })
-          })
-          $('#controls').fadeIn('fast')
-          console.info('%c[swarm]%c Online', 'font-weight: bold', 'color: inherit')
         }
+        nodetrust.start(err => {
+          if (err) {
+            $('#swarm-state').text('Node: Error')
+            throw err
+          } else {
+            $('#swarm-state').text('Node: Online')
+            $('#discovery').one('click', () => {
+              disable($('#discovery'))
+              discovery.start()
+            })
+            $('#dial').click(() => {
+              nodetrust.start(console.log) // eq. of swarm(nodetrust.node)
+            })
+            $('#controls').fadeIn('fast')
+            console.info('%c[swarm]%c Online', 'font-weight: bold', 'color: inherit')
+          }
+        })
       })
     })
 
@@ -175,12 +184,12 @@ $(document).ready(() => (function () {
       if (nodes[id]) return
       nodes[id] = true
       $('#peers').append(pi2html(pi, 'p'))
-      swarm.dial(pi, '/messages/1.0.0', (err, conn) => {
+      swarm.dialProtocol(pi, '/messages/1.0.0', (err, conn) => {
         if (err) return console.error(err)
         pull(
           pull.values([]),
           conn,
-          pull.map(m => m.indexOf('>') != -1 || m.indexOf('<') != -1 ? console.warn('Got an XSS\'d message') : $('#messages').append($('<p>' + m + '</p>'))),
+          pull.map(m => m.indexOf('>') !== -1 || m.indexOf('<') !== -1 ? console.warn('Got an XSS\'d message') : $('#messages').append($('<p>' + m + '</p>'))),
           pull.drain()
         )
       })
