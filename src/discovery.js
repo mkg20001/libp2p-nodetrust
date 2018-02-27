@@ -7,6 +7,7 @@ const Peer = require('peer-info')
 const multiaddr = require('multiaddr')
 const debug = require('debug')
 const log = debug('libp2p:nodetrust:discovery')
+const once = require('once')
 
 const CHANNEL = '_nodetrust_discovery_v2'
 const EE = require('events').EventEmitter
@@ -14,13 +15,13 @@ const noop = () => {}
 
 module.exports = class Discovery extends EE {
   start (cb) {
-    this.pubsub.subscribe(CHANNEL)
-    cb()
+    cb = once(cb || noop)
+    this.pubsub.subscribe(CHANNEL, this._handle.bind(this), cb)
   }
 
   stop (cb) {
-    this.pubsub.unsubscribe(CHANNEL)
-    cb()
+    cb = once(cb || noop)
+    this.pubsub.unsubscribe(CHANNEL, cb)
   }
 
   _handle (data) {
@@ -37,11 +38,11 @@ module.exports = class Discovery extends EE {
 
   _broadcast (peer, cb) {
     log('broadcasting')
-    this.pubsub.publish(CHANNEL, Announce.encode({ id: peer.id.toBytes(), addr: peer.multiaddrs.toArray().map(a => a.buffer) }), cb || noop)
+    cb = once(cb || noop)
+    this.pubsub.publish(CHANNEL, Announce.encode({ id: peer.id.toBytes(), addr: peer.multiaddrs.toArray().map(a => a.buffer) }), cb)
   }
 
   __setSwarm (swarm) {
     this.pubsub = swarm.pubsub
-    swarm._floodSub.on(CHANNEL, this._handle.bind(this)) // TODO: figure out why swarm.pubsub.on does not work
   }
 }

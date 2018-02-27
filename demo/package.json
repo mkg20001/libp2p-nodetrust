@@ -14,21 +14,21 @@
   "description": "",
   "dependencies": {
     "http-server": "^0.11.1",
-    "jquery": "^3.2.1",
-    "libp2p": "^0.15.0",
+    "jquery": "^3.3.1",
+    "libp2p": "^0.18.0",
     "libp2p-multiplex": "^0.5.1",
-    "libp2p-secio": "^0.9.0",
+    "libp2p-secio": "^0.9.3",
     "libp2p-spdy": "^0.11.0",
-    "libp2p-tcp": "^0.11.2",
-    "libp2p-websockets": "github:libp2p/js-libp2p-websockets#pass-options",
-    "mafmt": "github:mkg20001/js-mafmt#patch-2",
+    "libp2p-tcp": "^0.11.6",
+    "libp2p-websockets": "^0.10.5",
+    "mafmt": "^4.0.0",
     "moment": "^2.20.1",
-    "pull-stream": "^3.6.1"
+    "pull-stream": "^3.6.2"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-preset-es2015": "^6.24.1",
-    "browserify": "^15.1.0",
-    "watchify": "^3.9.0"
+    "browserify": "^16.1.0",
+    "watchify": "^3.10.0"
   }
 }

@@ -122,7 +122,8 @@ $(document).ready(() => (function () {
     if (err) throw err
     console.info('%c[swarm]%c Ready to launch', 'font-weight: bold', 'color: inherit')
 
-    const discovery = NodeTrust.discovery
+    const nodetrust = new NodeTrust({ node: ntPeer })
+    const {discovery} = nodetrust
 
     const peer = new Peer(id)
 
@@ -140,6 +141,8 @@ $(document).ready(() => (function () {
       }
     }, peer)
 
+    nodetrust.__setSwarm(swarm)
+
     window.swarm = swarm
     $('#swarm-state').text('Node: Offline (Click to launch)')
     $('#swarm-state').click(() => {
@@ -150,18 +153,20 @@ $(document).ready(() => (function () {
         if (err) {
           $('#swarm-state').text('Node: Error')
           throw err
-        } else {
-          $('#swarm-state').text('Node: Online')
-          $('#discovery').one('click', () => {
-            disable($('#discovery'))
-            discovery.enableStandalone({
-              node: ntPeer,
-              swarm
-            })
-          })
-          $('#controls').fadeIn('fast')
-          console.info('%c[swarm]%c Online', 'font-weight: bold', 'color: inherit')
         }
+        nodetrust.start(err => {
+          if (err) {
+            $('#swarm-state').text('Node: Error')
+            throw err
+          } else {
+            $('#swarm-state').text('Node: Online')
+            $('#discovery').one('click', () => {
+              disable($('#discovery'))
+            })
+            $('#controls').fadeIn('fast')
+            console.info('%c[swarm]%c Online', 'font-weight: bold', 'color: inherit')
+          }
+        })
       })
     })
 
@@ -180,7 +185,7 @@ $(document).ready(() => (function () {
         pull(
           pull.values([]),
           conn,
-          pull.map(m => m.indexOf('>') != -1 || m.indexOf('<') != -1 ? console.warn('Got an XSS\'d message') : $('#messages').append($('<p>' + m + '</p>'))),
+          pull.map(m => m.indexOf('>') !== -1 || m.indexOf('<') !== -1 ? console.warn('Got an XSS\'d message') : $('#messages').append($('<p>' + m + '</p>'))),
           pull.drain()
         )
       })

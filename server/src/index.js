@@ -80,16 +80,16 @@ module.exports = class Nodetrust {
   }
 
   start (cb) {
-    this.swarm.pubsub.subscribe(DISCOVERY) // act as a relay for nodetrust announces
     waterfall([
       cb => this.swarm.start(err => cb(err)),
+      cb => this.swarm.pubsub.subscribe(DISCOVERY, () => {}, cb), // act as a relay for nodetrust announces
       cb => this.dns.start(err => cb(err))
     ], cb)
   }
 
   stop (cb) {
-    this.swarm.pubsub.unsubscribe(DISCOVERY)
     waterfall([
+      cb => this.swarm.pubsub.unsubscribe(DISCOVERY, err => cb(err)),
       cb => this.swarm.stop(err => cb(err)),
       cb => this.dns.stop(err => cb(err))
     ], cb)
