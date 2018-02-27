@@ -35,4 +35,12 @@ module.exports = class DNSChallenge {
       acmeChallengeDns: '_acme-challenge.'
     }
   }
+
+  loopback (opts, domain, token, cb) { // TODO: added this stub so greenlock STFU, does not seem needed...
+    return cb()
+  }
+
+  test (args, domain, challenge, keyAuthorization, cb) { // TODO: added this stub so greenlock STFU, does not seem needed...
+    return cb()
+  }
 }
