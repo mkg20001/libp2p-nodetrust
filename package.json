@@ -32,7 +32,7 @@
     "dirty-chai": "^2.0.1",
     "libp2p": "^0.18.0",
     "libp2p-mplex": "^0.6.0",
-    "libp2p-secio": "github:libp2p/js-libp2p-secio#fix/set-parent-conn",
+    "libp2p-secio": "^0.9.3",
     "libp2p-spdy": "^0.11.0",
     "libp2p-tcp": "^0.11.6"
   },
