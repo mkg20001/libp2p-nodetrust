@@ -27,7 +27,7 @@ class Letsencrypt {
     const dns = new DnsChallenge(opt)
 
     this.le = LE.create({
-      server: LE.stagingServerUrl,
+      server: LE[(opt.env || 'staging') + 'ServerUrl'] || opt.env,
       store: leStore,
       challenges: {
         'dns-01': dns
