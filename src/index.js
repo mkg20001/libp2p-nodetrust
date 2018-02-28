@@ -55,7 +55,7 @@ module.exports = class Nodetrust {
     // HACK: hack in the wss server as a transport (needs some way to change listeners at runtime)
     this.wss = this.ws.createListener({
       cert: this.cert.chain,
-      key: this.cert.key
+      key: this.cert.privKey
     }, conn => {
       if (this.swarm.switch.protocolMuxer) { // this hack is compatible with 2 versions of libp2p-switch. hacks nowadays seem to evolve ;)
         this.swarm.switch.protocolMuxer('WebSockets')(conn)
