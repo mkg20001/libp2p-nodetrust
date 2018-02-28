@@ -64,7 +64,7 @@ module.exports = class Nodetrust {
       }
     })
 
-    this.wss.listen(multiaddr('/ip4/0.0.0.0/tcp/0'), err => {
+    this.wss.listen(multiaddr('/ip4/0.0.0.0/tcp/' + (process.env.NODETRUST_FIXED_PORT || 0)), err => {
       if (err) return cb(err)
       this.wss.getAddrs((err, addr) => {
         if (err) return cb(err)
