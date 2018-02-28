@@ -58,7 +58,7 @@ class Letsencrypt {
     if (this.pem) {
       const params = {
         error: false,
-        privKey: this.pem.key,
+        privkey: this.pem.key,
         cert: this.pem.cert,
         chain: this.pem.cert,
         issuedAt: this.cert.validity.notBefore.getTime(),
