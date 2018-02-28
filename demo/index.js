@@ -6,7 +6,7 @@ const Peer = require('peer-info')
 const Id = require('peer-id')
 
 const SPDY = require('libp2p-spdy')
-const MULTIPLEX = require('libp2p-multiplex')
+const MPLEX = require('libp2p-mplex')
 const SECIO = require('libp2p-secio')
 const listen = ['/ip4/0.0.0.0/tcp/0', '/ip6/::/tcp/0']
 const pull = require('pull-stream')
@@ -32,7 +32,7 @@ Id.create({bits: 512}, (e, id) => {
     ],
     connection: {
       muxer: [
-        MULTIPLEX,
+        MPLEX,
         SPDY
       ],
       crypto: [SECIO],

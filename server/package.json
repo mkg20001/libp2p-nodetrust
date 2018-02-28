@@ -34,7 +34,7 @@
     "libp2p-websockets": "^0.10.5",
     "mafmt": "^4.0.0",
     "named": "github:mkg20001/node-named",
-    "node-forge": "^0.7.1",
+    "node-forge": "^0.7.2",
     "protons": "^1.0.1",
     "pull-protocol-buffers": "^0.1.2"
   }

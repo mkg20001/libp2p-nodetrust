@@ -28,7 +28,7 @@ const NodeTrust = require('../src/browser')
 const disable = bt => bt.css('transition', '.5s').attr('disabled', true)
 
 const SPDY = require('libp2p-spdy')
-const MULTIPLEX = require('libp2p-multiplex')
+const MPLEX = require('libp2p-mplex')
 const SECIO = require('libp2p-secio')
 
 const COLSTART = 'ȵ'
@@ -133,7 +133,7 @@ $(document).ready(() => (function () {
       ],
       connection: {
         muxer: [
-          MULTIPLEX,
+          MPLEX,
           SPDY
         ],
         crypto: [SECIO],
