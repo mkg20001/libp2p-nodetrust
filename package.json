@@ -42,7 +42,7 @@
   "dependencies": {
     "async": "^2.6.0",
     "debug": "^3.1.0",
-    "libp2p-websockets": "^0.10.5",
+    "libp2p-websockets": "github:libp2p/js-libp2p-websockets#pass-options",
     "mafmt": "^4.0.0",
     "nat-puncher": "^0.1.2",
     "once": "^1.4.0",
