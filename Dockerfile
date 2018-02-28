@@ -5,6 +5,7 @@ WORKDIR /app
 RUN npm i --production
 WORKDIR /app/demo
 RUN npm i --production
+RUN npm i libp2p-switch --save
 ENTRYPOINT ["/usr/local/bin/dumb-init", "node", "."]
 ENV USE_PROD 1
 ENV DEBUG libp2p*
