@@ -1,7 +1,7 @@
 'use strict'
 
 const protons = require('protons')
-const {Announce} = protons('message Announce { required bytes id = 1; repeated bytes addr = 2; }')
+const {Announce} = protons('message Announce { repeated bytes addr = 1; }')
 const Id = require('peer-id')
 const Peer = require('peer-info')
 const multiaddr = require('multiaddr')
@@ -28,8 +28,8 @@ module.exports = class Discovery extends EE {
 
   _handle (data) {
     try {
+      const peer = new Peer(Id.createFromB58String(data.from))
       data = Announce.decode(data.data)
-      const peer = new Peer(new Id(data.id))
       data.addr.forEach(addr => peer.multiaddrs.add(multiaddr(addr)))
       log('discovered %s', peer.id.toB58String())
       this.emit('peer', peer)
@@ -41,7 +41,7 @@ module.exports = class Discovery extends EE {
   _broadcast (peer, cb) {
     log('broadcasting')
     cb = once(cb || noop)
-    this.pubsub.publish(CHANNEL, Announce.encode({ id: peer.id.toBytes(), addr: peer.multiaddrs.toArray().map(a => a.buffer) }), cb)
+    this.pubsub.publish(CHANNEL, Announce.encode({ addr: peer.multiaddrs.toArray().map(a => a.buffer) }), cb)
   }
 
   __setSwarm (swarm) {
