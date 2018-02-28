@@ -21,8 +21,13 @@ Id.create({bits: 512}, (e, id) => {
 
   listen.forEach(addr => peer.multiaddrs.add(addr))
 
-  const node = new Peer(Id.createFromB58String('QmNnMDsFRCaKHd8Tybhui1eVuN7xKMMqRZobAEtgKBJU5t'))
-  node.multiaddrs.add('/ip4/127.0.0.1/tcp/8899/ipfs/QmNnMDsFRCaKHd8Tybhui1eVuN7xKMMqRZobAEtgKBJU5t')
+  let node
+
+  if (!process.env.PRODUCTION) {
+    node = new Peer(Id.createFromB58String('QmNnMDsFRCaKHd8Tybhui1eVuN7xKMMqRZobAEtgKBJU5t'))
+    node.multiaddrs.add('/ip4/127.0.0.1/tcp/8899/ipfs/QmNnMDsFRCaKHd8Tybhui1eVuN7xKMMqRZobAEtgKBJU5t')
+  }
+
   const nodetrust = new NodeTrust({ node })
   const {discovery} = nodetrust
 

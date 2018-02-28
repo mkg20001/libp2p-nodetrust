@@ -6,6 +6,6 @@ RUN npm i --production
 WORKDIR /app/demo
 RUN npm i
 ENTRYPOINT ["/usr/local/bin/dumb-init", "node", "."]
-ENV USE_PROD 1
+ENV PRODUCTION 1
 ENV DEBUG libp2p*
 EXPOSE 5285
