@@ -1,6 +1,6 @@
 'use strict'
 
-if (window.location.host === 'libp2p-nodetrust.tk') {
+if (window.location.host === 'libp2p-nodetrust.tk' || window.location.host.endsWith('github.io')) {
   const Raven = require('raven-js')
   Raven.config('https://6378f3d56e7a41faae3058d3b9dfefef@sentry.zion.host/10').install()
 }
