@@ -1,5 +1,7 @@
 'use strict'
 
+/* eslint-disable no-console */
+
 const Peer = require('peer-info')
 const Id = require('peer-id')
 let node
