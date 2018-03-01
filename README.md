@@ -1,6 +1,6 @@
 # libp2p-nodetrust
 
-Why not give every libp2p node an `IP.libp2p.io` address and certificate?
+Why not give every libp2p node an `IP.ip.libp2p.io` address and certificate?
 
 # Why
 
