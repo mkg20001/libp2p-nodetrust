@@ -1,3 +1,3 @@
 # libp2p-nodetrust demo
 
-Currently broken!!
+The demo is live at [ » https://libp2p-nodetrust.tk/demo/ ](https://libp2p-nodetrust.tk/demo/)
