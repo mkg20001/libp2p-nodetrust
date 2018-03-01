@@ -60,5 +60,8 @@
   "bugs": {
     "url": "https://github.com/mkg20001/libp2p-nodetrust/issues"
   },
-  "homepage": "https://github.com/mkg20001/libp2p-nodetrust#readme"
+  "homepage": "https://github.com/mkg20001/libp2p-nodetrust#readme",
+  "contributors": [
+    "mkg20001 <mkg20001@gmail.com>"
+  ]
 }
