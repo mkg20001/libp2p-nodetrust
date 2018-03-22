@@ -8,6 +8,8 @@ let node
 if (process.env.USE_LOCAL) {
   node = new Peer(Id.createFromB58String('QmNnMDsFRCaKHd8Tybhui1eVuN7xKMMqRZobAEtgKBJU5t'))
   node.multiaddrs.add('/ip4/127.0.0.1/tcp/8899/ipfs/QmNnMDsFRCaKHd8Tybhui1eVuN7xKMMqRZobAEtgKBJU5t')
+} else {
+  node = require('./src/defaults').defaultNode
 }
 const {createClient} = require('./test/utils')
 const multiaddr = require('multiaddr')

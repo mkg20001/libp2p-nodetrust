@@ -24,17 +24,17 @@
   "license": "MIT",
   "dependencies": {
     "debug": "^3.1.0",
-    "greenlock": "^2.1.18",
+    "greenlock": "^2.1.19",
     "le-store-certbot": "github:mkg20001/le-store-certbot",
-    "libp2p": "^0.18.0",
+    "libp2p": "^0.19.0",
     "libp2p-mplex": "^0.6.0",
     "libp2p-secio": "^0.9.3",
     "libp2p-spdy": "^0.11.0",
     "libp2p-tcp": "^0.11.6",
     "libp2p-websockets": "^0.10.5",
     "mafmt": "^4.0.0",
+    "multihashing-async": "^0.4.8",
     "named": "github:mkg20001/node-named",
-    "node-forge": "^0.7.2",
     "protons": "^1.0.1",
     "pull-protocol-buffers": "^0.1.2"
   }

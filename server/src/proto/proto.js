@@ -4,15 +4,45 @@ const protons = require('protons')
 
 module.exports = protons(`
 
-message CertResponse {
-  required bool error = 1;
-  // param from https://www.npmjs.com/package/greenlock#useful-example
-  string privkey = 2;
-  string cert = 3;
-  string chain = 4;
-  int64 issuedAt = 5;
-  int64 expiresAt = 6;
-  repeated string altnames = 7;
+enum ErrorType {
+  NONE          = 0;
+  RATELIMIT     = 1; // can be either letsencrypt rate limit or internal rate limit
+  OTHER         = 9;
+}
+
+enum CertificateEncodingType {
+  PEM = 1;
+}
+
+enum KeyEncodingType {
+  PEM_RSA = 1;
+}
+
+enum KeyType {
+  RSA = 1;
+}
+
+message Certificate {
+  required bytes certificate = 1;
+  required CertificateEncodingType encoding = 2;
+  required KeyType keyType = 3;
+}
+
+message PrivateKey {
+  required bytes key = 1;
+  required KeyEncodingType encoding = 2;
+  required KeyType type = 3;
+}
+
+message CertificateWithKey {
+  required Certificate certificate = 1;
+  required PrivateKey key = 2;
+}
+
+message CertificateResponse {
+  required ErrorType error = 1;
+  optional CertificateWithKey cert = 2;
+  optional Certificate ca = 3;
 }
 
 `)
