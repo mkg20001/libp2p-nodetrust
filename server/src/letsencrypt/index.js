@@ -21,7 +21,7 @@ function leAgree (opts, agreeCb) {
 }
 
 function idToCN (id, cb) {
-  multihashing(Buffer.from(id), 'sha2-256', (err, digest) => {
+  multihashing(Buffer.from(id), 'sha3-224', (err, digest) => {
     if (err) return cb(err)
     id = base32Encode(digest, 'RFC4648').replace('=', '').toLowerCase()
     cb(null, id)
