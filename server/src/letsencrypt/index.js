@@ -11,11 +11,21 @@ const path = require('path')
 const _FAKECERT = path.join(__dirname, '..', '..')
 const fs = require('fs')
 const read = (...f) => fs.readFileSync(path.join(_FAKECERT, ...f)).toString()
+const multihashing = require('multihashing-async')
+const base32Encode = require('base32-encode')
 
 function leAgree (opts, agreeCb) {
   console.log('Agreeing to tos %s with email %s to obtain certificate for %s', opts.tosUrl, opts.email, opts.domains.join(', '))
   // opts = { email, domains, tosUrl }
   agreeCb(null, opts.tosUrl)
+}
+
+function idToCN (id, cb) {
+  multihashing(Buffer.from(id), 'sha2-256', (err, digest) => {
+    if (err) return cb(err)
+    id = base32Encode(digest, 'RFC4648').replace('=', '').toLowerCase()
+    cb(null, id)
+  })
 }
 
 class Letsencrypt {
@@ -51,7 +61,7 @@ class Letsencrypt {
     this.le.challenges['dns-01'] = dns // workarround
     this.le.challenges['tls-sni-01'] = sni // added this so it STFU about tls-sni-01.loopback
   }
-  handleRequest (domains, cb) {
+  handleRequest (id, zone, domains, cb) {
     if (this.pem) {
       const params = {
         error: false,
@@ -61,13 +71,19 @@ class Letsencrypt {
       }
       return cb(null, params)
     }
-    this.le.register({
-      domains,
-      email: this.email,
-      agreeTos: true, // yolo
-      rsaKeySize: 2048,
-      challengeType: 'dns-01'
-    }).then(res => cb(null, res), cb)
+    if (!domains.length) return cb(new Error('No domains specified!'))
+    idToCN(id, (err, cn) => {
+      if (err) return cb(err)
+      domains = [cn + '.' + zone].concat(domains)
+      log('issue: %s as %s', domains[0], domains.slice(1).join(', '))
+      this.le.register({
+        domains,
+        email: this.email,
+        agreeTos: true, // yolo
+        rsaKeySize: 2048,
+        challengeType: 'dns-01'
+      }).then(res => cb(null, res), cb)
+    })
   }
 }
 

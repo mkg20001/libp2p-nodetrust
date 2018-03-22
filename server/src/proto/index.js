@@ -42,9 +42,8 @@ class RPC {
     }
     const ips = this.addr.map(a => a.toString()).filter(a => a.startsWith('/ip')).map(a => a.split('/')[2]) // TODO: filter unique
     const domains = ips.map(ip => encodeAddr(ip)).filter(Boolean).map(sub => sub + '.' + this.opt.zone)
-    // if (domains.length) domains.push('id_' + this.pi.idTB58String())
     log('cert for %s', domains.join(', '))
-    this.opt.le.handleRequest(domains, (err, res) => {
+    this.opt.le.handleRequest(this.pi.id.toB58String(), this.opt.zone, domains, (err, res) => {
       if (err) return cb(err)
       let data = {
         cert: {
