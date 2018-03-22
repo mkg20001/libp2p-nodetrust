@@ -12,7 +12,7 @@ const _FAKECERT = path.join(__dirname, '..', '..')
 const fs = require('fs')
 const read = (...f) => fs.readFileSync(path.join(_FAKECERT, ...f)).toString()
 const multihashing = require('multihashing-async')
-const base32Encode = require('base32-encode')
+const domainBase = require('base-x')('abcdefghijklmnopqrstuvwxyz0123456789-')
 
 function leAgree (opts, agreeCb) {
   console.log('Agreeing to tos %s with email %s to obtain certificate for %s', opts.tosUrl, opts.email, opts.domains.join(', '))
@@ -20,10 +20,10 @@ function leAgree (opts, agreeCb) {
   agreeCb(null, opts.tosUrl)
 }
 
-function idToCN (id, cb) {
+function idToCN (id, zone, cb) {
   multihashing(Buffer.from(id), 'sha3-224', (err, digest) => {
     if (err) return cb(err)
-    id = base32Encode(digest, 'RFC4648').replace('=', '').toLowerCase()
+    id = domainBase.encode(digest).substr(0, 63 - zone.length)
     cb(null, id)
   })
 }
@@ -72,7 +72,7 @@ class Letsencrypt {
       return cb(null, params)
     }
     if (!domains.length) return cb(new Error('No domains specified!'))
-    idToCN(id, (err, cn) => {
+    idToCN(id, zone, (err, cn) => {
       if (err) return cb(err)
       domains = [cn + '.' + zone].concat(domains)
       log('issue: %s as %s', domains[0], domains.slice(1).join(', '))

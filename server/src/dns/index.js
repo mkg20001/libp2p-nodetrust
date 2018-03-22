@@ -20,7 +20,6 @@ function decodeAddr (addr) {
       if (!ip.match(ip6re)) return []
       return [['AAAA', ip]]
     default:
-      if (addr.startsWith('c4')) return [['A', '0.0.0.0']] // sha3 peer-id validation
       return []
   }
 }

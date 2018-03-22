@@ -23,7 +23,6 @@
   "author": "Maciej Krüger <mkg20001@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "base32-encode": "^1.0.0",
     "debug": "^3.1.0",
     "greenlock": "^2.1.19",
     "le-store-certbot": "github:mkg20001/le-store-certbot",
