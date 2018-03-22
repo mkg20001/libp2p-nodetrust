@@ -61,7 +61,7 @@ function decode (obj, cb) {
   try {
     res = {cert: certificateWithKey(obj.cert), ca: certificate(obj.ca)}
     res.expiresAt = res.cert.certificate.validity.notAfter.getTime()
-    res.altnames = [res.cert.certificate.subject.getField('CN').value]
+    res.altnames = res.cert.certificate.getExtension('subjectAltName').altNames.filter(a => a.type === 2 && a.value !== res.cert.certificate.subject.getField('CN').value).map(a => a.value)
   } catch (e) {
     return cb(e)
   }

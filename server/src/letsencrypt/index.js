@@ -20,11 +20,13 @@ function leAgree (opts, agreeCb) {
   agreeCb(null, opts.tosUrl)
 }
 
-function idToCN (id, zone, cb) {
+function idToCN (id, zone, cb) { // TODO: maybe refactor this method as it could be attacked
+  let pref = 'id0'
+  let suf = '.' + zone
   multihashing(Buffer.from(id), 'sha3-224', (err, digest) => {
     if (err) return cb(err)
-    id = domainBase.encode(digest).substr(0, 63 - zone.length)
-    cb(null, id)
+    id = domainBase.encode(digest).substr(0, 64 - pref.length - suf.length)
+    cb(null, pref + id + suf)
   })
 }
 
@@ -74,7 +76,7 @@ class Letsencrypt {
     if (!domains.length) return cb(new Error('No domains specified!'))
     idToCN(id, zone, (err, cn) => {
       if (err) return cb(err)
-      domains = [cn + '.' + zone].concat(domains)
+      domains = [cn].concat(domains)
       log('issue: %s as %s', domains[0], domains.slice(1).join(', '))
       this.le.register({
         domains,
