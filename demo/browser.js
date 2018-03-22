@@ -1,7 +1,11 @@
 'use strict'
 
+const Raven = require('raven-js')
+
+try {
+
 if (window.location.host === 'libp2p-nodetrust.tk' || window.location.host.endsWith('github.io')) {
-  const Raven = require('raven-js')
+  console.info('Raven error reporting enabled!')
   Raven.config('https://6378f3d56e7a41faae3058d3b9dfefef@sentry.zion.host/10').install()
 }
 
@@ -119,6 +123,7 @@ $(document).ready(() => (function () {
   $('#swarm-state').text('Preparing...')
 
   Id.create((err, id) => {
+    if (err) Raven.captureException(err)
     if (err) throw err
     console.info('%c[swarm]%c Ready to launch', 'font-weight: bold', 'color: inherit')
 
@@ -152,11 +157,13 @@ $(document).ready(() => (function () {
       swarm.start(err => {
         if (err) {
           $('#swarm-state').text('Node: Error')
+          Raven.captureException(err)
           throw err
         }
         nodetrust.start(err => {
           if (err) {
             $('#swarm-state').text('Node: Error')
+            Raven.captureException(err)
             throw err
           } else {
             $('#swarm-state').text('Node: Online')
@@ -200,3 +207,8 @@ $(document).ready(() => (function () {
     })
   })
 }()))
+
+} catch(e) {
+  Raven.captureException(e)
+  throw e
+}

@@ -8,6 +8,7 @@ const noop = err => err ? log(err) : false
 
 const Discovery = require('./discovery')
 const {defaultNode} = require('./defaults')
+const WS = require('libp2p-websockets')
 
 module.exports = class Nodetrust {
   constructor (opt) {
@@ -17,6 +18,7 @@ module.exports = class Nodetrust {
   __setSwarm (swarm) {
     this.discovery.__setSwarm(swarm)
     this.swarm = swarm
+    if (!this.swarm.switch.transports.WebSockets) this.swarm.switch.transports.WebSockets = new WS() // HACK: hack in the wss transport for dialing. (needs some way to add transports at runtime)
   }
 
   start (cb) {
