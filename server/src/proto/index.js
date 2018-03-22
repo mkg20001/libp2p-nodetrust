@@ -8,7 +8,7 @@ const log = debug('nodetrust:protocol')
 
 const {encodeAddr} = require('../dns')
 
-const {CertResponse} = require('./proto')
+const {ErrorType, CertificateEncodingType, KeyEncodingType, KeyType, CertificateResponse} = require('./proto')
 
 /*
 Protocol tl;dr
@@ -29,11 +29,11 @@ class RPC {
   }
   sink (read) {
     const cb = (err, res) => {
-      if (err) {
+      if (err) { // TODO: figure out how to detect le rate limits
         log(err)
-        this.source.push({ error: true })
+        this.source.push({ error: ErrorType.OTHER })
       } else {
-        this.source.push(Object.assign({ error: false }, res))
+        this.source.push(Object.assign({ error: ErrorType.NONE }, res))
       }
 
       this.source.end()
@@ -42,20 +42,47 @@ class RPC {
     }
     const ips = this.addr.map(a => a.toString()).filter(a => a.startsWith('/ip')).map(a => a.split('/')[2]) // TODO: filter unique
     const domains = ips.map(ip => encodeAddr(ip)).filter(Boolean).map(sub => sub + '.' + this.opt.zone)
+    // if (domains.length) domains.push('id_' + this.pi.idTB58String())
     log('cert for %s', domains.join(', '))
-    this.opt.le.handleRequest(domains, cb)
+    this.opt.le.handleRequest(domains, (err, res) => {
+      if (err) return cb(err)
+      let data = {
+        cert: {
+          certificate: {
+            certificate: res.cert,
+            encoding: CertificateEncodingType.PEM,
+            keyType: KeyType.RSA
+          },
+          key: {
+            key: res.privkey,
+            encoding: KeyEncodingType.PEM_RSA,
+            type: KeyType.RSA
+          }
+        },
+        ca: {
+          certificate: res.chain,
+          encoding: CertificateEncodingType.PEM,
+          keyType: KeyType.RSA
+        }
+      }
+      return cb(null, data)
+    })
   }
   setup (conn, cb) {
     conn.getObservedAddrs((err, addr) => {
       if (err) return cb(err)
       this.addr = addr
-      pull(
-        conn,
-        this,
-        ppb.encode(CertResponse),
-        conn
-      )
-      return cb()
+      conn.getPeerInfo((err, pi) => {
+        if (err) return cb(err)
+        this.pi = pi
+        pull(
+          conn,
+          this,
+          ppb.encode(CertificateResponse),
+          conn
+        )
+        return cb()
+      })
     })
   }
 }

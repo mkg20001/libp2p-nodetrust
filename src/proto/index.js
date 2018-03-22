@@ -1,9 +1,9 @@
 'use strict'
 
-const ppb = require('pull-protocol-buffers')
 const Pushable = require('pull-pushable')
 const pull = require('pull-stream')
-const {CertResponse} = require('./proto')
+const decoder = require('./decoder')
+const lp = require('pull-length-prefixed')
 
 /*
 Protocol tl;dr
@@ -27,12 +27,7 @@ module.exports = class RPC {
         if (err === true) err = new Error('Server unexpectedly closed the connection!')
         this.onCert(err)
       } else {
-        if (data.error) {
-          this.onCert(new Error('Server returned an error response!'))
-        } else {
-          delete data.error
-          this.onCert(null, data)
-        }
+        decoder(data, this.onCert)
       }
 
       return read(true, () => {})
@@ -43,7 +38,7 @@ module.exports = class RPC {
   setup (conn) {
     pull(
       conn,
-      ppb.decode(CertResponse),
+      lp.decode(),
       this,
       conn
     )

@@ -7,8 +7,6 @@ const sniChallenge = require('./fakeSni')
 
 const debug = require('debug')
 const log = debug('nodetrust:letsencrypt')
-const forge = require('node-forge')
-const {pki} = forge
 const path = require('path')
 const _FAKECERT = path.join(__dirname, '..', '..')
 const fs = require('fs')
@@ -24,7 +22,6 @@ class Letsencrypt {
   constructor (opt) {
     if (opt.stub) {
       this.pem = { cert: read('cert.pem'), key: read('key.pem') }
-      this.cert = pki.certificateFromPem(this.pem.cert)
     }
 
     const debug = log.enabled
@@ -60,10 +57,7 @@ class Letsencrypt {
         error: false,
         privkey: this.pem.key,
         cert: this.pem.cert,
-        chain: this.pem.cert,
-        issuedAt: this.cert.validity.notBefore.getTime(),
-        expiresAt: this.cert.validity.notAfter.getTime(),
-        altnames: domains
+        chain: this.pem.cert
       }
       return cb(null, params)
     }
