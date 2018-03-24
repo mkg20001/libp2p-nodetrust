@@ -7,8 +7,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "watchify browser.js -d -v -o bundle.js",
     "start": "http-server -p 3000 .",
-    "dist": "browserify browser.js -d | uglifyjs --source-map content=inline,url=bundle.min.js.map --compress -o bundle.min.js",
-    "_babel_disabled": "babel -s inline -f bundle.min.js --presets env | "
+    "dist": "browserify browser.js -d > bundle.min.js",
+    "_babel_disabled": "babel -s inline -f bundle.min.js --presets env | ",
+    "_uglify_disabled": " | uglifyjs --source-map content=inline,url=bundle.min.js.map --compress -o bundle.min.js"
   },
   "author": "Maciej Krüger <mkg20001@gmail.com>",
   "license": "MIT",
@@ -25,7 +26,7 @@
     "mafmt": "^4.0.0",
     "moment": "^2.21.0",
     "pull-stream": "^3.6.2",
-    "raven-js": "^3.23.3"
+    "raven-js": "^3.24.0"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",

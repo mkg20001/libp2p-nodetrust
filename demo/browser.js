@@ -12,8 +12,6 @@ if (window.location.host === 'libp2p-nodetrust.tk' || window.location.host.endsW
 let running = false
 
 require('debug').save('libp2p*')
-process.env.INTENSE_DEBUG = '1'
-process.env.DEBUG_PACKETS = '1'
 window.debug = require('debug')
 const pull = require('pull-stream')
 
@@ -123,8 +121,10 @@ $(document).ready(() => (function () {
   $('#swarm-state').text('Preparing...')
 
   Id.create((err, id) => {
-    if (err) Raven.captureException(err)
-    if (err) throw err
+    if (err) {
+      Raven.captureException(err)
+      throw err
+    }
     console.info('%c[swarm]%c Ready to launch', 'font-weight: bold', 'color: inherit')
 
     const nodetrust = new NodeTrust({ node: ntPeer })
@@ -172,7 +172,12 @@ $(document).ready(() => (function () {
               discovery.start()
             })
             $('#dial').click(() => {
-              nodetrust.start(console.log) // eq. of swarm(nodetrust.node)
+              nodetrust.start(err => { // re-dials the server
+                if (err) {
+                  Raven.captureException(err)
+                  throw err
+                }
+              })
             })
             $('#controls').fadeIn('fast')
             console.info('%c[swarm]%c Online', 'font-weight: bold', 'color: inherit')
