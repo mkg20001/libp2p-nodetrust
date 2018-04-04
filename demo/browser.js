@@ -1,9 +1,5 @@
 'use strict'
 
-const Raven = require('raven-js')
-
-try {
-
 if (window.location.host === 'libp2p-nodetrust.tk' || window.location.host.endsWith('github.io')) {
   console.info('Raven error reporting enabled!')
   Raven.config('https://6378f3d56e7a41faae3058d3b9dfefef@sentry.zion.host/10').install()
@@ -212,8 +208,3 @@ $(document).ready(() => (function () {
     })
   })
 }()))
-
-} catch(e) {
-  Raven.captureException(e)
-  throw e
-}
