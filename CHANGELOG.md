@@ -1,3 +1,14 @@
+<a name="0.1.1"></a>
+## [0.1.1](https://github.com/mkg20001/libp2p-nodetrust/compare/v0.1.0...v0.1.1) (2018-04-04)
+
+
+### Features
+
+* New protocol ([a037e47](https://github.com/mkg20001/libp2p-nodetrust/commit/a037e47))
+* Update demo ([e426934](https://github.com/mkg20001/libp2p-nodetrust/commit/e426934))
+
+
+
 <a name="0.1.0"></a>
 # 0.1.0 (2018-03-01)
 

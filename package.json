@@ -1,6 +1,6 @@
 {
   "name": "libp2p-nodetrust",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "IP.ip.libp2p.io addresses and certificates for libp2p nodes",
   "main": "src/index.js",
   "scripts": {
