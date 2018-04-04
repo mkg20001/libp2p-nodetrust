@@ -27,9 +27,6 @@ Additionally the clients will relay each others floodsub messages so there is no
 
 # Development
 
-## Client
-Run `USE_LOCAL=1 nodemon test-client.js -d 1`
-
 ## Server
 
 ### Certificate
@@ -38,3 +35,6 @@ You need a certificate for `ip4127-0-0-1.ip.libp2p-nodetrust.tk` to use the serv
 
 ### Usage
 Run `nodemon src/bin.js ./config.dev.json` in the `server/` directory
+
+## Client
+Run `nodemon -x env NODETRUST_IGNORE_ID_FILTER=1 SKIP_NAT=1 USE_LOCAL=1 node test-client.js`

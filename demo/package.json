@@ -7,9 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "watchify browser.js -d -v -o bundle.js",
     "start": "http-server -p 3000 .",
-    "dist": "browserify browser.js -d > bundle.min.js",
-    "_babel_disabled": "babel -s inline -f bundle.min.js --presets env | ",
-    "_uglify_disabled": " | uglifyjs --source-map content=inline,url=bundle.min.js.map --compress -o bundle.min.js"
+    "dist": "browserify browser.js -d | babel -s inline -f bundle.min.js --presets env | uglifyjs --source-map content=inline,url=bundle.min.js.map --compress -o bundle.min.js"
   },
   "author": "Maciej Krüger <mkg20001@gmail.com>",
   "license": "MIT",
@@ -17,15 +15,15 @@
   "dependencies": {
     "http-server": "^0.11.1",
     "jquery": "^3.3.1",
-    "libp2p": "^0.19.0",
+    "libp2p": "^0.19.2",
     "libp2p-mplex": "^0.6.0",
-    "libp2p-secio": "^0.9.3",
+    "libp2p-secio": "^0.9.4",
     "libp2p-spdy": "^0.11.0",
     "libp2p-tcp": "^0.11.6",
     "libp2p-websockets": "github:libp2p/js-libp2p-websockets#pass-options",
     "mafmt": "^4.0.0",
-    "moment": "^2.21.0",
-    "pull-stream": "^3.6.2",
+    "moment": "^2.22.0",
+    "pull-stream": "^3.6.7",
     "raven-js": "^3.24.0"
   },
   "devDependencies": {
