@@ -1,3 +1,18 @@
+<a name="0.1.2"></a>
+## [0.1.2](https://github.com/mkg20001/libp2p-nodetrust/compare/v0.1.1...v0.1.2) (2018-04-04)
+
+
+### Bug Fixes
+
+* Update packages and fix some bugs ([16327b4](https://github.com/mkg20001/libp2p-nodetrust/commit/16327b4))
+
+
+### Features
+
+* **demo:** Disable uglify once again - Use raven from CDN ([bcb5eec](https://github.com/mkg20001/libp2p-nodetrust/commit/bcb5eec))
+
+
+
 <a name="0.1.1"></a>
 ## [0.1.1](https://github.com/mkg20001/libp2p-nodetrust/compare/v0.1.0...v0.1.1) (2018-04-04)
 
