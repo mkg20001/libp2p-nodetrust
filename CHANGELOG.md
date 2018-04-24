@@ -1,3 +1,8 @@
+<a name="0.1.3"></a>
+## [0.1.3](https://github.com/mkg20001/libp2p-nodetrust/compare/v0.1.2...v0.1.3) (2018-04-24)
+
+
+
 <a name="0.1.2"></a>
 ## [0.1.2](https://github.com/mkg20001/libp2p-nodetrust/compare/v0.1.1...v0.1.2) (2018-04-04)
 
