@@ -58,7 +58,8 @@ class Letsencrypt {
       challengeType: 'dns-01',
       aggreeToTerms: leAgree,
       debug,
-      log
+      log,
+      version: 'v02'
     })
     this.le.challenges['dns-01'] = dns // workarround
     this.le.challenges['tls-sni-01'] = sni // added this so it STFU about tls-sni-01.loopback
