@@ -24,7 +24,8 @@
   "license": "MIT",
   "dependencies": {
     "debug": "^3.1.0",
-    "greenlock": "~2.2.4",
+    "greenlock": "~2.2.16",
+    "le-acme-core": "^2.1.3",
     "le-store-certbot": "github:mkg20001/le-store-certbot",
     "libp2p": "^0.20.4",
     "libp2p-mplex": "^0.7.0",
