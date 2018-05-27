@@ -33,6 +33,7 @@ class RPC {
   sink (read) {
     let next = (end, data) => {
       if (end) {
+        log('rpc err %s', end)
         this.online = false
         this.source.end()
         this.cbs.forEach(cb => cb(new Error('Server disconnected')))
@@ -46,10 +47,14 @@ class RPC {
 
       if (data.error) err = new Error('Server returned error: ' + (errorTable[data.error] || 'N/A'))
 
+      log('got resp: %s', err || 'ok')
+
       setImmediate(() => cb(err))
 
       return read(null, next)
     }
+
+    read(null, next)
   }
 
   exec (param, cb) {
@@ -82,13 +87,12 @@ class Client {
     })
   }
   rpc (param) {
-    log('rpc exec %o', param)
     return new Promise((resolve, reject) => {
       if (!this._rpc || !this._rpc.online) return this.dial(err => {
         if (err) return reject(err)
         this.rpc(param, cb).then(resolve, reject)
       })
-      log('rpc exec real %o', param)
+      log('rpc exec %o', param)
       this._rpc.exec(param, e => e ? reject(e) : resolve())
     })
   }
