@@ -68,9 +68,11 @@ module.exports = class DNSServer {
   }
   addRecords (domain, records) {
     this._db[domain] = records
+    return Promise.resolve()
   }
   deleteRecords (domain) {
     delete this._db[domain]
+    return Promise.resolve()
   }
 }
 

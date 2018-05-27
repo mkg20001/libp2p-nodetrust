@@ -14,9 +14,8 @@ module.exports = class DNSChallenge {
   set (args, domain, challenge, keyAuthorization, cb) {
     domain = (args.test || '') + (args.acmeChallengeDns || '_acme-challenge.') + domain
     if (!domain.endsWith(this.zone)) return cb(new Error('Domain not in managed zone!'))
-    this.dns.addRecords(domain, [['TXT', createAuthDigest(keyAuthorization)]])
+    this.dns.addRecords(domain, [['TXT', createAuthDigest(keyAuthorization)]]).then(cb, cb)
     log('deployed challenge for %s', domain)
-    cb(null)
   }
   get (defaults, domain, challenge, cb) {
     // This function is just a stub
@@ -24,9 +23,8 @@ module.exports = class DNSChallenge {
   }
   remove (args, domain, challenge, cb) {
     domain = (args.test || '') + (args.acmeChallengeDns || '_acme-challenge.') + domain
-    this.dns.deleteRecords(domain)
+    this.dns.deleteRecords(domain).then(cb, cb)
     log('removed challenge for %s', domain)
-    cb(null)
   }
   getOptions () {
     return {
