@@ -4,6 +4,10 @@ const Peer = require('peer-info')
 const Id = require('peer-id')
 const Pushable = require('pull-pushable')
 const pull = require('pull-stream')
+const ppb = require('pull-protocol-buffers')
+const {Update, Response} = require('./proto')
+const debug = require('debug')
+const log = debug('nodetrust:dns:remote:client')
 
 let errorTable = {
   1: 'Unauthorized',
@@ -56,14 +60,16 @@ class RPC {
 }
 
 class Client {
-  constructor (opt) {
+  constructor (opt, main) {
     let addr = opt.addr
-    this.swarm = opt.swarm
+    console.log(opt, main)
+    this.swarm = main.swarm
     this.peer = new Peer(Id.createFromB58String(addr.split('ipfs/').pop()))
     this.peer.multiaddrs.add(addr)
   }
   dial (cb) {
     if (this.dialing) return this.dialCBs.push(cb)
+    log('dialing')
     this.dialing = true
     this.dialCBs = []
     this.swarm.dialProtocol(this.peer, '/nodetrust/_internal/dns/1.0.0', (err, conn) => {
@@ -76,11 +82,13 @@ class Client {
     })
   }
   rpc (param) {
+    log('rpc exec %o', param)
     return new Promise((resolve, reject) => {
       if (!this._rpc || !this._rpc.online) return this.dial(err => {
         if (err) return reject(err)
         this.rpc(param, cb).then(resolve, reject)
       })
+      log('rpc exec real %o', param)
       this._rpc.exec(param, e => e ? reject(e) : resolve())
     })
   }
@@ -89,6 +97,12 @@ class Client {
   }
   deleteRecords (domain) {
     return this.rpc({name: domain})
+  }
+  start (cb) {
+    this.dial(cb)
+  }
+  stop (cb) {
+    cb()
   }
 }
 

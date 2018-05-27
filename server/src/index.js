@@ -80,16 +80,12 @@ module.exports = class Nodetrust {
     if (opt.dns.standalone || opt.dnsOnly) {
       this.dns = dns = new DNS(opt.dns)
     } else {
-      this.dns = dns = new RemoteDNS(opt.dns)
+      this.dns = dns = new RemoteDNS(opt.dns, this)
     }
 
-    if (!opt.dnsOnly) {
-      if (opt.dns.standalone) {
-        this.dns = dns = new DNS(opt.dns)
-      } else {
-        this.dns = new RemoteDNS(opt.dns)
-      }
+    dns.zone = opt.zone
 
+    if (!opt.dnsOnly) {
       opt.letsencrypt.dns = dns
       this.le = new LE(opt.letsencrypt)
 
@@ -99,8 +95,6 @@ module.exports = class Nodetrust {
     if (opt.dns.access) {
       RemoteDNSService(this, opt.dns.access)
     }
-
-    dns.zone = opt.zone
   }
 
   start (cb) {
