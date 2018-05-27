@@ -17,7 +17,8 @@ const argv = require('minimist')(process.argv.slice(2))
 
 const config = {
   genconf: argv.genconf || argv.g || process.env.GENCONF || false,
-  config: argv.config || argv.c || process.env.CONFIG || path.join(inDocker ? '/data' : process.cwd(), 'config.json')
+  config: argv.config || argv.c || process.env.CONFIG || path.join(inDocker ? '/data' : process.cwd(), 'config.json'),
+  dnsOnly: argv.dns || argv.d || process.env.DNS || false
 }
 
 const die = (...msg) => {

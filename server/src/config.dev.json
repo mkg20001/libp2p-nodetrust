@@ -12,6 +12,8 @@
   },
   "dns": {
     "port": 4500,
-    "ttl": 2
+    "ttl": 2,
+    "standalone": true,
+    "addr": "/ip4/127.0.0.1/tcp/6393/ipfs/QmX6Eo1cmZA2fmstTzTtY6Uo6Mt1zKbPH5dRr1qxCvzyUb"
   }
 }

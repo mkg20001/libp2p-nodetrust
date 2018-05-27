@@ -29,13 +29,16 @@ const LE = require('./letsencrypt')
 const DNS = require('./dns')
 const DISCOVERY = '_nodetrust_discovery_v2' // pubsub discovery channel
 
+const RemoteDNS = require('./dns/remote/client')
+const RemoteDNSService = require('./dns/remote')
+
 const {waterfall} = require('async')
 
 module.exports = class Nodetrust {
   constructor (opt) {
     if (!opt) throw new Error('No config!')
     if (!opt.listen) opt.listen = ['/ip4/0.0.0.0/tcp/8899', '/ip6/::/tcp/8899', '/ip4/0.0.0.0/tcp/8877/ws']
-    const keys = ['id', 'zone', 'dns', 'letsencrypt']
+    const keys = ['id', 'zone', 'dns'].concat(opt.dnsOnly ? [] : ['letsencrypt'])
     keys.forEach(k => {
       if (!opt[k]) throw new Error('Config is missing key ' + JSON.stringify(k) + '!')
     })
@@ -70,13 +73,34 @@ module.exports = class Nodetrust {
     })
 
     this.zone = opt.zone
+    opt.dns.zone = opt.zone
 
-    const dns = this.dns = new DNS(opt.dns)
+    let dns
+
+    if (opt.dns.standalone || opt.dnsOnly) {
+      this.dns = dns = new DNS(opt.dns)
+    } else {
+      this.dns = dns = new RemoteDNS(opt.dns)
+    }
+
+    if (!opt.dnsOnly) {
+      if (opt.dns.standalone) {
+        this.dns = dns = new DNS(opt.dns)
+      } else {
+        this.dns = new RemoteDNS(opt.dns)
+      }
+
+      opt.letsencrypt.dns = dns
+      this.le = new LE(opt.letsencrypt)
+
+      Proto(this)
+    }
+
+    if (opt.dns.access) {
+      RemoteDNSService(this, opt.dns.access)
+    }
+
     dns.zone = opt.zone
-    opt.letsencrypt.dns = dns
-    this.le = new LE(opt.letsencrypt)
-
-    Proto(this)
   }
 
   start (cb) {
