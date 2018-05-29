@@ -3,21 +3,23 @@
 const LE = require('greenlock')
 const storeCertbot = require('le-store-certbot')
 const DnsChallenge = require('./dnsChallenge')
-const sniChallenge = require('./fakeSni')
+const cp = require('child_process')
 
 const debug = require('debug')
 const log = debug('nodetrust:letsencrypt')
+
 const path = require('path')
-const _FAKECERT = path.join(__dirname, '..', '..')
 const fs = require('fs')
+
+const _FAKECERT = path.join(__dirname, '..', '..')
 const read = (...f) => fs.readFileSync(path.join(_FAKECERT, ...f)).toString()
+
 const multihashing = require('multihashing-async')
 const domainBase = require('base-x')('abcdefghijklmnopqrstuvwxyz0123456789-')
 
-function leAgree (opts, agreeCb) {
-  console.log('Agreeing to tos %s with email %s to obtain certificate for %s', opts.tosUrl, opts.email, opts.domains.join(', '))
-  // opts = { email, domains, tosUrl }
-  agreeCb(null, opts.tosUrl)
+const urls = {
+  production: 'https://acme-v02.api.letsencrypt.org/directory',
+  staging: 'https://acme-staging-v02.api.letsencrypt.org/directory'
 }
 
 function idToCN (id, zone, cb) { // TODO: maybe refactor this method as it could be attacked
@@ -46,23 +48,32 @@ class Letsencrypt {
     this.email = opt.email
 
     const dns = new DnsChallenge(opt)
-    const sni = sniChallenge.create({})
 
     this.le = LE.create({
-      server: LE[(opt.env || 'staging') + 'ServerUrl'] || opt.env,
-      store: leStore,
+      version: 'v02',
+      server: urls[(opt.env || 'staging')] || opt.env,
+      agreeTos: true,
+
       challenges: {
-        'dns-01': dns,
-        'tls-sni-01': sni
+        'dns-01': dns
       },
       challengeType: 'dns-01',
-      aggreeToTerms: leAgree,
+
+      store: leStore,
+
       debug,
-      log,
-      version: 'v02'
+      log
     })
-    this.le.challenges['dns-01'] = dns // workarround
-    this.le.challenges['tls-sni-01'] = sni // added this so it STFU about tls-sni-01.loopback
+
+    this.le.acme._dig = (q) => new Promise((resolve, reject) => { // the nodeJS dns module seems to be buggy sometimes. use real dig.
+      try {
+        let records = cp.spawnSync('dig', ['+short', q.name, q.type, '@8.8.8.8'], {stdio: 'pipe'})
+          .stdout.toString().split('\n').filter(s => Boolean(s.trim())).map(v => JSON.parse(v))
+        resolve({answer: records.map(data => { return {data: [data]} }) })
+      } catch(e) {
+        reject(e)
+      }
+    })
   }
   handleRequest (id, zone, domains, cb) {
     if (this.pem) {
@@ -82,7 +93,7 @@ class Letsencrypt {
       this.le.register({
         domains,
         email: this.email,
-        agreeTos: true, // yolo
+        agreeTos: true,
         rsaKeySize: 2048,
         challengeType: 'dns-01'
       }).then(res => cb(null, res), cb)

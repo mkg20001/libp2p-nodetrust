@@ -5,6 +5,7 @@ const log = debug('nodetrust:letsencrypt:dns')
 const crypto = require('crypto')
 const createAuthDigest = keyAuthorization => crypto.createHash('sha256').update(keyAuthorization || '').digest('base64')
   .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '')
+const slowCb = cb => (...a) => setTimeout(() => cb(...a), 100)
 
 module.exports = class DNSChallenge {
   constructor (opt) {
@@ -14,6 +15,7 @@ module.exports = class DNSChallenge {
   set (args, domain, challenge, keyAuthorization, cb) {
     domain = (args.test || '') + (args.acmeChallengeDns || '_acme-challenge.') + domain
     if (!domain.endsWith(this.zone)) return cb(new Error('Domain not in managed zone!'))
+    cb = slowCb(cb) // slow down a bit to ensure dns is properly set-up
     this.dns.addRecords(domain, [['TXT', createAuthDigest(keyAuthorization)]]).then(cb, cb)
     log('deployed challenge for %s', domain)
   }
@@ -32,13 +34,5 @@ module.exports = class DNSChallenge {
       zone: this.zone,
       acmeChallengeDns: '_acme-challenge.'
     }
-  }
-
-  loopback (opts, domain, token, cb) { // TODO: added this stub so greenlock STFU, does not seem needed...
-    return cb()
-  }
-
-  test (args, domain, challenge, keyAuthorization, cb) { // TODO: added this stub so greenlock STFU, does not seem needed...
-    return cb()
   }
 }
