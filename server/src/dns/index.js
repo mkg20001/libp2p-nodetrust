@@ -59,7 +59,7 @@ module.exports = class DNSServer {
       const [type, value] = r
       if (TYPE[query._question.type] === type || TYPE[query._question.type] === 'ANY') { // only answer things we should answer
         log('[%s]\t%s\t=>\t[%s]\t%s', id, domain, type, value)
-        query.addAnswer(domain, new named[type + 'Record'](value), this.ttl)
+        query.addAnswer(domain, new named[type + 'Record'](value), type === 'TXT' ? 10 : this.ttl)
       }
     })
     if (!res.length) log('[%s]\t%s\t=>\t×', id, domain)
