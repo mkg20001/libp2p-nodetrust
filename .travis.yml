@@ -7,6 +7,8 @@ matrix:
   - node_js: 10
 
 script:
+  - cd server && npm i && cd ..
+  - export REMOTE_DNS=ip.libp2p-nodetrust.tk@/ip4/88.99.229.51/tcp/8899/ipfs/QmQvFUNc1pKcUAoekE1XxS5TsMSDB9dw5CYkRxRiDGfFsX
   - npm run lint
   - xvfb-run npm run test
   - npm run coverage

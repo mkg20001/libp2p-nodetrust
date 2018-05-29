@@ -107,7 +107,7 @@ module.exports = class Nodetrust {
 
   stop (cb) {
     waterfall([
-      cb => this.swarm.pubsub.unsubscribe(DISCOVERY, err => cb(err)),
+      // cb => this.swarm.pubsub.unsubscribe(DISCOVERY, () => {}, err => cb(err)),
       cb => this.swarm.stop(err => cb(err)),
       cb => this.dns.stop(err => cb(err))
     ], cb)

@@ -49,8 +49,7 @@ module.exports = class DNSServer {
     this.server.listen(this.port, this.host, cb)
   }
   stop (cb) {
-    // TODO: stop the server
-    cb()
+    this.server.close(cb)
   }
   _handle (query, send) { // TODO: legitify the dns response
     const domain = query.name().toLowerCase() //  [78.47.119.230:15900#8530]      V8-8-8-8.iP.liBp2P-NODETrusT.tk, yep some dns clients are plain retarded
