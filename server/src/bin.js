@@ -51,6 +51,9 @@ try {
 if (!conf) die('Config format error: Not an object')
 if (!conf.id) die('Config format error: No PeerId (.id) found!')
 
+const Raven = require('raven')
+Raven.config().install()
+
 Id.createFromJSON(conf.id, (err, id) => {
   if (err) die('ID load error: %s', err)
   conf.id = id
