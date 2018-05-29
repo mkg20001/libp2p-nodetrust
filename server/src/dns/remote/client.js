@@ -67,7 +67,6 @@ class RPC {
 class Client {
   constructor (opt, main) {
     let addr = opt.addr
-    console.log(opt, main)
     this.swarm = main.swarm
     this.peer = new Peer(Id.createFromB58String(addr.split('ipfs/').pop()))
     this.peer.multiaddrs.add(addr)
@@ -81,9 +80,13 @@ class Client {
       let cbs = this.dialCBs
       this.dialing = false
       delete this.dialCBs
-      if (err) return cbs.forEach(() => cb(err))
+      if (err) {
+        cb(err)
+        return cbs.forEach(() => cb(err))
+      }
       this._rpc = new RPC(conn)
       cbs.forEach(() => cb())
+      cb()
     })
   }
   rpc (param) {
