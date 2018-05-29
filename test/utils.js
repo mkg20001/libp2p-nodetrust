@@ -37,7 +37,7 @@ const Utils = module.exports = {
     let config = {
       letsencrypt: {
         storageDir: '/tmp/nodetrust-le-tmp',
-        email: 'mkg20001@gmail.com'
+        email: 'letsencrypt@mkg20001.io'
       },
       dns: {
         ttl: 10
