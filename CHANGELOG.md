@@ -1,3 +1,14 @@
+<a name="0.1.4"></a>
+## [0.1.4](https://github.com/mkg20001/libp2p-nodetrust/compare/v0.1.3...v0.1.4) (2018-05-29)
+
+
+### Features
+
+* Add tests ([a3e8283](https://github.com/mkg20001/libp2p-nodetrust/commit/a3e8283))
+* Remote DNS ([6958e65](https://github.com/mkg20001/libp2p-nodetrust/commit/6958e65))
+
+
+
 <a name="0.1.3"></a>
 ## [0.1.3](https://github.com/mkg20001/libp2p-nodetrust/compare/v0.1.2...v0.1.3) (2018-04-24)
 
