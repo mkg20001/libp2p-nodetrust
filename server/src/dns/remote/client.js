@@ -41,12 +41,13 @@ class RPC {
       }
 
       let cb = this.cbs.shift()
-      if (!cb) return read(null, next)
+      if (!cb) {
+        log('got response without matching callback, ignore...')
+        return read(null, next)
+      }
 
       let err
-
       if (data.error) err = new Error('Server returned error: ' + (errorTable[data.error] || 'N/A'))
-
       log('got resp: %s', err || 'ok')
 
       setImmediate(() => cb(err))
@@ -72,7 +73,9 @@ class Client {
     this.peer.multiaddrs.add(addr)
   }
   dial (cb) {
-    if (this.dialing) return this.dialCBs.push(cb)
+    if (this.dialing) {
+      return this.dialCBs.push(cb)
+    }
     log('dialing')
     this.dialing = true
     this.dialCBs = []
@@ -91,16 +94,20 @@ class Client {
   }
   rpc (param) {
     return new Promise((resolve, reject) => {
-      if (!this._rpc || !this._rpc.online) return this.dial(err => {
-        if (err) return reject(err)
-        this.rpc(param, cb).then(resolve, reject)
-      })
+      if (!this._rpc || !this._rpc.online) {
+        return this.dial(err => {
+          if (err) {
+            return reject(err)
+          }
+          this.rpc(param).then(resolve, reject)
+        })
+      }
       log('rpc exec %o', param)
       this._rpc.exec(param, e => e ? reject(e) : resolve())
     })
   }
   addRecords (domain, rec) {
-    return this.rpc({name: domain, value: rec.map(r => { return { type: r[0], value: r[1] } }) })
+    return this.rpc({ name: domain, value: rec.map(r => { return { type: r[0], value: r[1] } }) })
   }
   deleteRecords (domain) {
     return this.rpc({name: domain})

@@ -69,8 +69,8 @@ class Letsencrypt {
       try {
         let records = cp.spawnSync('dig', ['+short', q.name, q.type, '@8.8.8.8'], {stdio: 'pipe'})
           .stdout.toString().split('\n').filter(s => Boolean(s.trim())).map(v => JSON.parse(v))
-        resolve({answer: records.map(data => { return {data: [data]} }) })
-      } catch(e) {
+        resolve({ answer: records.map(data => { return { data: [data] } }) })
+      } catch (e) {
         reject(e)
       }
     })

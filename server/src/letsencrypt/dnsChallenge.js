@@ -5,7 +5,7 @@ const log = debug('nodetrust:letsencrypt:dns')
 const crypto = require('crypto')
 const createAuthDigest = keyAuthorization => crypto.createHash('sha256').update(keyAuthorization || '').digest('base64')
   .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '')
-const slowCb = cb => (...a) => setTimeout(() => cb(...a), 100)
+const slowCb = cb => (...a) => setTimeout(() => cb(...a), 100) // eslint-disable-line standard/no-callback-literal
 
 module.exports = class DNSChallenge {
   constructor (opt) {
@@ -21,7 +21,7 @@ module.exports = class DNSChallenge {
   }
   get (defaults, domain, challenge, cb) {
     // This function is just a stub
-    cb(null)
+    cb()
   }
   remove (args, domain, challenge, cb) {
     domain = (args.test || '') + (args.acmeChallengeDns || '_acme-challenge.') + domain
