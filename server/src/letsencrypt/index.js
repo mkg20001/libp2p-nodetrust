@@ -47,8 +47,9 @@ class Letsencrypt {
     idPrefix(id, zone)
       .then(prefix => {
         domains.unshift(prefix)
-        this.acme.getCertificate(id, domains)
+        return this.acme.getCertificate(id, domains)
       }, cb)
+      .then(cert => cb(null, cert), cb)
   }
 
   gc () { // TODO: make this async
