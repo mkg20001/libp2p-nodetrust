@@ -12,9 +12,6 @@ const promiseFnc = ['init', 'getOrGenKey', 'genKey', 'registerAccount', 'obtainC
 const debug = require('debug')
 const log = debug('nodetrust:letsencrypt:acme')
 
-const forge = require('node-forge')
-const pki = forge.pki
-
 const URLS = {
   production: 'https://acme-v02.api.letsencrypt.org/directory',
   staging: 'https://acme-staging-v02.api.letsencrypt.org/directory'
@@ -80,8 +77,7 @@ class LetsencryptACME {
       setChallenge: this.challenge.set,
       removeChallenge: this.challenge.remove
     }).then(certs => {
-      let [cert, ca] = certs.split('\n\n')
-      let certForge = pki.certificateFromPem(cert)
+      let {cert, ca, chain, expires} = certs
       let res = {
         error: false,
         domains,
@@ -89,9 +85,9 @@ class LetsencryptACME {
         altnames: domains.slice(1),
         privkey: domainKeypair.privateKeyPem,
         cert,
-        chain: cert + '\n' + ca,
+        chain,
         ca,
-        validity: certForge.validity.notAfter.getTime()
+        validity: Date.parse(expires)
       }
       this.storage.writeJSON(...id, res)
       cb(null, res)
