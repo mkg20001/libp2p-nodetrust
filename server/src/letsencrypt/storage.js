@@ -42,9 +42,11 @@ class Storage {
   ls (...a) {
     if (this.exists(...a)) return fs.readdirSync(this.locate(...a))
   }
-
-  remove (...a) {
+  rm (...a) {
     if (this.exists(...a)) fs.unlinkSync(this.locate(...a))
+  }
+  rmdir (...a) {
+    if (this.exists(...a)) fs.rmdirSync(this.locate(...a))
   }
 }
 

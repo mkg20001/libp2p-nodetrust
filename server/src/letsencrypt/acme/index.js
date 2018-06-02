@@ -7,7 +7,7 @@ const prom = require('promisify-es6')
 const promCl = (cl, fnc) => prom(fnc.bind(cl))
 
 const genKeyPair = prom((cb) => RSA.generateKeypair(2048, null, { pem: true, public: true, jwk: true }, cb))
-const promiseFnc = ['getOrGenKey', 'genKey', 'registerAccount', 'obtainCertificate', 'getCertificate']
+const promiseFnc = ['init', 'getOrGenKey', 'genKey', 'registerAccount', 'obtainCertificate', 'getCertificate'] // TODO: find a better way to do this
 
 const debug = require('debug')
 const log = debug('nodetrust:letsencrypt:acme')
@@ -104,7 +104,7 @@ class LetsencryptACME {
     this.getOrGenKey('@' + nodeID)
       .then(domainKeypair => {
         let cert = this.storage.readJSON(...certID)
-        if (!cert) return this.obtainCertificate(certID, domainKeypair, domains)
+        if (!cert || Date.now() > (cert.validity - 60 * 60 * 1000)) return this.obtainCertificate(certID, domainKeypair, domains)
         else return Promise.resolve(cert)
       }, cb)
   }
