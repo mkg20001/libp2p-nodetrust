@@ -69,4 +69,14 @@ Id.create({bits: 512}, (e, id) => {
     nodes[id] = true
     console.log('%s%s%s', id.blue.bold, ': '.white.bold, pi.multiaddrs.toArray().map(s => s.toString().yellow).join(', '.grey.bold))
   })
+
+  swarm.on('peer:disconnect', pi => {
+    if (pi.id.toB58String() === nodetrust.node.id.toB58String()) {
+      const reconnect = () => swarm.dial(nodetrust.node, (err) => {
+        console.log('Reconnect: %s', err || 'OK')
+        if (err) setTimeout(reconnect, 1000)
+      })
+      reconnect()
+    }
+  })
 })
