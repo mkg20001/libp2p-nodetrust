@@ -22,9 +22,11 @@ class Letsencrypt {
     }
     this.acme = new ACME(acmeConf)
   }
+
   init (cb) {
     this.acme.init(cb)
   }
+
   handleRequest (id, zone, domains, cb) {
     idPrefix(id, zone)
       .then(prefix => {

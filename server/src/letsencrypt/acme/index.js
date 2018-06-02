@@ -29,6 +29,19 @@ class LetsencryptACME {
     this.acme._dig = ACME_DIG
     promiseFnc.forEach(name => (this[name] = promCl(this, this[name])))
   }
+
+  getOrGenKey (keyid, cb) {
+    if (this.storage.exists('key', keyid)) return cb(null, this.storage.readJSON('key', keyid))
+    return this.genKey(keyid, cb)
+  }
+  genKey (keyid, cb) {
+    genKeyPair((err, pair) => {
+      if (err) return cb(err)
+      this.storage.writeJSON('key', keyid, pair)
+      cb(null, pair)
+    })
+  }
+
   init (cb) {
     this.acme.init(this.opt.serverUrl)
       .then(() => this.registerAccount(this.opt.email), cb)
@@ -38,17 +51,7 @@ class LetsencryptACME {
         cb()
       }, cb)
   }
-  getOrGenKey (keyid, cb) {
-    if (this.storage.exists('key', keyid)) return cb(null, this.storage.readJSON('key', keyid))
-    return this.genKey(keyid, cb)
-  }
-  genKey (keyid, cb) {
-    genKeyPair((err, pair) => {
-      if (err) return cb(err)
-      this.storage.storeJSON('key', keyid, pair)
-      cb(null, pair)
-    })
-  }
+
   registerAccount (email, cb) {
     this.getOrGenKey('ac-key', (err, accountKeypair) => {
       if (err) return cb(err)
@@ -60,13 +63,13 @@ class LetsencryptACME {
         accountKeypair: accountKeypair,
         agreeToTerms: tosUrl => Promise.resolve(tosUrl)
       }).then(account => {
-        this.storage.storeJSON('ac-data', account)
+        this.storage.writeJSON('ac-data', account)
         cb(null, {account, accountKeypair})
       }, cb)
     })
   }
 
-  obtainCertificate (id, domainKeypair, domains, cb) {
+  obtainCertificate (id, domainKeypair, domains, cb) { // TODO: save authorizations to save time // TODO: fix race conditions
     const {accountKeypair} = this
     log('obtain certificate %s', domains.join(', '))
     this.acme.certificates.create({
@@ -90,7 +93,7 @@ class LetsencryptACME {
         ca,
         validity: certForge.validity.notAfter.getTime()
       }
-      this.storage.storeJSON(...id, res)
+      this.storage.writeJSON(...id, res)
       cb(null, res)
     }, cb)
   }
@@ -105,7 +108,6 @@ class LetsencryptACME {
         else return Promise.resolve(cert)
       }, cb)
   }
-
 }
 
 module.exports = LetsencryptACME

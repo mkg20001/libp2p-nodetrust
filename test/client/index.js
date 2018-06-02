@@ -10,7 +10,9 @@ describe('client', () => {
   let clientSwarm
   let client
 
-  before((done) => {
+  before(function (done) {
+    this.timeout(30 * 1000)
+
     parallel([
       cb => {
         server = Utils.createServer(Utils.serverConfig({}), cb)
