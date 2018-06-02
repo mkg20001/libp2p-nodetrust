@@ -1,5 +1,7 @@
 'use strict'
 
+localStorage.debug = 'libp2p*'
+
 if (window.location.host === 'libp2p-nodetrust.tk' || window.location.host.endsWith('github.io')) {
   console.info('Raven error reporting enabled!')
   Raven.config('https://6378f3d56e7a41faae3058d3b9dfefef@sentry.zion.host/10').install()
@@ -7,7 +9,6 @@ if (window.location.host === 'libp2p-nodetrust.tk' || window.location.host.endsW
 
 let running = false
 
-require('debug').save('libp2p*')
 window.debug = require('debug')
 const pull = require('pull-stream')
 
@@ -23,7 +24,6 @@ const WS = require('libp2p-websockets')
 const Peer = require('peer-info')
 const Id = require('peer-id')
 const NodeTrust = require('../src/browser')
-const disable = bt => bt.css('transition', '.5s').attr('disabled', true)
 
 const SPDY = require('libp2p-spdy')
 const MPLEX = require('libp2p-mplex')
@@ -123,8 +123,26 @@ $(document).ready(() => (function () {
     }
     console.info('%c[swarm]%c Ready to launch', 'font-weight: bold', 'color: inherit')
 
-    const nodetrust = new NodeTrust({ node: ntPeer })
+    const nodetrust = window.nodetrust = new NodeTrust({ node: ntPeer })
     const {discovery} = nodetrust
+
+    function connectToServer() {
+      if (!swarm.switch.muxedConns[nodetrust.node.id.toB58String()]) {
+        $('#connection-state').text('Connection to Server: Establishing...')
+        console.info('%c[swarm]%c Connecting to server...', 'font-weight: bold', 'color: inherit')
+        nodetrust.start(err => {
+          if (err) {
+            $('#connection-state').text('Connection to Server: Failed!')
+            console.info('%c[swarm]%c Connection to server failed: %s', 'font-weight: bold', 'color: inherit', err)
+            Raven.captureException(err)
+            throw err
+          } else {
+            $('#connection-state').text('Connection to Server: Established!')
+            console.info('%c[swarm]%c Connection to server succeeded', 'font-weight: bold', 'color: inherit')
+          }
+        })
+      }
+    }
 
     const peer = new Peer(id)
 
@@ -156,41 +174,31 @@ $(document).ready(() => (function () {
           Raven.captureException(err)
           throw err
         }
-        nodetrust.start(err => {
-          if (err) {
-            $('#swarm-state').text('Node: Error')
-            Raven.captureException(err)
-            throw err
-          } else {
-            $('#swarm-state').text('Node: Online')
-            $('#discovery').one('click', () => {
-              disable($('#discovery'))
-              discovery.start()
-            })
-            $('#dial').click(() => {
-              nodetrust.start(err => { // re-dials the server
-                if (err) {
-                  Raven.captureException(err)
-                  throw err
-                }
-              })
-            })
-            $('#controls').fadeIn('fast')
-            console.info('%c[swarm]%c Online', 'font-weight: bold', 'color: inherit')
-          }
-        })
+        $('#swarm-state').text('Node: Online')
+        $('#connection-state').click(connectToServer)
+        discovery.start()
+        connectToServer()
+        setInterval(() => connectToServer(), 10 * 1000)
+        $('#connection-state').fadeIn('fast')
+        console.info('%c[swarm]%c Online', 'font-weight: bold', 'color: inherit')
       })
+    })
+
+    swarm.on('peer:disconnect', pi => {
+      if (pi.id.toB58String() === nodetrust.node.id.toB58String()) {
+        console.info('%c[swarm]%c Connection to server lost', 'font-weight: bold', 'color: inherit')
+        connectToServer()
+      }
     })
 
     const pi2html = (pi, i) => $('<div id="' + i + pi.id.toB58String() + '" class="peer ipfs-style">Id: <tt>' + pi.id.toB58String() + '</tt><br>Multiaddr(s): ' + pi.multiaddrs.toArray().map(a => a.toString()).map(a => '<tt>' + a + '</tt>').join(' ') + '</div>')
 
     // Discovery
 
-    let nodes = {}
     discovery.on('peer', pi => {
       const id = pi.id.toB58String()
-      if (nodes[id]) return
-      nodes[id] = true
+      if (swarm.switch.muxedConns[id]) return
+      $('#p' + pi.id.toB58String()).remove()
       $('#peers').append(pi2html(pi, 'p'))
       swarm.dialProtocol(pi, '/messages/1.0.0', (err, conn) => {
         if (err) return console.error(err)
