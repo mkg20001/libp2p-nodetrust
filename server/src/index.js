@@ -99,6 +99,7 @@ module.exports = class Nodetrust {
 
   start (cb) {
     waterfall([
+      cb => this.le.init(err => cb(err)),
       cb => this.swarm.start(err => cb(err)),
       cb => this.swarm.pubsub.subscribe(DISCOVERY, () => {}, cb), // act as a relay for nodetrust announces
       cb => this.dns.start(err => cb(err))

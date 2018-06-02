@@ -23,9 +23,8 @@
   "author": "Maciej Krüger <mkg20001@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "acme-v2": "^1.0.8",
     "debug": "^3.1.0",
-    "greenlock": "~2.2.19",
-    "le-store-certbot": "github:mkg20001/le-store-certbot",
     "libp2p": "^0.20.4",
     "libp2p-mplex": "^0.7.0",
     "libp2p-secio": "^0.10.0",
@@ -35,6 +34,8 @@
     "mafmt": "^6.0.0",
     "multihashing-async": "^0.5.1",
     "named": "github:mkg20001/node-named",
+    "node-forge": "^0.7.5",
+    "promisify-es6": "^1.0.3",
     "protons": "^1.0.1",
     "pull-protocol-buffers": "^0.1.2",
     "raven": "^2.6.2"
