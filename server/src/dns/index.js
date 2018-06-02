@@ -7,6 +7,7 @@ const log = debug('nodetrust:dns')
 
 const ip4re = /^(\d{1,3}\.){3,3}\d{1,3}$/
 const ip6re = /^(::)?(((\d{1,3}\.){3}(\d{1,3}){1})?([0-9a-f]){0,4}:{0,2}){1,8}(::)?$/i
+const slowPromise = () => new Promise(resolve => setTimeout(resolve, 200)) // slow down local dns updates a bit so less race-conditions appear
 
 function decodeAddr (addr) {
   let ip
@@ -67,11 +68,11 @@ module.exports = class DNSServer {
   }
   addRecords (domain, records) {
     this._db[domain] = records
-    return Promise.resolve()
+    return slowPromise()
   }
   deleteRecords (domain) {
     delete this._db[domain]
-    return Promise.resolve()
+    return slowPromise()
   }
 }
 
