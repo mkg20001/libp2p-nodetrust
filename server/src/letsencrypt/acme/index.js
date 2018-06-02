@@ -2,6 +2,7 @@
 
 const ACME = require('acme-v2')
 const ACME_DIG = require('./dig')
+const Queue = require('./queue')
 const RSA = require('rsa-compat').RSA
 const prom = require('promisify-es6')
 const promCl = (cl, fnc) => prom(fnc.bind(cl))
@@ -23,6 +24,7 @@ class LetsencryptACME {
     this.storage = opt.storage
     this.challenge = opt.challenge
     this.acme = ACME.ACME.create({debug: true})
+    this.queue = new Queue()
     if (opt.validateWithDig) this.acme._dig = ACME_DIG
     promiseFnc.forEach(name => (this[name] = promCl(this, this[name])))
   }
@@ -66,7 +68,7 @@ class LetsencryptACME {
     })
   }
 
-  obtainCertificate (id, domainKeypair, domains, cb) { // TODO: save authorizations to save time // TODO: fix race conditions
+  obtainCertificateReal (id, domainKeypair, domains, cb) { // TODO: save authorizations to save time // TODO: fix race conditions
     const {accountKeypair} = this
     log('obtain certificate %s', domains.join(', '))
     this.acme.certificates.create({
@@ -92,6 +94,11 @@ class LetsencryptACME {
       this.storage.writeJSON(...id, res)
       cb(null, res)
     }, cb)
+  }
+
+  obtainCertificate (id, domainKeypair, domains, cb) {
+    let taskID = id + '@' + domains.join('!')
+    this.queue.aquireLock(taskID, domains, (cb) => this.obtainCertificateReal(id, domainKeypair, domains, cb), cb)
   }
 
   getCertificate (nodeID, domains, cb) {
