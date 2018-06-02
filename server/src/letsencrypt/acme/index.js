@@ -107,6 +107,7 @@ class LetsencryptACME {
         if (!cert || Date.now() > (cert.validity - 60 * 60 * 1000)) return this.obtainCertificate(certID, domainKeypair, domains)
         else return Promise.resolve(cert)
       }, cb)
+      .then(cert => cb(null, cert), cb)
   }
 }
 
