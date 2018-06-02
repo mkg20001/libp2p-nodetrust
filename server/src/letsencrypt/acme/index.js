@@ -23,7 +23,7 @@ class LetsencryptACME {
     this.storage = opt.storage
     this.challenge = opt.challenge
     this.acme = ACME.ACME.create({debug: true})
-    this.acme._dig = ACME_DIG
+    if (opt.validateWithDig) this.acme._dig = ACME_DIG
     promiseFnc.forEach(name => (this[name] = promCl(this, this[name])))
   }
 

@@ -21,7 +21,8 @@ class Letsencrypt {
         type: 'dns-01',
         set: (auth) => opt.dns.addRecords('_acme-challenge.' + auth.identifier.value, [['TXT', auth.dnsAuthorization]]),
         remove: (auth) => opt.dns.deleteRecords('_acme-challenge.' + auth.identifier.value)
-      }
+      },
+      validateWithDig: opt.validateWithDig || false
     }
     this.acme = new ACME(acmeConf)
     this.opt = opt
