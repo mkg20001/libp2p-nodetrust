@@ -5,7 +5,7 @@ const Pushable = require('pull-pushable')
 const pull = require('pull-stream')
 const debug = require('debug')
 const log = debug('nodetrust:protocol')
-const Raven = require('raven')
+const raven = require('raven')
 
 const {encodeAddr} = require('../dns')
 
