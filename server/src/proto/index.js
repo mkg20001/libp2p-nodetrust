@@ -5,6 +5,7 @@ const Pushable = require('pull-pushable')
 const pull = require('pull-stream')
 const debug = require('debug')
 const log = debug('nodetrust:protocol')
+const Raven = require('raven')
 
 const {encodeAddr} = require('../dns')
 
@@ -31,6 +32,7 @@ class RPC {
     const cb = (err, res) => {
       if (err) { // TODO: figure out how to detect le rate limits
         log(err)
+        raven.captureException(err)
         this.source.push({ error: ErrorType.OTHER })
       } else {
         this.source.push(Object.assign({ error: ErrorType.NONE }, res))
