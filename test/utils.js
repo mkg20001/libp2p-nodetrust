@@ -24,7 +24,7 @@ const Utils = module.exports = {
   clientPeer: () => {
     const id = global.ids[1]
     const peer = new Peer(id)
-    peer.multiaddrs.add('/ip4/127.0.0.1/tcp/7788/ipfs/' + id.toB58String())
+    peer.multiaddrs.add('/ip4/127.0.0.1/tcp/0/ipfs/' + id.toB58String())
     return peer
   },
   createServer: (config, cb) => {

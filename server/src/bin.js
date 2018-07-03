@@ -30,7 +30,7 @@ if (config.genconf) {
   if (fs.existsSync(config.config)) die('Config %s already exists! Not overwriting...', config.config)
   console.log('Creating %s...', config.config)
   Id.create((err, id) => {
-    if (err) die('Failed to create ID: %s', id)
+    if (err) { die('Failed to create ID: %s', id) }
     fs.writeFileSync(config.config, JSON.stringify({
       id: id.toJSON()
     }, null, 2))
@@ -40,7 +40,7 @@ if (config.genconf) {
 
 console.log('Launching...')
 
-if (!fs.existsSync(config.config)) die('Config file %s not found', config.config)
+if (!fs.existsSync(config.config)) { die('Config file %s not found', config.config) }
 let conf
 try {
   conf = require(path.resolve(inDocker ? '/data' : process.cwd(), config.config))
@@ -48,8 +48,8 @@ try {
   die('Error loading %s: %s', config.config, e)
 }
 
-if (!conf) die('Config format error: Not an object')
-if (!conf.id) die('Config format error: No PeerId (.id) found!')
+if (!conf) { die('Config format error: Not an object') }
+if (!conf.id) { die('Config format error: No PeerId (.id) found!') }
 
 const Raven = require('raven')
 Raven.config().install()
@@ -61,7 +61,7 @@ Id.createFromJSON(conf.id, (err, id) => {
   let server = new Server(conf)
 
   server.start(err => {
-    if (err) die('Starting server failed: %s', err)
+    if (err) { die('Starting server failed: %s', err.stack) }
     server.swarm.peerInfo.multiaddrs.toArray().map(a => a.toString()).forEach(addr => {
       console.log('Listening on %s', addr)
     })
