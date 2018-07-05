@@ -55,7 +55,7 @@ module.exports = class Nodetrust {
 
     // HACK: hack in the wss server as a transport (needs some way to change listeners at runtime)
     this.wss = this.ws.createListener({
-      cert: this.cert.cert.certificate.certificate,
+      cert: Buffer.concat([this.cert.cert.certificate.certificate, Buffer.from('\n\n'), this.cert.ca.certificate]),
       key: this.cert.cert.key.key
     }, conn => {
       this.swarm._switch.protocolMuxer('WebSockets')(conn)
