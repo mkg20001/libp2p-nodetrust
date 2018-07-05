@@ -32,18 +32,27 @@ Id.create({bits: 512}, (e, id) => {
   const {discovery} = nodetrust
 
   const swarm = new Libp2p({
-    transport: [
-      new TCP()
-    ],
-    connection: {
-      muxer: [
-        MPLEX,
-        SPDY
-      ],
-      crypto: [SECIO],
-      discovery: [discovery]
+    peerInfo: peer, // The Identity of your Peer
+    modules: {
+      transport: [TCP],
+      streamMuxer: [SPDY, MPLEX],
+      connEncryption: [SECIO],
+      peerDiscovery: [discovery]
+    },
+    config: { // The config object is the part of the config that can go into a file, config.json.
+      peerDiscovery: {
+        nodetrust: {
+          enabled: true
+        }
+      },
+      relay: { // Circuit Relay options
+        enabled: true,
+        hop: { enabled: true, active: false }
+      },
+      // Enable/Disable Experimental features
+      EXPERIMENTAL: { pubsub: true, dht: false }
     }
-  }, peer)
+  })
 
   nodetrust.__setSwarm(swarm)
 

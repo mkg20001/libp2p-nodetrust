@@ -25,8 +25,8 @@
   "dependencies": {
     "acme-v2": "git+https://git.coolaj86.com/mkg20001/acme-v2.js.git",
     "debug": "^3.1.0",
-    "libp2p": "~0.20.4",
-    "libp2p-mplex": "~0.7.0",
+    "libp2p": "~0.22.0",
+    "libp2p-mplex": "~0.8.0",
     "libp2p-secio": "~0.10.0",
     "libp2p-spdy": "~0.12.1",
     "libp2p-tcp": "~0.12.0",

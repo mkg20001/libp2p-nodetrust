@@ -1,9 +1,13 @@
 'use strict'
 
+/* global Raven */
+/* eslint-env browser */
+/* eslint-disable no-console */
+
 localStorage.debug = 'libp2p*'
 
 if (window.location.host === 'libp2p-nodetrust.tk' || window.location.host.endsWith('github.io')) {
-  console.info('Raven error reporting enabled!')
+  console.log('Raven error reporting enabled!')
   Raven.config('https://6378f3d56e7a41faae3058d3b9dfefef@sentry.zion.host/10').install()
 }
 
@@ -13,7 +17,7 @@ window.debug = require('debug')
 const pull = require('pull-stream')
 
 window.onerror = function (messageOrEvent, source, lineno, colno, error) {
-  console.error('%c' + (messageOrEvent == 'Script Error.' ? messageOrEvent : error.stack), 'color: red')
+  console.error('%c' + (messageOrEvent === 'Script Error.' ? messageOrEvent : error.stack), 'color: red')
 }
 
 const $ = window.$ = require('jquery')
@@ -33,12 +37,12 @@ const COLSTART = 'ȵ'
 const COLEND = 'ȶ'
 const COLRESET = 'ȷ'
 const MAX_KEEP = 500
-let c_hist = []
+let cHist = []
 
 let ntPeer
 
 if (window.location.host === 'localhost:3000') { // ifdev
-  console.info('Using dev!')
+  console.log('Using dev!')
   ntPeer = new Peer(Id.createFromB58String('QmNnMDsFRCaKHd8Tybhui1eVuN7xKMMqRZobAEtgKBJU5t'))
   ntPeer.multiaddrs.add('/ip4/127.0.0.1/tcp/8877/ws/ipfs/QmNnMDsFRCaKHd8Tybhui1eVuN7xKMMqRZobAEtgKBJU5t')
 }
@@ -47,10 +51,10 @@ function consoleParse (t) {
   let rr = t.slice(1)
   const n = t[0].replace(/%[a-z]/g, function (str) {
     const r = rr.shift()
-    if (typeof r == null) {
+    if (r == null) {
       return r
     }
-    if (str.toLowerCase() == '%c') {
+    if (str.toLowerCase() === '%c') {
       return COLSTART + r + COLEND
     }
     return r
@@ -59,7 +63,7 @@ function consoleParse (t) {
 }
 
 function cssProcess (rules) {
-  return rules.split(';').map(r => r.split(':').map(r => r.trim())).filter(v => v.length == 2)
+  return rules.split(';').map(r => r.split(':').map(r => r.trim())).filter(v => v.length === 2)
 }
 
 $(document).ready(() => (function () {
@@ -83,25 +87,25 @@ $(document).ready(() => (function () {
       t.split('').forEach(c => {
         lc = cc
         cc = c
-        if (c == COLSTART) {
+        if (c === COLSTART) {
           return (iscol = true)
-        } else if (c == COLEND) {
+        } else if (c === COLEND) {
           return (iscol = false)
-        } else if (c == COLRESET && lc != COLEND) {
+        } else if (c === COLRESET && lc !== COLEND) {
           return (css = '')
         }
-        if (iscol) return css += c
+        if (iscol) return (css += c)
         const e = $('<span></span>')
-        if (c != ' ') p = true
+        if (c !== ' ') p = true
         if (!p) e.css('margin-left', '9px')
-        cssProcess(css).forEach(r => e.css(r[0], r[1]))
-        if (c == ' ') p = false
+        cssProcess(css).forEach(r => e.css(r[0], r[1])) // eslint-disable-line
+        if (c === ' ') p = false
         e.text(c)
         d.append(e)
       })
-      c_hist.push(d)
+      cHist.push(d)
       $('#logfield').append(d)
-      while (c_hist.length >= MAX_KEEP) [c_hist.shift()].forEach(r => $(r).remove())
+      while (cHist.length >= MAX_KEEP) [cHist.shift()].forEach(r => $(r).remove())
     })
   }
 
@@ -113,7 +117,7 @@ $(document).ready(() => (function () {
     }
   })
 
-  console.info('%c[swarm]%c Preparing to launch...', 'font-weight: bold', 'color: inherit')
+  console.log('%c[swarm]%c Preparing to launch...', 'font-weight: bold', 'color: inherit')
   $('#swarm-state').text('Preparing...')
 
   Id.create((err, id) => {
@@ -121,24 +125,24 @@ $(document).ready(() => (function () {
       Raven.captureException(err)
       throw err
     }
-    console.info('%c[swarm]%c Ready to launch', 'font-weight: bold', 'color: inherit')
+    console.log('%c[swarm]%c Ready to launch', 'font-weight: bold', 'color: inherit')
 
     const nodetrust = window.nodetrust = new NodeTrust({ node: ntPeer })
     const {discovery} = nodetrust
 
-    function connectToServer() {
-      if (!swarm.switch.muxedConns[nodetrust.node.id.toB58String()]) {
+    function connectToServer () {
+      if (!swarm._switch.muxedConns[nodetrust.node.id.toB58String()]) {
         $('#connection-state').text('Connection to Server: Establishing...')
-        console.info('%c[swarm]%c Connecting to server...', 'font-weight: bold', 'color: inherit')
+        console.log('%c[swarm]%c Connecting to server...', 'font-weight: bold', 'color: inherit')
         nodetrust.start(err => {
           if (err) {
             $('#connection-state').text('Connection to Server: Failed!')
-            console.info('%c[swarm]%c Connection to server failed: %s', 'font-weight: bold', 'color: inherit', err)
+            console.log('%c[swarm]%c Connection to server failed: %s', 'font-weight: bold', 'color: inherit', err)
             Raven.captureException(err)
             throw err
           } else {
             $('#connection-state').text('Connection to Server: Established!')
-            console.info('%c[swarm]%c Connection to server succeeded', 'font-weight: bold', 'color: inherit')
+            console.log('%c[swarm]%c Connection to server succeeded', 'font-weight: bold', 'color: inherit')
           }
         })
       }
@@ -147,18 +151,27 @@ $(document).ready(() => (function () {
     const peer = new Peer(id)
 
     const swarm = new Libp2p({
-      transport: [
-        new WS()
-      ],
-      connection: {
-        muxer: [
-          MPLEX,
-          SPDY
-        ],
-        crypto: [SECIO],
-        discovery: [discovery]
+      peerInfo: peer, // The Identity of your Peer
+      modules: {
+        transport: [WS],
+        streamMuxer: [SPDY, MPLEX],
+        connEncryption: [SECIO],
+        peerDiscovery: [discovery]
+      },
+      config: { // The config object is the part of the config that can go into a file, config.json.
+        peerDiscovery: {
+          nodetrust: {
+            enabled: true
+          }
+        },
+        relay: { // Circuit Relay options
+          enabled: true,
+          hop: { enabled: true, active: false }
+        },
+        // Enable/Disable Experimental features
+        EXPERIMENTAL: { pubsub: true, dht: false }
       }
-    }, peer)
+    })
 
     nodetrust.__setSwarm(swarm)
 
@@ -178,15 +191,15 @@ $(document).ready(() => (function () {
         $('#connection-state').click(connectToServer)
         discovery.start()
         connectToServer()
-        setInterval(() => connectToServer(), 10 * 1000)
+        setInterval(() => connectToServer(), 10 * 1000) // eslint-disable-line
         $('#connection-state').fadeIn('fast')
-        console.info('%c[swarm]%c Online', 'font-weight: bold', 'color: inherit')
+        console.log('%c[swarm]%c Online', 'font-weight: bold', 'color: inherit')
       })
     })
 
     swarm.on('peer:disconnect', pi => {
       if (pi.id.toB58String() === nodetrust.node.id.toB58String()) {
-        console.info('%c[swarm]%c Connection to server lost', 'font-weight: bold', 'color: inherit')
+        console.log('%c[swarm]%c Connection to server lost', 'font-weight: bold', 'color: inherit')
         connectToServer()
       }
     })
@@ -197,7 +210,7 @@ $(document).ready(() => (function () {
 
     discovery.on('peer', pi => {
       const id = pi.id.toB58String()
-      if (swarm.switch.muxedConns[id]) return
+      if (swarm._switch.muxedConns[id]) return
       $('#p' + pi.id.toB58String()).remove()
       $('#peers').append(pi2html(pi, 'p'))
       swarm.dialProtocol(pi, '/messages/1.0.0', (err, conn) => {

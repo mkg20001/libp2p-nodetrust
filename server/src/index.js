@@ -51,24 +51,20 @@ module.exports = class Nodetrust {
     log('creating server', configSafe)
 
     this.swarm = new Libp2p({
-      transport: [
-        new TCP(),
-        new WS()
-      ],
-      connection: {
-        muxer: [
-          MPLEX,
-          SPDY
-        ],
-        crypto: [SECIO]
-      }
-    }, peer, null, {
-      relay: {
-        enabled: true,
-        hop: {
+      peerInfo: peer, // The Identity of your Peer
+      modules: {
+        transport: [TCP, WS],
+        streamMuxer: [SPDY, MPLEX],
+        connEncryption: [SECIO]
+      },
+      config: { // The config object is the part of the config that can go into a file, config.json.
+        peerDiscovery: {},
+        relay: { // Circuit Relay options
           enabled: true,
-          active: false // passive relay
-        }
+          hop: { enabled: true, active: false }
+        },
+        // Enable/Disable Experimental features
+        EXPERIMENTAL: { pubsub: true, dht: false }
       }
     })
 

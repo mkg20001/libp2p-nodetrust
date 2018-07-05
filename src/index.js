@@ -9,8 +9,7 @@ const debug = require('debug')
 const log = debug('libp2p:nodetrust')
 const noop = err => err ? log(err) : false
 
-const nat = require('nat-puncher')
-const protocolMuxer = require('libp2p-switch/src/protocol-muxer')
+const nat = require('nat-puncher') // TODO: use libp2p nat-flow once ready
 
 const Discovery = require('./discovery')
 const {defaultNode} = require('./defaults')
@@ -50,18 +49,16 @@ module.exports = class Nodetrust {
 
     log('starting wss server')
 
-    if (!this.swarm.switch.transports.WebSockets) this.swarm.switch.transports.WebSockets = this.ws // HACK: hack in the wss transport for dialing. (needs some way to add transports at runtime)
+    if (!this.swarm._modules.transport.filter(t => WS.isWebSockets(t) || t.isWebSockets).length) {
+      this.swarm._switch.transport.add('WebSockets', new WS())
+    }
 
     // HACK: hack in the wss server as a transport (needs some way to change listeners at runtime)
     this.wss = this.ws.createListener({
       cert: this.cert.cert.certificate.certificate,
       key: this.cert.cert.key.key
     }, conn => {
-      if (this.swarm.switch.protocolMuxer) { // this hack is compatible with 2 versions of libp2p-switch. hacks nowadays seem to evolve ;)
-        this.swarm.switch.protocolMuxer('WebSockets')(conn)
-      } else {
-        protocolMuxer(this.swarm.switch.protocols, conn)
-      }
+      this.swarm._switch.protocolMuxer('WebSockets')(conn)
     })
 
     this.wss.listen(multiaddr('/ip4/0.0.0.0/tcp/' + (process.env.NODETRUST_FIXED_PORT || 0)), err => {

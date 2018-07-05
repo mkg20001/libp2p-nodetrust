@@ -14,10 +14,20 @@ const EE = require('events').EventEmitter
 const noop = () => {}
 
 module.exports = class Discovery extends EE {
+  constructor () {
+    super()
+    this.tag = 'nodetrust'
+  }
+
   start (cb) {
     log('starting')
     cb = once(cb || noop)
-    this.pubsub.subscribe(CHANNEL, this._handle.bind(this), cb)
+    cb()
+
+    setTimeout(() => { // HACK: pubsub not started yet, need to do this async. more chicken&egg
+      cb = noop
+      this.pubsub.subscribe(CHANNEL, this._handle.bind(this), cb)
+    }, 1000)
   }
 
   stop (cb) {

@@ -18,7 +18,9 @@ module.exports = class Nodetrust {
   __setSwarm (swarm) {
     this.discovery.__setSwarm(swarm)
     this.swarm = swarm
-    if (!this.swarm.switch.transports.WebSockets && !this.swarm.modules.transport.filter(transport => transport.constructor && transport.constructor.name === 'WebSockets')[0]) this.swarm.switch.transports.WebSockets = new WS() // HACK: hack in the wss transport for dialing. (needs some way to add transports at runtime)
+    if (!swarm._modules.transport.filter(t => WS.isWebSockets(t) || t.isWebSockets).length) {
+      swarm._switch.transport.add('WebSockets', new WS())
+    }
   }
 
   start (cb) {

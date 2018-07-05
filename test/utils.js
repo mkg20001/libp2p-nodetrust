@@ -66,18 +66,22 @@ const Utils = module.exports = {
   },
   createClientSwarm: () => {
     return new Libp2p({
-      transport: [
-        new TCP(),
-        new WS()
-      ],
-      connection: {
-        muxer: [
-          MPLEX,
-          SPDY
-        ],
-        crypto: [SECIO]
+      peerInfo: Utils.clientPeer(), // The Identity of your Peer
+      modules: {
+        transport: [TCP, WS],
+        streamMuxer: [SPDY, MPLEX],
+        connEncryption: [SECIO]
+      },
+      config: { // The config object is the part of the config that can go into a file, config.json.
+        peerDiscovery: {},
+        relay: { // Circuit Relay options
+          enabled: true,
+          hop: { enabled: true, active: false }
+        },
+        // Enable/Disable Experimental features
+        EXPERIMENTAL: { pubsub: true, dht: false }
       }
-    }, Utils.clientPeer())
+    })
   },
   createClient: (config, cb) => {
     if (!config.node) config.node = Utils.serverPeer()
