@@ -1,9 +1,7 @@
 #!/bin/bash
 
-npm run dist
+set -e
+
 rm -rf dist
-mkdir dist
-mv bundle.min.js{,.map} dist
-cp {index.html,page.css} dist
-sed "s|bundle.js|bundle.min.js|g" -i dist/index.html
+npm run build
 ipfs add -r dist

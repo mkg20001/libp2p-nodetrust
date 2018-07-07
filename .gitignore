@@ -25,6 +25,7 @@ zeronet-win*
 *.log
 tmp
 /data
+.cache
 config.json
 *.pem
 *.crt

@@ -1,10 +1,11 @@
 'use strict'
 
-/* global Raven */
 /* eslint-env browser */
 /* eslint-disable no-console */
 
 localStorage.debug = 'libp2p*'
+
+const Raven = require('raven')
 
 if (window.location.host === 'libp2p-nodetrust.tk' || window.location.host.endsWith('github.io')) {
   console.log('Raven error reporting enabled!')
