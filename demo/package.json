@@ -23,6 +23,6 @@
     "moment": "^2.22.2",
     "parcel-bundler": "^1.9.4",
     "pull-stream": "^3.6.8",
-    "raven": "^2.6.3"
+    "raven-js": "^3.26.3"
   }
 }

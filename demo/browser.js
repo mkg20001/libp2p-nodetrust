@@ -5,9 +5,7 @@
 
 localStorage.debug = 'libp2p*'
 
-global.process = process
-
-const Raven = require('raven')
+const Raven = require('raven-js')
 
 if (window.location.host === 'libp2p-nodetrust.tk' || window.location.host.endsWith('github.io')) {
   console.log('Raven error reporting enabled!')
