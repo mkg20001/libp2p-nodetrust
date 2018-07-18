@@ -37,6 +37,12 @@ message ProofWrapper {
   required bytes signature = 2;
 }
 
+message ProofServer {
+  required bytes id = 1;
+  repeated bytes addrs = 2;
+  required string display = 3;
+}
+
 // /p2p/nodetrust/proof/1.0.0
 
 message ProofResponse {
@@ -45,6 +51,11 @@ message ProofResponse {
 }
 
 // /p2p/nodetrust/issue/1.0.0
+
+message IssueInfo {
+  required string domain = 1;
+  repeated ProofServer proofs = 2;
+}
 
 message IssueRequest {
   repeated ProofWrapper proofs = 1;

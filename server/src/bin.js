@@ -50,7 +50,7 @@ const createCommand = (serviceName) => {
         const server = new Server(Service, serviceName, config)
         server.start().then(() => {
           server.swarm.peerInfo.multiaddrs.toArray().map(a => a.toString()).forEach(addr => {
-            server.log.info({addr}, 'Listening on %s', addr)
+            server.swarm.log.info({type: 'listen', addr}, 'Listening on %s', addr)
           })
         }, (err) => die('Starting server failed: %s', err.stack))
       })
@@ -71,7 +71,7 @@ require('yargs') // eslint-disable-line no-unused-expressions
   })
   .command(createCommand('dns'))
 //  .command(createCommand('issue'))
-//  .command(createCommand('proof'))
+  .command(createCommand('proof'))
   .demandCommand()
   .help()
   .argv

@@ -64,7 +64,7 @@ module.exports = {
       hop: { enabled: true, active: false }
     },
     // Enable/Disable Experimental features
-    EXPERIMENTAL: { pubsub: true, dht: false }
+    EXPERIMENTAL: { pubsub: false, dht: false }
   },
   template: { // template for config creation
     swarm: {
