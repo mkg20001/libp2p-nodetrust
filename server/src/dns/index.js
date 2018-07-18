@@ -1,81 +1,83 @@
 'use strict'
 
-const named = require('named')
-const TYPE = named.Protocol.queryTypes
 const debug = require('debug')
-const log = debug('nodetrust:dns')
+const log = debug('nodetrust:server:dns')
+const pull = require('pull-stream')
+const ppb = require('pull-protocol-buffers')
+const {DNS01Request, DNS01Response} = require('../proto')
+const Named = require('./named')
 
-const ip4re = /^(\d{1,3}\.){3,3}\d{1,3}$/
-const ip6re = /^(::)?(((\d{1,3}\.){3}(\d{1,3}){1})?([0-9a-f]){0,4}:{0,2}){1,8}(::)?$/i
-const slowPromise = () => new Promise(resolve => setTimeout(resolve, 200)) // slow down local dns updates a bit so less race-conditions appear
+class DNS {
+  constructor (node, config) {
+    this.node = node
+    this.config = config
+    this.named = new Named(node.log, config)
+  }
 
-function decodeAddr (addr) {
-  let ip
-  switch (addr.substr(0, 3)) {
-    case 'ip4':
-      ip = addr.substr(3).replace(/-/g, '.')
-      if (!ip.match(ip4re)) return []
-      return [['A', ip]]
-    case 'ip6':
-      ip = addr.substr(3).replace(/-/g, ':')
-      if (!ip.match(ip6re)) return []
-      return [['AAAA', ip]]
-    default:
-      return []
-  }
-}
+  async start () {
+    this.node.handle('/p2p/nodetrust/dns-01/1.0.0', (proto, conn) => {
+      conn.getPeerInfo((err, pi) => {
+        if (err) {
+          return log(err)
+        }
 
-function encodeAddr (ip) {
-  switch (true) {
-    case Boolean(ip.match(ip4re)):
-      return 'ip4' + ip.replace(/\./g, '-')
-    case Boolean(ip.match(ip6re)):
-      return 'ip6' + ip.replace(/:/g, '-')
-    default:
-      return false
-  }
-}
+        const id = pi.id.toB58String()
 
-module.exports = class DNSServer {
-  constructor (opt) {
-    this.opt = opt || {}
-    this.port = opt.port || 53
-    this.host = opt.host || '127.0.0.1'
-    this.ttl = opt.ttl || 3600
-    this.server = named.createServer()
-    this.server.on('query', q => this._handle.bind(this)(q, this.server.send.bind(this.server)))
-    this._db = {}
-  }
-  start (cb) {
-    this.server.listen(this.port, this.host, cb)
-  }
-  stop (cb) {
-    this.server.close(cb)
-  }
-  _handle (query, send) { // TODO: legitify the dns response
-    const domain = query.name().toLowerCase() //  [78.47.119.230:15900#8530]      V8-8-8-8.iP.liBp2P-NODETrusT.tk, yep some dns clients are plain retarded
-    const res = decodeAddr(domain.split('.')[0]).concat(this._db[domain] || [])
-    const id = query._client.address + ':' + query._client.port + '#' + query.id
-    res.forEach(r => {
-      const [type, value] = r
-      if (TYPE[query._question.type] === type || TYPE[query._question.type] === 'ANY') { // only answer things we should answer
-        log('[%s]\t%s\t=>\t[%s]\t%s', id, domain, type, value)
-        query.addAnswer(domain, new named[type + 'Record'](value), type === 'TXT' ? 10 : this.ttl) // HACK: make this configurable
-      }
+        if (this.config.admins.indexOf(id) === -1) {
+          this.node.log.warn({type: 'dns.failedAuth', id}, 'Failed auth attempt!')
+          return // TODO: somehow tell the other side or at least disconnect
+        }
+
+        this.handle(conn, id)
+      })
     })
-    if (!res.length) log('[%s]\t%s\t=>\t×', id, domain)
-    send(query)
+
+    return this.named.start()
   }
-  addRecords (domain, records) {
-    this._db[domain] = records
-    return slowPromise()
+
+  async stop () {
+    this.node.unhandle('/p2p/nodetrust/dns-01/1.0.0') // TODO: close conns
+    return this.named.stop()
   }
-  deleteRecords (domain) {
-    delete this._db[domain]
-    return slowPromise()
+
+  handle (conn, id) {
+    pull(
+      conn,
+      ppb.decode(DNS01Request),
+      pull.map(request => {
+        // TODO: validate fqdn
+        let fqdn = '_acme-challenge.' + request.fqdn
+        this.named.setDNS01(fqdn, request.value)
+        return {error: 0}
+      }),
+      ppb.encode(DNS01Response),
+      conn
+    )
   }
 }
 
-module.exports.decodeAddr = decodeAddr
-
-module.exports.encodeAddr = encodeAddr
+module.exports = {
+  libp2pConfig: { // libp2p config
+    peerDiscovery: {},
+    relay: { // Circuit Relay options
+      enabled: true,
+      hop: { enabled: true, active: false }
+    },
+    // Enable/Disable Experimental features
+    EXPERIMENTAL: { pubsub: true, dht: false }
+  },
+  template: { // template for config creation
+    swarm: {
+      addrs: [
+        '/ip4/0.0.0.0/tcp/25891'
+      ]
+    },
+    dns: {
+      addr: '/ip4/0.0.0.0/udp/53',
+      admins: ['QmIssueServerId'],
+      ttl: 1000 * 60 * 60 * 10, // 10h default TTL
+      txtttl: 1000 * 60 * 2 // 2min for dns-01
+    }
+  },
+  create: (node, config) => new DNS(node, config)
+}

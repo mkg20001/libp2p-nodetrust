@@ -38,6 +38,7 @@
     "promisify-es6": "^1.0.3",
     "protons": "^1.0.1",
     "pull-protocol-buffers": "~0.1.2",
-    "raven": "^2.6.3"
+    "raven": "^2.6.3",
+    "yargs": "^12.0.1"
   }
 }

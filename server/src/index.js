@@ -2,6 +2,8 @@
 
 const debug = require('debug')
 const log = debug('nodetrust:server')
+const bunyan = require('bunyan')
+const promisify = require('promisify-es6')
 
 const Libp2p = require('libp2p')
 const TCP = require('libp2p-tcp')
@@ -12,43 +14,10 @@ const SPDY = require('libp2p-spdy')
 const MPLEX = require('libp2p-mplex')
 const SECIO = require('libp2p-secio')
 
-function stripSecrets (conf) {
-  const c = Object.assign({}, conf) // clone the object
-  for (const p in c) {
-    if (Boolean(['key', 'cert', 'priv', 'id', 'api'].filter(v => p.indexOf(v) !== -1).length) && p !== 'provider') {
-      c[p] = '[secret]'
-    } else if (typeof c[p] === 'object' && !Array.isArray(c[p])) {
-      c[p] = stripSecrets(c[p])
-    }
-  }
-  return c
-}
-
-const Proto = require('./proto')
-const LE = require('./letsencrypt')
-const DNS = require('./dns')
-const DISCOVERY = '_nodetrust_discovery_v2' // pubsub discovery channel
-
-const RemoteDNS = require('./dns/remote/client')
-const RemoteDNSService = require('./dns/remote')
-
-const {waterfall} = require('async')
-
 module.exports = class Nodetrust {
-  constructor (opt) {
-    if (!opt) throw new Error('No config!')
-    if (!opt.listen) opt.listen = ['/ip4/0.0.0.0/tcp/8899', '/ip6/::/tcp/8899', '/ip4/0.0.0.0/tcp/8877/ws']
-    const keys = ['id', 'zone', 'dns'].concat(opt.dnsOnly ? [] : ['letsencrypt'])
-    keys.forEach(k => {
-      if (!opt[k]) throw new Error('Config is missing key ' + JSON.stringify(k) + '!')
-    })
-
-    const configSafe = stripSecrets(opt)
-
-    const peer = new Peer(opt.id)
-    opt.listen.forEach(addr => peer.multiaddrs.add(addr))
-
-    log('creating server', configSafe)
+  constructor (service, serviceName, config) {
+    const peer = new Peer(config.swarm.id)
+    config.swarm.addrs.forEach(addr => peer.multiaddrs.add(addr))
 
     this.swarm = new Libp2p({
       peerInfo: peer, // The Identity of your Peer
@@ -57,57 +26,19 @@ module.exports = class Nodetrust {
         streamMuxer: [SPDY, MPLEX],
         connEncryption: [SECIO]
       },
-      config: { // The config object is the part of the config that can go into a file, config.json.
-        peerDiscovery: {},
-        relay: { // Circuit Relay options
-          enabled: true,
-          hop: { enabled: true, active: false }
-        },
-        // Enable/Disable Experimental features
-        EXPERIMENTAL: { pubsub: true, dht: false }
-      }
+      config: service.libp2pConfig
     })
-
-    this.zone = opt.zone
-    opt.dns.zone = opt.zone
-
-    let dns
-
-    if (opt.dns.standalone || opt.dnsOnly) {
-      this.dns = dns = new DNS(opt.dns)
-    } else {
-      this.dns = dns = new RemoteDNS(opt.dns, this)
-    }
-
-    dns.zone = opt.zone
-
-    if (!opt.dnsOnly) {
-      opt.letsencrypt.dns = dns
-      this.le = new LE(opt.letsencrypt)
-
-      Proto(this)
-    }
-
-    if (opt.dns.access) {
-      RemoteDNSService(this, opt.dns.access)
-    }
+    this.swarm.log = bunyan.createLogger({name: 'nodetrust.' + serviceName})
+    this.service = service.create(this.swarm, config[serviceName])
   }
-
-  start (cb) {
-    waterfall([
-      cb => this.le.start(err => cb(err)),
-      cb => this.swarm.start(err => cb(err)),
-      cb => this.swarm.pubsub.subscribe(DISCOVERY, () => {}, cb), // act as a relay for nodetrust announces
-      cb => this.dns.start(err => cb(err))
-    ], cb)
+  async start () {
+    log('starting')
+    await promisify(cb => this.swarm.start(cb))()
+    await this.service.start()
   }
-
-  stop (cb) {
-    waterfall([
-      // cb => this.swarm.pubsub.unsubscribe(DISCOVERY, () => {}, err => cb(err)),
-      cb => this.swarm.stop(err => cb(err)),
-      cb => this.dns.stop(err => cb(err)),
-      cb => this.le.stop(err => cb(err))
-    ], cb)
+  async stop () {
+    log('stopping')
+    await this.service.stop()
+    await promisify(cb => this.swarm.stop(cb))()
   }
 }
