@@ -84,8 +84,8 @@ module.exports = class DNSServer {
       query.addAnswer(domain, new named[questionType + 'Record'](value), this.ttl)
       response = 'DNS2IP'
     } else {
-      // TODO: set nxdomain, etc
-      response = 'NXDOMAIN'
+      // TODO: behave like a normal dns server
+      response = 'NONE'
     }
 
     this.log.info({domain, id, questionType, response})

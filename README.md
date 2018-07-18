@@ -27,7 +27,13 @@ Additionally the clients will relay each others floodsub messages so there is no
 
 # Development
 
+> Might be outdated
+
 ## Server
+
+The configs for development have already been created for you. In order to launch the 3 services in 1 terminal we recommend [Overmind](https://github.com/DarthSim/overmind)
+
+Go to `server/src` and run `overmind s`
 
 ### Certificate
 
