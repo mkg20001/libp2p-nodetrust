@@ -1,3 +1,32 @@
+<a name="0.1.5"></a>
+## [0.1.5](https://github.com/mkg20001/libp2p-nodetrust/compare/v0.1.4...v0.1.5) (2018-07-18)
+
+
+### Bug Fixes
+
+* demo fix ([d456b82](https://github.com/mkg20001/libp2p-nodetrust/commit/d456b82))
+* drop dash from domainBase ([937eb11](https://github.com/mkg20001/libp2p-nodetrust/commit/937eb11))
+* Fix cert cb ([714f064](https://github.com/mkg20001/libp2p-nodetrust/commit/714f064))
+* Fix server cb crash ([4c14d0a](https://github.com/mkg20001/libp2p-nodetrust/commit/4c14d0a))
+* Greenlook warnings - fix: [#18](https://github.com/mkg20001/libp2p-nodetrust/issues/18) ([db0b50d](https://github.com/mkg20001/libp2p-nodetrust/commit/db0b50d))
+* lint ([873ec1a](https://github.com/mkg20001/libp2p-nodetrust/commit/873ec1a))
+* missing cb at the end ([86384e6](https://github.com/mkg20001/libp2p-nodetrust/commit/86384e6))
+* upgrade to latest libp2p and fix bugs ([3944f59](https://github.com/mkg20001/libp2p-nodetrust/commit/3944f59))
+
+
+### Features
+
+* ACME v2 based api ([bfec0a1](https://github.com/mkg20001/libp2p-nodetrust/commit/bfec0a1))
+* Add gc ([1d4b337](https://github.com/mkg20001/libp2p-nodetrust/commit/1d4b337))
+* add queue to fix races - fix: [#20](https://github.com/mkg20001/libp2p-nodetrust/issues/20) ([c4392da](https://github.com/mkg20001/libp2p-nodetrust/commit/c4392da))
+* **demo:** Make the demo easier to use ([78b32d1](https://github.com/mkg20001/libp2p-nodetrust/commit/78b32d1))
+* capture exceptions on server ([0d7bd61](https://github.com/mkg20001/libp2p-nodetrust/commit/0d7bd61))
+* Low TTL for TXTs ([b4f09dd](https://github.com/mkg20001/libp2p-nodetrust/commit/b4f09dd))
+* option to use real dig insteaad of dns module ([38c2f41](https://github.com/mkg20001/libp2p-nodetrust/commit/38c2f41))
+* use my own improved acme-v2 fork ([f11387b](https://github.com/mkg20001/libp2p-nodetrust/commit/f11387b))
+
+
+
 <a name="0.1.4"></a>
 ## [0.1.4](https://github.com/mkg20001/libp2p-nodetrust/compare/v0.1.3...v0.1.4) (2018-05-29)
 
