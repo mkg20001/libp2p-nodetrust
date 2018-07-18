@@ -17,8 +17,10 @@ let running = false
 window.debug = require('debug')
 const pull = require('pull-stream')
 
+const sentryCatch = window.onerror
 window.onerror = function (messageOrEvent, source, lineno, colno, error) {
   console.error('%c' + (messageOrEvent === 'Script Error.' ? messageOrEvent : error.stack), 'color: red')
+  sentryCatch(...arguments)
 }
 
 const $ = window.$ = require('jquery')

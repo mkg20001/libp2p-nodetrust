@@ -1,7 +1,7 @@
 'use strict'
 
 const debug = require('debug')
-const log = debug('nodetrust:server:dns')
+const log = debug('nodetrust:server:proof')
 const pull = require('pull-stream')
 const ppb = require('pull-protocol-buffers')
 const {Proof, ProofResponse} = require('../proto')
@@ -32,7 +32,7 @@ async function generateProof (addrs, id, key) {
   return {proof, signature}
 }
 
-class DNS {
+class Proof {
   constructor (node, config) {
     this.node = node
     this.config = config
@@ -104,5 +104,5 @@ module.exports = {
       key: 'Add private proof key here'
     }
   },
-  create: (node, config) => new DNS(node, config)
+  create: (node, config) => new Proof(node, config)
 }

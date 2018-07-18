@@ -4,7 +4,7 @@ const ACME = require('./acme')
 const { URLS } = ACME
 const Storage = require('./storage')
 const debug = require('debug')
-const log = debug('nodetrust:server:dns')
+const log = debug('nodetrust:server:issue')
 const pull = require('pull-stream')
 const lp = require('pull-length-prefixed')
 const ppb = require('pull-protocol-buffers')
@@ -63,6 +63,8 @@ class Issue {
   }
 
   async start () {
+    this.gc()
+
     this.node.handle('/p2p/nodetrust/issue/info/1.0.0', (proto, conn) => pull(pull.values([this.infoPacket]), lp.encode(), conn, pull.drain()))
     this.node.handle('/p2p/nodetrust/issue/1.0.0', (proto, conn) => {
       conn.getPeerInfo((err, pi) => {
@@ -75,12 +77,14 @@ class Issue {
         this.handle(conn, id)
       })
     })
+    this.gcIntv = setInterval(() => this.gc(), this.config.gcIntv || 60 * 60 * 1000)
 
     this.proofKey = await promisify(cb => Id.createFromPubKey(this.config.proof, cb))()
   }
 
   async stop () {
-    this.node.unhandle('/p2p/nodetrust/issue/1.0.0') // TODO: close conns
+    clearInterval(this.gcIntv)
+    this.node.unhandle('/p2p/nodetrust/issue/1.0.0')
     this.node.unhandle('/p2p/nodetrust/issue/info/1.0.0')
   }
 
@@ -118,6 +122,42 @@ class Issue {
       ppb.encode(IssueResponse),
       conn
     )
+  }
+
+  gc () { // TODO: make this async
+    let log = debug('nodetrust:letsencrypt:gc')
+    log('running gc')
+
+    const store = this.storage
+    let now = Date.now()
+
+    let certStores = store.ls('.')
+      .filter(file => file.startsWith('@'))
+      .filter(certStore => {
+        let files = store.ls(certStore)
+          .filter(cert => {
+            if (now > store.readJSON(certStore, cert).validity) {
+              log('remove old cert %s from %s', cert, certStore)
+              store.rm(certStore, cert)
+            } else {
+              return true
+            }
+          })
+        if (files.length) {
+          return true
+        }
+        log('remove empty store %s', certStore)
+        store.rmdir(certStore)
+      })
+    store.ls('key')
+      .filter(file => file.startsWith('@'))
+      .filter(key => certStores.indexOf(key) === -1)
+      .forEach(key => {
+        log('remove unused key %s', key)
+        store.rm('key', key)
+      })
+
+    log('gc took %sms', Date.now() - now)
   }
 }
 
