@@ -41,6 +41,7 @@ class Storage {
 
   ls (...a) {
     if (this.exists(...a)) return fs.readdirSync(this.locate(...a))
+    else return []
   }
   rm (...a) {
     if (this.exists(...a)) fs.unlinkSync(this.locate(...a))

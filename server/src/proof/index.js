@@ -32,7 +32,7 @@ async function generateProof (addrs, id, key) {
   return {proof, signature}
 }
 
-class Proof {
+class ProofService {
   constructor (node, config) {
     this.node = node
     this.config = config
@@ -104,5 +104,5 @@ module.exports = {
       key: 'Add private proof key here'
     }
   },
-  create: (node, config) => new Proof(node, config)
+  create: (node, config) => new ProofService(node, config)
 }

@@ -46,7 +46,7 @@ class Issue {
     let storage = this.storage = new Storage(config.store)
     let dnsAddrs = config.dns.map(multiaddr)
     let dnsPi = new Peer(Id.createFromB58String(dnsAddrs[0].getPeerId()))
-    dnsAddrs.forEach(addr => dnsPi.multiaddrs.addD(addr))
+    dnsAddrs.forEach(addr => dnsPi.multiaddrs.add(addr))
     this.dns = new DNS(dnsPi, node)
     let acmeConf = {
       email: config.email,

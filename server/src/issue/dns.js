@@ -7,7 +7,7 @@ const promisify = require('promisify-es6')
 const pull = require('pull-stream')
 const ppb = require('pull-protocol-buffers')
 const Pushable = require('pull-pushable')
-const {DNS01Request, DNS01Response} = require('./proto')
+const {DNS01Request, DNS01Response} = require('../proto')
 const once = require('once')
 
 class DNS {

@@ -23,19 +23,7 @@
       {
         "display": "v4",
         "addrs": [
-          "/dnsaddr/v4.domain.tld/tcp/25892/ipfs/Qm"
-        ]
-      },
-      {
-        "display": "v6",
-        "addrs": [
-          "/dnsaddr/v6.domain.tld/tcp/25892/ipfs/Qm"
-        ]
-      },
-      {
-        "display": "fc00",
-        "addrs": [
-          "/dnsaddr/fc00.domain.tld/tcp/25892/ipfs/Qm"
+          "/ip4/127.0.0.1/tcp/25892/ipfs/QmY1esartJsy6jN73vD9YSZ8TvduhansSVL2m7gbxUbGWA"
         ]
       }
     ]
