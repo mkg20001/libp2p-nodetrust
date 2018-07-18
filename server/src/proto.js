@@ -63,11 +63,13 @@ message IssueRequest {
 
 message IssueResponse {
   required Error error = 1;
-  bytes cert = 2; // cert + ca = fullchain
-  bytes ca = 3;
-  bytes key = 4; // private key
-  string cn = 5; // this makes the client's life easier because the client does not have to somehow extract the cn & altnames itself
-  repeated string altnames = 6;
+  bytes cert = 2;
+  bytes chain = 3; // cert + ca = chain
+  bytes ca = 4;
+  bytes key = 5; // private key
+  string cn = 6; // this makes the client's life easier because the client does not have to somehow extract the cn & altnames itself
+  repeated string altnames = 7;
+  int64 validity = 8;
   // NOTE: it is assumed that cn is id0 and altnames are all ipN addrs
 }
 

@@ -57,12 +57,11 @@ class DNS {
       })
     })
 
-    this.proofKey = await promisify(cb => Id.createFromPrivKey(this.config.key, cb))
+    this.proofKey = await promisify(cb => Id.createFromPrivKey(this.config.key, cb))()
   }
 
   async stop () {
-    this.node.unhandle('/p2p/nodetrust/proof/1.0.0') // TODO: close conns
-    return this.named.stop()
+    this.node.unhandle('/p2p/nodetrust/proof/1.0.0')
   }
 
   async handle (conn, addrs, id) {
@@ -79,7 +78,8 @@ class DNS {
     pull(
       pull.values(proof),
       ppb.encode(ProofResponse),
-      conn
+      conn,
+      pull.drain()
     )
   }
 }

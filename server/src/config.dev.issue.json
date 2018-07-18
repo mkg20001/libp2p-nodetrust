@@ -1,7 +1,8 @@
 {
   "swarm": {
     "addrs": [
-      "/ip4/127.0.0.1/tcp/25893"
+      "/ip4/127.0.0.1/tcp/25893",
+      "/ip4/127.0.0.1/tcp/25894/ws"
     ],
     "id": {
       "id": "QmdhBbSG7Anhch4Ux2WhVmkLwaZUdKabZuBGsPewALbBJj",
@@ -13,6 +14,7 @@
     "domain": "nodetrust.localhost",
     "store": "./letsencrypt",
     "email": "letsencrypt@mkg20001.io",
+    "leenv": "staging",
     "dns": [
       "/ip4/127.0.0.1/tcp/25891/ipfs/QmQN9swLNCe6KPp7SrYJ2J4RvXSVuxHBja4SwyKb52tZS5"
     ],

@@ -82,13 +82,12 @@ class LetsencryptACME {
       let {cert, ca, chain, expires} = certs
       let res = {
         error: false,
-        domains,
-        cn: domains[0],
-        altnames: domains.slice(1),
-        privkey: domainKeypair.privateKeyPem,
         cert,
         chain,
         ca,
+        key: domainKeypair.privateKeyPem,
+        cn: domains[0],
+        altnames: domains.slice(1),
         validity: Date.parse(expires)
       }
       this.storage.writeJSON(...id, res)

@@ -70,7 +70,7 @@ require('yargs') // eslint-disable-line no-unused-expressions
     default: false
   })
   .command(createCommand('dns'))
-//  .command(createCommand('issue'))
+  .command(createCommand('issue'))
   .command(createCommand('proof'))
   .demandCommand()
   .help()

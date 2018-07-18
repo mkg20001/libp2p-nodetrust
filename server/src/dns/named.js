@@ -72,11 +72,14 @@ module.exports = class DNSServer {
     const id = query._client.address + ':' + query._client.port + '#' + query.id
 
     if (questionType === 'ANY') {
-      // TODO: respond with 'IN	HINFO	"ANY obsoleted" "See draft-ietf-dnsop-refuse-any"'
+      // TODO: respond with 'IN HINFO "ANY obsoleted" "See draft-ietf-dnsop-refuse-any"'
       response = 'ANY OBSOLETED'
     } else if (domain.startsWith('_acme_challenge') && (value = this.dns01[domain])) {
       query.addAnswer(domain, new named.TXTRecord(value), this.txtttl)
       response = 'ACME DNS-01'
+    } else if (questionType === 'TXT' && domain.startsWith('id0')) {
+      query.addAnswer(domain, new named.TXTRecord('id0=' + domain.split('.')[0].substr(3)), this.ttl)
+      response = 'ID0'
     } else if ((value = decodeAddr(domain.split('.')[0], questionType))) {
       query.addAnswer(domain, new named[questionType + 'Record'](value), this.ttl)
       response = 'DNS2IP'
