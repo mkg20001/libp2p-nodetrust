@@ -3,6 +3,7 @@
 # Configs, etc.
 *.pem
 config.json
+letsencrypt/
 
 # NodeJS
 node_modules

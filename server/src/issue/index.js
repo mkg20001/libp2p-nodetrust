@@ -63,6 +63,8 @@ class Issue {
   }
 
   async start () {
+    await this.acme.init()
+    this.proofKey = await promisify(cb => Id.createFromPubKey(this.config.proof, cb))()
     this.gc()
 
     this.node.handle('/p2p/nodetrust/issue/info/1.0.0', (proto, conn) => pull(pull.values([this.infoPacket]), lp.encode(), conn, pull.drain()))
@@ -78,8 +80,6 @@ class Issue {
       })
     })
     this.gcIntv = setInterval(() => this.gc(), this.config.gcIntv || 60 * 60 * 1000)
-
-    this.proofKey = await promisify(cb => Id.createFromPubKey(this.config.proof, cb))()
   }
 
   async stop () {

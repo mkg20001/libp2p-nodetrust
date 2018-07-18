@@ -39,6 +39,8 @@ class ProofService {
   }
 
   async start () {
+    this.proofKey = await promisify(cb => Id.createFromPrivKey(this.config.key, cb))()
+
     this.node.handle('/p2p/nodetrust/proof/1.0.0', (proto, conn) => {
       conn.getPeerInfo((err, pi) => {
         if (err) {
@@ -56,8 +58,6 @@ class ProofService {
         })
       })
     })
-
-    this.proofKey = await promisify(cb => Id.createFromPrivKey(this.config.key, cb))()
   }
 
   async stop () {
