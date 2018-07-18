@@ -88,7 +88,7 @@ module.exports = class DNSServer {
       response = 'NXDOMAIN'
     }
 
-    this.log({id, questionType, response})
+    this.log.info({domain, id, questionType, response})
     send(query)
   }
   setDNS01 (domain, value) {
