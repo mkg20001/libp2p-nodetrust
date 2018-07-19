@@ -6,8 +6,8 @@ const Peer = require('peer-info')
 const Id = require('peer-id')
 let node
 if (process.env.USE_LOCAL) {
-  node = new Peer(Id.createFromB58String('QmNnMDsFRCaKHd8Tybhui1eVuN7xKMMqRZobAEtgKBJU5t'))
-  node.multiaddrs.add('/ip4/127.0.0.1/tcp/8899/ipfs/QmNnMDsFRCaKHd8Tybhui1eVuN7xKMMqRZobAEtgKBJU5t')
+  node = new Peer(Id.createFromB58String('QmdhBbSG7Anhch4Ux2WhVmkLwaZUdKabZuBGsPewALbBJj'))
+  node.multiaddrs.add('/ip4/127.0.0.1/tcp/25893/ipfs/QmdhBbSG7Anhch4Ux2WhVmkLwaZUdKabZuBGsPewALbBJj')
 } else {
   node = require('./src/defaults').defaultNode
 }
