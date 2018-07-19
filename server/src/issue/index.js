@@ -15,9 +15,11 @@ const promisify = require('promisify-es6')
 const id0 = require('./idPrefix')
 const DNS = require('./dns')
 const Peer = require('peer-info')
+const delta = (a, b) => a > b ? a - b : b - a
 
 async function verifyProof (proof, key) {
   try {
+    if (delta(proof.proof.timestamp, Date.now()) > 5 * 60 * 1000) return false // if delta more than 5min
     return (await promisify(cb => key.pubKey.verify(Proof.encode(proof.proof), proof.signature, cb))())
   } catch (err) {
     return false
@@ -66,6 +68,7 @@ class Issue {
     await this.acme.init()
     this.proofKey = await promisify(cb => Id.createFromPubKey(this.config.proof, cb))()
     this.gc()
+    await this.dns.start()
 
     this.node.handle('/p2p/nodetrust/issue/info/1.0.0', (proto, conn) => pull(pull.values([this.infoPacket]), lp.encode(), conn, pull.drain()))
     this.node.handle('/p2p/nodetrust/issue/1.0.0', (proto, conn) => {

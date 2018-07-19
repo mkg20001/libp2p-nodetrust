@@ -38,7 +38,7 @@ module.exports = class Nodetrust {
   }
 
   async _setupServer () {
-    if (this.wss) return
+    if (this.wss) return this.wss
 
     log('starting wss server')
 

@@ -54,6 +54,7 @@ class ProofService {
             return log(err)
           }
 
+          this.node.log.info({type: 'proof.create', id: pi.id.toB58String(), addrs: addrs.map(String).join(', ')}, 'Create proof')
           this.handle(conn, addrs, id)
         })
       })
@@ -65,18 +66,19 @@ class ProofService {
   }
 
   async handle (conn, addrs, id) {
-    let proof
+    let response = {}
 
     try {
-      proof = await generateProof(addrs, id, this.proofKey)
-      proof.error = 0
+      let proof = await generateProof(addrs, id, this.proofKey)
+      response.error = 0
+      response.proof = proof
     } catch (err) {
       log(err)
-      proof.error = 9
+      response.error = 9
     }
 
     pull(
-      pull.values(proof),
+      pull.values([response]),
       ppb.encode(ProofResponse),
       conn,
       pull.drain()

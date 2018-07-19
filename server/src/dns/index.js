@@ -41,12 +41,15 @@ class DNS {
   }
 
   handle (conn, id) {
+    this.node.log.info({type: 'dns01.connect', from: id}, 'New client connected')
+
     pull(
       conn,
       ppb.decode(DNS01Request),
       pull.map(request => {
         // TODO: validate fqdn
         let fqdn = '_acme-challenge.' + request.fqdn
+        this.node.log.info({type: 'dns01.set', fqdn, from: id}, 'Add DNS-01 challenge proof')
         this.named.setDNS01(fqdn, request.value)
         return {error: 0}
       }),

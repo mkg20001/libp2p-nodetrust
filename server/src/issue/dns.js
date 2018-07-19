@@ -18,7 +18,7 @@ class DNS {
 
   async connect () {
     log('connecting')
-    const conn = await promisify(cb => this.swarm.dial(this.pi, '/p2p/nodetrust/dns/1.0.0', cb))()
+    const conn = await promisify(cb => this.swarm.dialProtocol(this.pi, '/p2p/nodetrust/dns-01/1.0.0', cb))()
 
     const source = Pushable()
 
@@ -32,11 +32,14 @@ class DNS {
       conn,
       ppb.decode(DNS01Response),
       pull.drain((res) => {
+        log('got res %o', res)
         let cb
         if (typeof (cb = cbs.shift()) === 'function') {
+          log('res has cb')
           cb(null, res)
         }
       }, () => {
+        log('disconnected')
         online = false
         cbs.forEach(cb => cb(new Error('Disconnected')))
         cbs = null
@@ -45,8 +48,11 @@ class DNS {
 
     return {
       rpc: promisify((req, cb) => {
+        log('sending rpc %o', req)
         cb = once(cb)
         setTimeout(() => cb(new Error('Timeout')), 10 * 1000)
+        cbs.push(cb)
+        source.push(req)
       }),
       online: () => online
     }
@@ -57,6 +63,10 @@ class DNS {
     if (!this.rpc || !this.rpc.online()) { this.rpc = await this.connect() }
     const resp = await this.rpc.rpc({fqdn, value})
     if (resp.error) throw new Error('DNS Error: ' + resp.error)
+  }
+
+  async start () {
+    if (!this.rpc || !this.rpc.online()) { this.rpc = await this.connect() }
   }
 }
 

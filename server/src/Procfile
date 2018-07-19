@@ -1,4 +1,0 @@
-issue: DEBUG=node*,acme*,libp2p* node ./bin.js issue ./config.dev.issue.json | bunyan -l 0
-dns: DEBUG=node*,acme*,libp2p* node ./bin.js dns ./config.dev.dns.json | bunyan -l 0
-proof: DEBUG=node*,acme*,libp2p* node ./bin.js proof ./config.dev.proof.json | bunyan -l 0
-

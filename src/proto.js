@@ -28,7 +28,7 @@ message Address {
 
 message Proof {
   required bytes id = 1; // id for which this proof has been generated
-  required int64 timestamp = 2; // time at which this proof has been generated (validity: +/- 1min)
+  required int64 timestamp = 2; // time at which this proof has been generated (validity: +/- 5min)
   repeated Address addrs = 3; // addresses that get proven
 }
 
