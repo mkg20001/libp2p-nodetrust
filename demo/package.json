@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "build": "parcel build --public-url ./ --out-dir dist --no-minify index.html",
+    "build": "parcel build --public-url ./ --out-dir dist index.html",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "parcel index.html",
     "postinstall": "sed \"s|big.js')|big.js').Big|g\" -i node_modules/libp2p-switch/src/stats/stat.js"
@@ -21,7 +21,7 @@
     "libp2p-websockets": "^0.12.0",
     "mafmt": "^6.0.0",
     "moment": "^2.22.2",
-    "parcel-bundler": "^1.9.4",
+    "parcel-bundler": "^1.9.7",
     "pull-stream": "^3.6.8",
     "raven-js": "^3.26.3"
   }
