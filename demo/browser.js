@@ -166,8 +166,8 @@ $(document).ready(() => (function () {
           }
         },
         relay: { // Circuit Relay options
-          enabled: true,
-          hop: { enabled: true, active: false }
+          enabled: false,
+          hop: { enabled: false, active: false }
         },
         // Enable/Disable Experimental features
         EXPERIMENTAL: { pubsub: true, dht: false }
