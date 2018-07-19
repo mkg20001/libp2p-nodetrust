@@ -74,7 +74,7 @@ module.exports = class DNSServer {
     if (questionType === 'ANY') {
       // TODO: respond with 'IN HINFO "ANY obsoleted" "See draft-ietf-dnsop-refuse-any"'
       response = 'ANY OBSOLETED'
-    } else if (domain.startsWith('_acme_challenge') && (value = this.dns01[domain])) {
+    } else if (questionType === 'TXT' && (value = this.dns01[domain])) {
       query.addAnswer(domain, new named.TXTRecord(value), this.txtttl)
       response = 'ACME DNS-01'
     } else if (questionType === 'TXT' && domain.startsWith('id0')) {
