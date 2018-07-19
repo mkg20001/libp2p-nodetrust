@@ -5,13 +5,14 @@ const Peer = require('peer-info')
 
 let defaultNode
 
-defaultNode = new Peer(Id.createFromB58String('QmQvFUNc1pKcUAoekE1XxS5TsMSDB9dw5CYkRxRiDGfFsX'))
+defaultNode = new Peer(Id.createFromB58String('QmP44NJN9MyhZCTcPXqBNroW9ekkp5PFrMQRxRhuSzd3Mz'))
 if (process.toString() === '[object process]') { // node
   /* defaultNode.multiaddrs.add('/dnsaddr/nodetrust.libp2p.io/tcp/8899/ipfs/Qm') */
-  defaultNode.multiaddrs.add('/ip4/88.99.229.51/tcp/8899/ipfs/QmQvFUNc1pKcUAoekE1XxS5TsMSDB9dw5CYkRxRiDGfFsX')
+  defaultNode.multiaddrs.add('/dnsaddr/issue.libp2p-nodetrust.tk/tcp/25893/ipfs/QmP44NJN9MyhZCTcPXqBNroW9ekkp5PFrMQRxRhuSzd3Mz')
+  defaultNode.multiaddrs.add('/ip4/136.243.32.225/tcp/25893/ipfs/QmP44NJN9MyhZCTcPXqBNroW9ekkp5PFrMQRxRhuSzd3Mz')
 } else { // browser
   /* defaultNode.multiaddrs.add('/dnsaddr/nodetrust.libp2p.io/tcp/443/wss/ipfs/Qm') */
-  defaultNode.multiaddrs.add('/dnsaddr/libp2p-nodetrust.tk/tcp/443/wss/ipfs/QmQvFUNc1pKcUAoekE1XxS5TsMSDB9dw5CYkRxRiDGfFsX')
+  defaultNode.multiaddrs.add('/dnsaddr/libp2p-nodetrust.tk/tcp/443/wss/ipfs/QmP44NJN9MyhZCTcPXqBNroW9ekkp5PFrMQRxRhuSzd3Mz')
 }
 
 module.exports = {

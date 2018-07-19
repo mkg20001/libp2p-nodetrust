@@ -27,7 +27,7 @@ module.exports = class Nodetrust {
   }
 
   async _getCert () {
-    if (this.cert && this.cert.expiresAt - Date.now() > 0) {
+    if (this.cert && this.cert.validity - Date.now() > 0) {
       log('using cached cert')
       return this.cert
     }
@@ -48,8 +48,8 @@ module.exports = class Nodetrust {
 
     // HACK: hack in the wss server as a transport (needs some way to change listeners at runtime)
     this.wss = this.ws.createListener({
-      cert: Buffer.concat([this.cert.cert.certificate.certificate, Buffer.from('\n\n'), this.cert.ca.certificate]),
-      key: this.cert.cert.key.key
+      cert: this.cert.chain,
+      key: this.cert.key
     }, conn => {
       this.swarm._switch.protocolMuxer('WebSockets')(conn)
     })
@@ -111,7 +111,7 @@ module.exports = class Nodetrust {
   }
 
   async _renew () {
-    if (this.cert.expiresAt + 1000 > Date.now()) return this.discovery._broadcast(this.swarm.peerInfo)
+    if (this.cert.validity + 1000 > Date.now()) return this.discovery._broadcast(this.swarm.peerInfo)
     log('renewing')
     await this._shutdown() // TODO: use sni callback instead of restarting wss://
     await this._setup()
