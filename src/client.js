@@ -31,6 +31,7 @@ module.exports = async (swarm, node) => {
       const proof = await promy(cb => pull(pull.values([]), conn, ppb.decode(ProofResponse), pull.collect(cb)))
       if (!proof[0]) { throw new Error('Got no proof!') }
       if (proof[0].error) { throw new Error('Proof error: ' + proof[0].error) }
+      log('aquired proof:%s for %s', server.display, proof[0].proof.proof.addrs.map(a => a.address).join(', '))
       return proof[0].proof
     } catch (err) {
       log('failed to get proof:%s %s', server.display, err.stack)
