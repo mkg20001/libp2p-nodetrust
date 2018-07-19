@@ -16,6 +16,7 @@ const id0 = require('./idPrefix')
 const DNS = require('./dns')
 const Peer = require('peer-info')
 const delta = (a, b) => a > b ? a - b : b - a
+const DISCOVERY = '_nodetrust_discovery_v2' // pubsub discovery channel
 
 async function verifyProof (proof, key) {
   try {
@@ -69,6 +70,7 @@ class Issue {
     this.proofKey = await promisify(cb => Id.createFromPubKey(this.config.proof, cb))()
     this.gc()
     await this.dns.start()
+    await promisify(cb => this.node.pubsub.subscribe(DISCOVERY, () => {}, cb))()
 
     this.node.handle('/p2p/nodetrust/issue/info/1.0.0', (proto, conn) => pull(pull.values([this.infoPacket]), lp.encode(), conn, pull.drain()))
     this.node.handle('/p2p/nodetrust/issue/1.0.0', (proto, conn) => {
