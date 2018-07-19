@@ -3,7 +3,9 @@ RUN wget -O /usr/local/bin/dumb-init https://github.com/Yelp/dumb-init/releases/
 COPY . /app
 WORKDIR /app
 RUN npm i --production
-ENTRYPOINT ["/usr/local/bin/dumb-init", "node", "src/bin.js", "/data/config.json"]
+ENTRYPOINT ["/usr/local/bin/dumb-init", "node", "src/bin.js"]
 VOLUME /data
-EXPOSE 8877
-EXPOSE 8899
+EXPOSE 25891
+EXPOSE 25892
+EXPOSE 25893
+EXPOSE 25894
