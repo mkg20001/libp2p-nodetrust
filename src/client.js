@@ -47,7 +47,7 @@ module.exports = async (swarm, node) => {
   log('aquire cert')
 
   const conn2 = await promy(cb => swarm.dialProtocol(node, '/p2p/nodetrust/issue/1.0.0', cb))
-  const cert = await promy(cb => pull(pull.values([{proofs}]), ppb.encode(IssueRequest), conn2, ppb.decode(IssueResponse), pull.collect(cb)))
+  const cert = await promy(cb => pull(pull.values([{proofs, supportedCryptos: [1]}]), ppb.encode(IssueRequest), conn2, ppb.decode(IssueResponse), pull.collect(cb)))
   if (!cert[0]) { throw new Error('Got no response!') }
   if (cert[0].error) { throw new Error('Issue error: ' + cert[0].error) }
 

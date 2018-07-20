@@ -5,10 +5,9 @@ const ACME_DIG = require('./dig')
 const Queue = require('./queue')
 const RSA = require('rsa-compat').RSA
 const prom = require('promisify-es6')
-const promCl = (cl, fnc) => prom(fnc.bind(cl))
+const promy = (fnc) => new Promise((resolve, reject) => fnc((err, res) => err ? reject(err) : resolve(res)))
 
 const genKeyPair = prom((cb) => RSA.generateKeypair(2048, null, { pem: true, public: true, jwk: true }, cb))
-const promiseFnc = ['init', 'getOrGenKey', 'genKey', 'registerAccount', 'obtainCertificate', 'getCertificate'] // TODO: find a better way to do this
 
 const debug = require('debug')
 const log = debug('nodetrust:letsencrypt:acme')
@@ -26,90 +25,79 @@ class LetsencryptACME {
     this.acme = ACME.ACME.create({debug: true})
     this.queue = new Queue()
     if (opt.validateWithDig) this.acme._dig = ACME_DIG
-    promiseFnc.forEach(name => (this[name] = promCl(this, this[name])))
   }
 
-  getOrGenKey (keyid, cb) {
-    if (this.storage.exists('key', keyid)) return cb(null, this.storage.readJSON('key', keyid))
-    return this.genKey(keyid, cb)
+  async getOrGenKey (keyid) {
+    if (this.storage.exists('key', keyid)) return this.storage.readJSON('key', keyid)
+    return this.genKey(keyid)
   }
-  genKey (keyid, cb) {
-    genKeyPair((err, pair) => {
-      if (err) return cb(err)
-      this.storage.writeJSON('key', keyid, pair)
-      cb(null, pair)
+
+  async genKey (keyid) {
+    const pair = await genKeyPair()
+    this.storage.writeJSON('key', keyid, pair)
+    return pair
+  }
+
+  async init () {
+    await this.acme.init(this.opt.serverUrl)
+    const account = await this.registerAccount(this.opt.email)
+    Object.assign(this, account)
+    this.acme._kid = account.account.key.kid
+  }
+
+  async registerAccount (email) {
+    const accountKeypair = await this.getOrGenKey('ac-key')
+    let account = this.storage.readJSON('ac-data')
+    if (account) return {account, accountKeypair}
+
+    log('creating account')
+    account = await this.acme.accounts.create({
+      email,
+      accountKeypair: accountKeypair,
+      agreeToTerms: tosUrl => Promise.resolve(tosUrl)
     })
+    this.storage.writeJSON('ac-data', account)
+    return {account, accountKeypair}
   }
 
-  init (cb) {
-    this.acme.init(this.opt.serverUrl)
-      .then(() => this.registerAccount(this.opt.email), cb)
-      .then((account) => {
-        Object.assign(this, account)
-        this.acme._kid = account.account.key.kid
-        cb()
-      }, cb)
-  }
-
-  registerAccount (email, cb) {
-    this.getOrGenKey('ac-key', (err, accountKeypair) => {
-      if (err) return cb(err)
-      let account = this.storage.readJSON('ac-data')
-      if (account) return cb(null, {account, accountKeypair})
-      log('creating account')
-      this.acme.accounts.create({
-        email,
-        accountKeypair: accountKeypair,
-        agreeToTerms: tosUrl => Promise.resolve(tosUrl)
-      }).then(account => {
-        this.storage.writeJSON('ac-data', account)
-        cb(null, {account, accountKeypair})
-      }, cb)
-    })
-  }
-
-  obtainCertificateReal (id, domainKeypair, domains, cb) { // TODO: save authorizations to save time // TODO: fix race conditions
+  async obtainCertificateReal (id, domainKeypair, domains) { // TODO: fix var overwrite race conditions in acme-v2
     const {accountKeypair} = this
     log('obtain certificate %s', domains.join(', '))
-    this.acme.certificates.create({
+    const certs = await this.acme.certificates.create({
       domainKeypair,
       accountKeypair,
       domains,
       challengeType: this.challenge.type,
       setChallenge: this.challenge.set,
       removeChallenge: this.challenge.remove
-    }).then(certs => {
-      let {cert, ca, chain, expires} = certs
-      let res = {
-        error: false,
-        cert,
-        chain,
-        ca,
-        key: domainKeypair.privateKeyPem,
-        cn: domains[0],
-        altnames: domains.slice(1),
-        validity: Date.parse(expires)
-      }
-      this.storage.writeJSON(...id, res)
-      cb(null, res)
-    }, cb)
+    })
+    let {cert, ca, chain, expires} = certs
+    let res = {
+      cert,
+      chain,
+      ca,
+      key: domainKeypair.privateKeyPem,
+      cn: domains[0],
+      altnames: domains.slice(1),
+      validity: Date.parse(expires)
+    }
+    this.storage.writeJSON(...id, res)
+    return res
   }
 
-  obtainCertificate (id, domainKeypair, domains, cb) {
+  async obtainCertificate (id, domainKeypair, domains, cb) {
     let taskID = id + '@' + domains.join('!')
-    this.queue.aquireLock(taskID, domains, (cb) => this.obtainCertificateReal(id, domainKeypair, domains, cb), cb)
+    return promy(cb => this.queue.aquireLock(taskID, domains, (cb) => this.obtainCertificateReal(id, domainKeypair, domains).then((res) => cb(res), cb), cb))
   }
 
-  getCertificate (nodeID, domains, cb) {
+  async getCertificate (nodeID, domains) {
     let certID = ['@' + nodeID, domains.join('!')]
     log('get certificate %s %s', nodeID, domains.join(', '))
-    this.getOrGenKey('@' + nodeID)
-      .then(domainKeypair => {
-        let cert = this.storage.readJSON(...certID)
-        if (!cert || Date.now() > (cert.validity - 60 * 60 * 1000)) return this.obtainCertificate(certID, domainKeypair, domains)
-        else return Promise.resolve(cert)
-      }, cb)
-      .then(cert => cb(null, cert), cb)
+    const domainKeypair = await this.getOrGenKey('@' + nodeID)
+    let cert = this.storage.readJSON(...certID)
+    if (!cert || Date.now() > (cert.validity - 60 * 60 * 1000)) return this.obtainCertificate(certID, domainKeypair, domains)
+    cert.fromCache = true
+    return cert
   }
 }
 

@@ -108,6 +108,12 @@ class Issue {
           return cb(null, {error: 2}) // one or more proofs have invalid signatures
         }
 
+        let canDoRSA = Boolean(request.supportedCryptos.filter(crypto => crypto === 1).length) // TODO: make this more dynamic once needed
+
+        if (!canDoRSA) {
+          return cb(null, {error: 4})
+        }
+
         let ip2dns = request.proofs.map(proof => proof.proof.addrs.map(addr => {
           switch (addr.type) {
             case 1: // v4
@@ -122,6 +128,7 @@ class Issue {
 
         const cert = await this.acme.getCertificate(id.toB58String(), domains)
         cert.error = 0
+        cert.cryptoType = 1 // RSA only for now
         return cb(null, cert)
       }),
       ppb.encode(IssueResponse),

@@ -7,14 +7,20 @@ module.exports = protons(`
 // errors
 
 enum Error {
-  OK               = 0;
-  E_RATE_LIMIT     = 1; // rate limit error (letsencrypt or server)
-  E_INVALID_PROOF  = 2; // proof signature error or proof expired
-  E_NOT_AUTHORIZED = 3; // used in dns-01
-  E_OTHER          = 9; // internal server error
+  OK                   = 0;
+  E_RATE_LIMIT         = 1; // rate limit error (letsencrypt or server)
+  E_INVALID_PROOF      = 2; // proof signature error or proof expired
+  E_NOT_AUTHORIZED     = 3; // used in dns-01
+  E_NO_MATCHING_CRYPTO = 4; // when server and client do not have any crypto in common
+  E_OTHER              = 9; // internal server error
 }
 
 // types
+
+enum Crypto { // crypto refers to the type of the private key
+  RSA = 1;
+  // TODO: add ECC curves here
+}
 
 enum AddressType {
   IPv4 = 1;
@@ -59,6 +65,7 @@ message IssueInfo {
 
 message IssueRequest {
   repeated ProofWrapper proofs = 1;
+  repeated Crypto supportedCryptos = 2;
 }
 
 message IssueResponse {
@@ -70,6 +77,8 @@ message IssueResponse {
   string cn = 6; // this makes the client's life easier because the client does not have to somehow extract the cn & altnames itself
   repeated string altnames = 7;
   int64 validity = 8;
+  bool fromCache = 9;
+  Crypto cryptoType = 10;
   // NOTE: it is assumed that cn is id0 and altnames are all ipN addrs
 }
 
