@@ -10,6 +10,9 @@ const promisify = require('promisify-es6')
 const ip4re = /^(\d{1,3}\.){3,3}\d{1,3}$/
 const ip6re = /^(::)?(((\d{1,3}\.){3}(\d{1,3}){1})?([0-9a-f]){0,4}:{0,2}){1,8}(::)?$/i
 
+const alphanum = require('base-x')('abcdefghijklmnopqrstuvwxyz0123456789')
+const bs58 = require('bs58')
+
 function decodeAddr (addr, type) {
   let ip
   switch (addr.substr(0, 3)) {
@@ -77,8 +80,9 @@ module.exports = class DNSServer {
     } else if (questionType === 'TXT' && (value = this.dns01[domain])) {
       query.addAnswer(domain, new named.TXTRecord(value), this.txtttl)
       response = 'ACME DNS-01'
-    } else if (questionType === 'TXT' && domain.startsWith('id0')) {
-      query.addAnswer(domain, new named.TXTRecord('id0=' + domain.split('.')[0].substr(3)), this.ttl)
+    } else if (questionType === 'TXT' && domain.startsWith('p')) {
+      let b58 = bs58.encode(alphanum.decode(domain.split('.')[0].substr(1)))
+      query.addAnswer(domain, new named.TXTRecord('id=' + b58), this.ttl)
       response = 'ID0'
     } else if ((value = decodeAddr(domain.split('.')[0], questionType))) {
       query.addAnswer(domain, new named[questionType + 'Record'](value), this.ttl)

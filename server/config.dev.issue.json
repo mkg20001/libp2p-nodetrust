@@ -11,7 +11,7 @@
     }
   },
   "issue": {
-    "domain": "libp2p-nodetrust.tk",
+    "domain": "nt.lp2p.tk",
     "store": "./letsencrypt",
     "email": "letsencrypt@mkg20001.io",
     "leenv": "staging",

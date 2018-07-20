@@ -32,7 +32,7 @@ class Issue {
     this.node = node
     this.config = config
     this.domain = config.domain
-    this.suffix = '.ip.' + this.domain
+    this.suffix = '.' + this.domain
     this.infoPacket = IssueInfo.encode({
       domain: config.domain,
       proofs: config.pser.map(serv => {
