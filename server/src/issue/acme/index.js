@@ -87,7 +87,7 @@ class LetsencryptACME {
 
   async obtainCertificate (id, domainKeypair, domains, cb) {
     let taskID = id + '@' + domains.join('!')
-    return promy(cb => this.queue.aquireLock(taskID, domains, (cb) => this.obtainCertificateReal(id, domainKeypair, domains).then((res) => cb(res), cb), cb))
+    return promy(cb => this.queue.aquireLock(taskID, domains, (cb) => this.obtainCertificateReal(id, domainKeypair, domains).then((res) => cb(null, res), cb), cb))
   }
 
   async getCertificate (nodeID, domains) {
