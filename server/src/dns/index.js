@@ -6,6 +6,8 @@ const pull = require('pull-stream')
 const ppb = require('pull-protocol-buffers')
 const {DNS01Request, DNS01Response} = require('../proto')
 const Named = require('./named')
+const promisify = require('promisify-es6')
+const DISCOVERY = '_nodetrust_discovery_v2' // pubsub discovery channel
 
 class DNS {
   constructor (node, config) {
@@ -15,6 +17,7 @@ class DNS {
   }
 
   async start () {
+    await promisify(cb => this.node.pubsub.subscribe(DISCOVERY, () => {}, cb))()
     this.node.handle('/p2p/nodetrust/dns-01/1.0.0', (proto, conn) => {
       conn.getPeerInfo((err, pi) => {
         if (err) {
@@ -67,7 +70,7 @@ module.exports = {
       hop: { enabled: true, active: false }
     },
     // Enable/Disable Experimental features
-    EXPERIMENTAL: { pubsub: false, dht: false }
+    EXPERIMENTAL: { pubsub: true, dht: false }
   },
   template: { // template for config creation
     swarm: {
