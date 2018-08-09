@@ -81,6 +81,7 @@ module.exports = {
     dns: {
       addr: '/ip4/0.0.0.0/udp/53',
       admins: ['QmIssueServerId'],
+      ns: 'this-server.domain.tld',
       ttl: 1000 * 60 * 60 * 10, // 10h default TTL
       txtttl: 1000 * 60 * 2 // 2min for dns-01
     }

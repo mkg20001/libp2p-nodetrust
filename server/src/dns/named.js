@@ -46,6 +46,7 @@ module.exports = class DNSServer {
     this.address = multiaddr(config.addr).nodeAddress()
     this.ttl = config.ttl
     this.txtttl = config.txtttl
+    this.myNS = config.ns
     this.server = named.createServer()
     this.server.on('query', q => this._handle.bind(this)(q, this.server.send.bind(this.server)))
     this.dns01 = {}
@@ -53,7 +54,7 @@ module.exports = class DNSServer {
   }
   start () {
     log('starting')
-    return promisify(this.server.listen.bind(this.server))(this.address)
+    return promisify(this.server.listen.bind(this.server))(this.address.port, this.address.address)
   }
   stop () {
     log('stopping')
@@ -87,6 +88,9 @@ module.exports = class DNSServer {
     } else if ((value = decodeAddr(domain.split('.')[0], questionType))) {
       query.addAnswer(domain, new named[questionType + 'Record'](value), this.ttl)
       response = 'DNS2IP'
+    } else if (questionType === 'NS') {
+      query.addAnswer(domain, new named.NSRecord(this.myNS))
+      response = 'NS'
     } else {
       // TODO: behave like a normal dns server
       response = 'NONE'
