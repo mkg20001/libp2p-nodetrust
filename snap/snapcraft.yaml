@@ -2,6 +2,8 @@ name: libp2p-nodetrust-server
 version: 0.0.1
 summary: Server for libp2p nodetrust
 description: Server for libp2p nodetrusts
+confinement: strict
+grade: stable
 
 apps:
   libp2p-nodetrust-server:
