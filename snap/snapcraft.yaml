@@ -1,0 +1,15 @@
+name: libp2p-nodetrust-server
+version: 0.0.1
+summary: Server for libp2p nodetrust
+description: Server for libp2p nodetrusts
+
+apps:
+  libp2p-nodetrust-server:
+    command: libp2p-nodetrust-server
+    plugs: [network, network-bind]
+
+parts:
+  server:
+    plugin: nodejs
+    node-engine: v10.9.0
+    source: server
