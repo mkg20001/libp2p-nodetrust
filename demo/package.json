@@ -17,12 +17,12 @@
     "libp2p-mplex": "^0.8.0",
     "libp2p-secio": "^0.10.0",
     "libp2p-spdy": "^0.12.1",
-    "libp2p-tcp": "^0.12.1",
+    "libp2p-tcp": "^0.13.0",
     "libp2p-websockets": "^0.12.0",
-    "mafmt": "^6.0.0",
+    "mafmt": "^6.0.2",
     "moment": "^2.22.2",
     "parcel-bundler": "^1.9.7",
     "pull-stream": "^3.6.9",
-    "raven-js": "^3.26.4"
+    "raven-js": "^3.27.0"
   }
 }

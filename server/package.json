@@ -27,22 +27,22 @@
   "license": "MIT",
   "dependencies": {
     "acme-v2": "github:mkg20001/acme-v2-fork",
-    "debug": "^3.1.0",
+    "debug": "^4.0.1",
     "libp2p": "~0.23.1",
     "libp2p-mplex": "~0.8.0",
     "libp2p-secio": "~0.10.0",
     "libp2p-spdy": "~0.12.1",
-    "libp2p-tcp": "~0.12.1",
+    "libp2p-tcp": "~0.13.0",
     "libp2p-websockets": "~0.12.0",
-    "mafmt": "^6.0.0",
+    "mafmt": "^6.0.2",
     "mkdirp": "~0.5.1",
     "multihashing-async": "~0.5.1",
     "named": "github:mkg20001/node-named",
     "promisify-es6": "^1.0.3",
     "protons": "^1.0.1",
     "pull-protocol-buffers": "~0.1.2",
-    "raven": "^2.6.3",
-    "yargs": "^12.0.1"
+    "raven": "^2.6.4",
+    "yargs": "^12.0.2"
   },
   "devDependencies": {}
 }
