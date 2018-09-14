@@ -13,5 +13,5 @@ apps:
 parts:
   server:
     plugin: nodejs
-    node-engine: 10.9.0
+    node-engine: 10.10.0
     source: server
