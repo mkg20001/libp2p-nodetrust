@@ -13,7 +13,9 @@
     "release-minor": "aegir release --type minor",
     "release-major": "aegir release --type major",
     "coverage": "aegir coverage",
-    "coverage-publish": "aegir coverage -u"
+    "coverage-publish": "aegir coverage -u",
+    "snyk-protect": "snyk protect",
+    "prepublish": "npm run snyk-protect"
   },
   "keywords": [
     "libp2p",
@@ -49,7 +51,8 @@
     "once": "^1.4.0",
     "protons": "^1.0.1",
     "pull-protocol-buffers": "~0.1.2",
-    "pull-stream": "^3.6.9"
+    "pull-stream": "^3.6.9",
+    "snyk": "^1.189.0"
   },
   "directories": {
     "test": "tests"
@@ -64,5 +67,6 @@
   "homepage": "https://github.com/mkg20001/libp2p-nodetrust#readme",
   "contributors": [
     "Maciej Krüger <mkg20001@gmail.com>"
-  ]
+  ],
+  "snyk": true
 }
