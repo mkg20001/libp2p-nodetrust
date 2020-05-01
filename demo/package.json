@@ -6,7 +6,9 @@
     "build": "parcel build --public-url ./ --out-dir dist index.html",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "parcel index.html",
-    "postinstall": "sed \"s|big.js')|big.js').Big|g\" -i node_modules/libp2p-switch/src/stats/stat.js"
+    "postinstall": "sed \"s|big.js')|big.js').Big|g\" -i node_modules/libp2p-switch/src/stats/stat.js",
+    "snyk-protect": "snyk protect",
+    "prepublish": "npm run snyk-protect"
   },
   "author": "Maciej Krüger <mkg20001@gmail.com>",
   "license": "MIT",
@@ -23,6 +25,8 @@
     "moment": "^2.22.2",
     "parcel-bundler": "^1.9.7",
     "pull-stream": "^3.6.9",
-    "raven-js": "^3.27.0"
-  }
+    "raven-js": "^3.27.0",
+    "snyk": "^1.316.1"
+  },
+  "snyk": true
 }
