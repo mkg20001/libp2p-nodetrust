@@ -45,7 +45,7 @@
     "libp2p-websockets": "~0.12.0",
     "mafmt": "^6.0.2",
     "nat-puncher": "~0.1.2",
-    "node-forge": "~0.7.6",
+    "node-forge": "~0.10.0",
     "once": "^1.4.0",
     "protons": "^1.0.1",
     "pull-protocol-buffers": "~0.1.2",
