@@ -28,7 +28,7 @@
   "dependencies": {
     "acme-v2": "github:mkg20001/acme-v2-fork",
     "debug": "^4.0.1",
-    "libp2p": "~0.23.1",
+    "libp2p": "~0.26.0",
     "libp2p-mplex": "~0.8.0",
     "libp2p-secio": "~0.10.0",
     "libp2p-spdy": "~0.12.1",
